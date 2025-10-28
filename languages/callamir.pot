@@ -1,0 +1,291 @@
+# Copyright (C) 2025 Callamir
+# This file is distributed under the same license as the Callamir Theme package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Callamir Theme 1.0.51\n"
+"Report-Msgid-Bugs-To: https://github.com/amkalhori/wordpress/issues\n"
+"POT-Creation-Date: 2025-04-15 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4\n"
+
+#: index.php
+msgid "Simplifying Tech for Seniors & Small Businesses"
+msgstr ""
+
+msgid "Reliable, friendly, and easy IT support."
+msgstr ""
+
+msgid "Get IT Support Now"
+msgstr ""
+
+msgid "I’m here to make technology easy and stress-free for seniors and small businesses."
+msgstr ""
+
+msgid "Subscribe"
+msgstr ""
+
+msgid "Our Services"
+msgstr ""
+
+msgid "Blog"
+msgstr ""
+
+msgid "Ask a Question"
+msgstr ""
+
+msgid "Contact Us"
+msgstr ""
+
+msgid "Posted on"
+msgstr ""
+
+msgid "No Comments"
+msgstr ""
+
+msgid "1 Comment"
+msgstr ""
+
+msgid "% Comments"
+msgstr ""
+
+msgid "No posts found."
+msgstr ""
+
+#: header.php
+msgid "Languages:"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Persian"
+msgstr ""
+
+msgid "Next Section"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+#: footer.php
+msgid "Subscribe to stay updated with our latest videos!"
+msgstr ""
+
+msgid "Subscribe Now"
+msgstr ""
+
+msgid "© 2025 Callamir. All rights reserved."
+msgstr ""
+
+#: functions.php
+msgid "WhatsApp"
+msgstr ""
+
+msgid "Call"
+msgstr ""
+
+msgid "Telegram"
+msgstr ""
+
+msgid "SMS"
+msgstr ""
+
+msgid "Messenger"
+msgstr ""
+
+msgid "Instagram"
+msgstr ""
+
+msgid "Snapchat"
+msgstr ""
+
+msgid "Facebook"
+msgstr ""
+
+msgid "Twitter"
+msgstr ""
+
+msgid "LinkedIn"
+msgstr ""
+
+msgid "Please subscribe to our YouTube channel first!"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Blog Post Icon"
+msgstr ""
+
+msgid "Icon Type"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Font Awesome"
+msgstr ""
+
+msgid "Icon Image"
+msgstr ""
+
+msgid "Upload Image"
+msgstr ""
+
+msgid "Recommended: 32x32px PNG/SVG"
+msgstr ""
+
+msgid "Font Awesome Icon"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Smile"
+msgstr ""
+
+msgid "Laugh"
+msgstr ""
+
+msgid "Star"
+msgstr ""
+
+msgid "Rocket"
+msgstr ""
+
+msgid "Paw"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Custom Font Awesome Class"
+msgstr ""
+
+msgid "E.g., fa-laptop"
+msgstr ""
+
+msgid "Select Icon"
+msgstr ""
+
+msgid "Use Image"
+msgstr ""
+
+msgid "Primary Menu"
+msgstr ""
+
+msgid "Language Settings"
+msgstr ""
+
+msgid "Site Language"
+msgstr ""
+
+msgid "Text Settings"
+msgstr ""
+
+msgid "Theme Colors"
+msgstr ""
+
+msgid "Body Background Color"
+msgstr ""
+
+msgid "Primary Color"
+msgstr ""
+
+msgid "Hero Background Color"
+msgstr ""
+
+msgid "Services Background Color"
+msgstr ""
+
+msgid "Contact Background Color"
+msgstr ""
+
+msgid "Community Background Color"
+msgstr ""
+
+msgid "Blog Background Color"
+msgstr ""
+
+msgid "Subscribe Background Color"
+msgstr ""
+
+msgid "Footer Background Color"
+msgstr ""
+
+msgid "Contact Settings"
+msgstr ""
+
+msgid "WhatsApp URL"
+msgstr ""
+
+msgid "Cellphone Number (e.g., +1234567890)"
+msgstr ""
+
+msgid "Telegram URL"
+msgstr ""
+
+msgid "Facebook Messenger URL"
+msgstr ""
+
+msgid "SMS Number (e.g., +1234567890)"
+msgstr ""
+
+msgid "Instagram URL"
+msgstr ""
+
+msgid "Snapchat URL"
+msgstr ""
+
+msgid "Contact Form Settings"
+msgstr ""
+
+msgid "Contact Form 7 Shortcode"
+msgstr ""
+
+msgid "E.g., [contact-form-7 id=\"123\" title=\"Contact\"]"
+msgstr ""
+
+msgid "Community Form Settings"
+msgstr ""
+
+msgid "Community Form 7 Shortcode"
+msgstr ""
+
+msgid "E.g., [contact-form-7 id=\"124\" title=\"Community\"]"
+msgstr ""
+
+msgid "Social Media Settings"
+msgstr ""
+
+msgid "Facebook URL"
+msgstr ""
+
+msgid "Twitter URL"
+msgstr ""
+
+msgid "LinkedIn URL"
+msgstr ""
+
+msgid "YouTube Settings"
+msgstr ""
+
+msgid "YouTube Channel URL"
+msgstr ""
+
+msgid "YouTube Video ID"
+msgstr ""
+
+msgid "E.g., dQw4w9WgXcQ"
+msgstr ""
+
+msgid "Services Settings"
+msgstr ""
+
+msgid "Menu Settings"
+msgstr ""

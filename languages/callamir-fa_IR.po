@@ -1,0 +1,292 @@
+# Copyright (C) 2025 Callamir
+# This file is distributed under the same license as the Callamir Theme package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Callamir Theme 1.0.51\n"
+"Report-Msgid-Bugs-To: https://github.com/amkalhori/wordpress/issues\n"
+"POT-Creation-Date: 2025-04-15 12:00+0000\n"
+"PO-Revision-Date: 2025-04-15 12:00+0000\n"
+"Last-Translator: Callamir <support@callamir.com>\n"
+"Language-Team: Persian <fa@callamir.com>\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4\n"
+
+#: index.php
+msgid "Simplifying Tech for Seniors & Small Businesses"
+msgstr "سادگی تکنولوژی برای سالمندان و کسب و کارهای کوچک"
+
+msgid "Reliable, friendly, and easy IT support."
+msgstr "پشتیبانی آی تی قابل اعتماد، دوستانه و آسان."
+
+msgid "Get IT Support Now"
+msgstr "دریافت پشتیبانی آی تی"
+
+msgid "I’m here to make technology easy and stress-free for seniors and small businesses."
+msgstr "من اینجا هستم تا تکنولوژی را برای سالمندان و کسب‌وکارهای کوچک آسان و بدون استرس کنم."
+
+msgid "Subscribe"
+msgstr "اشتراک"
+
+msgid "Our Services"
+msgstr "خدمات"
+
+msgid "Blog"
+msgstr "وبلاگ"
+
+msgid "Ask a Question"
+msgstr "سوال بپرسید"
+
+msgid "Contact Us"
+msgstr "تماس با ما"
+
+msgid "Posted on"
+msgstr "ارسال شده در"
+
+msgid "No Comments"
+msgstr "بدون نظر"
+
+msgid "1 Comment"
+msgstr "۱ نظر"
+
+msgid "% Comments"
+msgstr "% نظر"
+
+msgid "No posts found."
+msgstr "پستی یافت نشد."
+
+#: header.php
+msgid "Languages:"
+msgstr "زبان‌ها:"
+
+msgid "English"
+msgstr "انگلیسی"
+
+msgid "Persian"
+msgstr "فارسی"
+
+msgid "Next Section"
+msgstr "بخش بعدی"
+
+msgid "Home"
+msgstr "خانه"
+
+#: footer.php
+msgid "Subscribe to stay updated with our latest videos!"
+msgstr "برای به‌روز ماندن با آخرین ویدیوهای ما اشتراک کنید!"
+
+msgid "Subscribe Now"
+msgstr "اکنون اشتراک کنید"
+
+msgid "© 2025 Callamir. All rights reserved."
+msgstr "© ۱۴۰۴ کالامیر. همه حقوق محفوظ است."
+
+#: functions.php
+msgid "WhatsApp"
+msgstr "واتساپ"
+
+msgid "Call"
+msgstr "تلفن"
+
+msgid "Telegram"
+msgstr "تلگرام"
+
+msgid "SMS"
+msgstr "پیامک"
+
+msgid "Messenger"
+msgstr "مسنجر"
+
+msgid "Instagram"
+msgstr "اینستاگرام"
+
+msgid "Snapchat"
+msgstr "اسنپ‌چت"
+
+msgid "Facebook"
+msgstr "فیسبوک"
+
+msgid "Twitter"
+msgstr "توییتر"
+
+msgid "LinkedIn"
+msgstr "لینکدین"
+
+msgid "Please subscribe to our YouTube channel first!"
+msgstr "لطفاً ابتدا در کانال یوتیوب ما اشتراک کنید!"
+
+msgid "Close"
+msgstr "بستن"
+
+msgid "Blog Post Icon"
+msgstr "آیکون پست وبلاگ"
+
+msgid "Icon Type"
+msgstr "نوع آیکون"
+
+msgid "Image"
+msgstr "تصویر"
+
+msgid "Font Awesome"
+msgstr "فونت آوسام"
+
+msgid "Icon Image"
+msgstr "تصویر آیکون"
+
+msgid "Upload Image"
+msgstr "آپلود تصویر"
+
+msgid "Recommended: 32x32px PNG/SVG"
+msgstr "توصیه شده: PNG/SVG با ابعاد 32x32 پیکسل"
+
+msgid "Font Awesome Icon"
+msgstr "آیکون فونت آوسام"
+
+msgid "None"
+msgstr "هیچ‌کدام"
+
+msgid "Smile"
+msgstr "لبخند"
+
+msgid "Laugh"
+msgstr "خنده"
+
+msgid "Star"
+msgstr "ستاره"
+
+msgid "Rocket"
+msgstr "موشک"
+
+msgid "Paw"
+msgstr "پنجه"
+
+msgid "Custom"
+msgstr "سفارشی"
+
+msgid "Custom Font Awesome Class"
+msgstr "کلاس سفارشی فونت آوسام"
+
+msgid "E.g., fa-laptop"
+msgstr "مثال: fa-laptop"
+
+msgid "Select Icon"
+msgstr "انتخاب آیکون"
+
+msgid "Use Image"
+msgstr "استفاده از تصویر"
+
+msgid "Primary Menu"
+msgstr "منوی اصلی"
+
+msgid "Language Settings"
+msgstr "تنظیمات زبان"
+
+msgid "Site Language"
+msgstr "زبان سایت"
+
+msgid "Text Settings"
+msgstr "تنظیمات متن"
+
+msgid "Theme Colors"
+msgstr "رنگ‌های قالب"
+
+msgid "Body Background Color"
+msgstr "رنگ پس‌زمینه بدنه"
+
+msgid "Primary Color"
+msgstr "رنگ اصلی"
+
+msgid "Hero Background Color"
+msgstr "رنگ پس‌زمینه هیرو"
+
+msgid "Services Background Color"
+msgstr "رنگ پس‌زمینه خدمات"
+
+msgid "Contact Background Color"
+msgstr "رنگ پس‌زمینه تماس"
+
+msgid "Community Background Color"
+msgstr "رنگ پس‌زمینه جامعه"
+
+msgid "Blog Background Color"
+msgstr "رنگ پس‌زمینه وبلاگ"
+
+msgid "Subscribe Background Color"
+msgstr "رنگ پس‌زمینه اشتراک"
+
+msgid "Footer Background Color"
+msgstr "رنگ پس‌زمینه فوتر"
+
+msgid "Contact Settings"
+msgstr "تنظیمات تماس"
+
+msgid "WhatsApp URL"
+msgstr "آدرس واتساپ"
+
+msgid "Cellphone Number (e.g., +1234567890)"
+msgstr "شماره تلفن (مثال: +1234567890)"
+
+msgid "Telegram URL"
+msgstr "آدرس تلگرام"
+
+msgid "Facebook Messenger URL"
+msgstr "آدرس مسنجر فیسبوک"
+
+msgid "SMS Number (e.g., +1234567890)"
+msgstr "شماره پیامک (مثال: +1234567890)"
+
+msgid "Instagram URL"
+msgstr "آدرس اینستاگرام"
+
+msgid "Snapchat URL"
+msgstr "آدرس اسنپ‌چت"
+
+msgid "Contact Form Settings"
+msgstr "تنظیمات فرم تماس"
+
+msgid "Contact Form 7 Shortcode"
+msgstr "شورتکد فرم تماس ۷"
+
+msgid "E.g., [contact-form-7 id=\"123\" title=\"Contact\"]"
+msgstr "مثال: [contact-form-7 id=\"123\" title=\"Contact\"]"
+
+msgid "Community Form Settings"
+msgstr "تنظیمات فرم جامعه"
+
+msgid "Community Form 7 Shortcode"
+msgstr "شورتکد فرم جامعه ۷"
+
+msgid "E.g., [contact-form-7 id=\"124\" title=\"Community\"]"
+msgstr "مثال: [contact-form-7 id=\"124\" title=\"Community\"]"
+
+msgid "Social Media Settings"
+msgstr "تنظیمات شبکه‌های اجتماعی"
+
+msgid "Facebook URL"
+msgstr "آدرس فیسبوک"
+
+msgid "Twitter URL"
+msgstr "آدرس توییتر"
+
+msgid "LinkedIn URL"
+msgstr "آدرس لینکدین"
+
+msgid "YouTube Settings"
+msgstr "تنظیمات یوتیوب"
+
+msgid "YouTube Channel URL"
+msgstr "آدرس کانال یوتیوب"
+
+msgid "YouTube Video ID"
+msgstr "شناسه ویدیوی یوتیوب"
+
+msgid "E.g., dQw4w9WgXcQ"
+msgstr "مثال: dQw4w9WgXcQ"
+
+msgid "Services Settings"
+msgstr "تنظیمات خدمات"
+
+msgid "Menu Settings"
+msgstr "تنظیمات منو"
