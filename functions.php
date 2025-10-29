@@ -1650,7 +1650,7 @@ function callamir_service_management_scripts() {
     <?php
 }
 
-function callamir_get_visitor_lang() {
+function callamir_get_visitor_lang($use_theme_mod = true) {
     // First check if there's a cookie set
     if (isset($_COOKIE['language'])) {
         $cookie_lang = sanitize_text_field($_COOKIE['language']);
@@ -1658,10 +1658,16 @@ function callamir_get_visitor_lang() {
             return $cookie_lang;
         }
     }
-    
+
     // Fallback to theme mod default
-    $default_lang = get_theme_mod('site_language', 'en');
-    return in_array($default_lang, array('en', 'fa'), true) ? $default_lang : 'en';
+    if ($use_theme_mod) {
+        $default_lang = get_theme_mod('site_language', 'en');
+        if (in_array($default_lang, array('en', 'fa'), true)) {
+            return $default_lang;
+        }
+    }
+
+    return 'en';
 }
 
 // Language detection working properly
@@ -2009,7 +2015,7 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
         if (!function_exists('callamir_get_visitor_lang')) {
             return $mods;
         }
-        $lang = callamir_get_visitor_lang();
+        $lang = callamir_get_visitor_lang(false);
         if ($lang !== 'fa') {
             return $mods;
         }
