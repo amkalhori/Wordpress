@@ -151,7 +151,15 @@ if (!function_exists('callamir_mod')) {
                     <?php echo esc_html(callamir_mod('community_question_form_desc', $lang, __('Have a question? Ask our community and get helpful answers.', 'callamir'))); ?>
                 </p>
                 <div class="max-w-2xl mx-auto">
-                    <?php echo do_shortcode(get_theme_mod('callamir_community_question_form', '[contact-form-7 id="124" title="Community Question Form"]')); ?>
+                    <?php
+                    $community_form_shortcode = get_theme_mod('callamir_community_question_form', '[contact-form-7 id="124" title="Community Question Form"]');
+                    $community_form_output = do_shortcode($community_form_shortcode);
+                    if (stripos($community_form_output, 'contact form not found') !== false) {
+                        echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the community form shortcode in the Customizer.', 'callamir') . '</div>';
+                    } else {
+                        echo $community_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    }
+                    ?>
                 </div>
             </div>
 
@@ -218,7 +226,13 @@ if (!function_exists('callamir_mod')) {
             </div>
             <div class="w-full md:w-2/3">
                 <?php
-                echo do_shortcode(get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]'));
+                $contact_form_shortcode = get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]');
+                $contact_form_output = do_shortcode($contact_form_shortcode);
+                if (stripos($contact_form_output, 'contact form not found') !== false) {
+                    echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
+                } else {
+                    echo $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
                 ?>
             </div>
         </div>
