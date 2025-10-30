@@ -747,7 +747,7 @@ function callamir_customize_register($wp_customize) {
     // Services Section Title and Subtitle
     $wp_customize->add_setting('services_title_en', array(
         'default' => __('Our Services', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('services_title_en', array(
         'label' => __('Services Section Title (EN)', 'callamir'),
@@ -757,7 +757,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_title_fa', array(
         'default' => __('خدمات ما', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('services_title_fa', array(
         'label' => __('Services Section Title (FA)', 'callamir'),
@@ -788,7 +788,7 @@ function callamir_customize_register($wp_customize) {
     // Read More Button Text
     $wp_customize->add_setting('read_more_text_en', array(
         'default' => __('Read More', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('read_more_text_en', array(
         'label' => __('Read More Button Text (EN)', 'callamir'),
@@ -798,7 +798,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('read_more_text_fa', array(
         'default' => __('بیشتر بخوانید', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('read_more_text_fa', array(
         'label' => __('Read More Button Text (FA)', 'callamir'),
@@ -811,7 +811,7 @@ function callamir_customize_register($wp_customize) {
         // Service Icon
         $wp_customize->add_setting("callamir_service_icon_{$i}", array(
             'default' => 'fa-solid fa-computer',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("callamir_service_icon_{$i}", array(
             'label' => __("Service {$i} Icon (FontAwesome class)", 'callamir'),
@@ -834,7 +834,7 @@ function callamir_customize_register($wp_customize) {
         // Service Title (EN/FA)
         $wp_customize->add_setting("service_title_{$i}_en", array(
             'default' => __("Service {$i}", 'callamir'),
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_title_{$i}_en", array(
             'label' => __("Service {$i} Title (EN)", 'callamir'),
@@ -844,7 +844,7 @@ function callamir_customize_register($wp_customize) {
 
         $wp_customize->add_setting("service_title_{$i}_fa", array(
             'default' => __("خدمت {$i}", 'callamir'),
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_title_{$i}_fa", array(
             'label' => __("Service {$i} Title (FA)", 'callamir'),
@@ -899,7 +899,7 @@ function callamir_customize_register($wp_customize) {
         // Service Price (EN/FA)
         $wp_customize->add_setting("service_price_{$i}_en", array(
             'default' => '',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_price_{$i}_en", array(
             'label' => __("Service {$i} Price (EN)", 'callamir'),
@@ -910,7 +910,7 @@ function callamir_customize_register($wp_customize) {
 
         $wp_customize->add_setting("service_price_{$i}_fa", array(
             'default' => '',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_price_{$i}_fa", array(
             'label' => __("Service {$i} Price (FA)", 'callamir'),
@@ -1698,10 +1698,73 @@ function callamir_get_blog_items($posts_per_page = 3, $paged = 1) {
 /* --------------------------------------------------------------------------
  * Theme Mod Helper
  * -------------------------------------------------------------------------- */
+if (!function_exists('callamir_normalize_theme_mod_value')) {
+    /**
+     * Normalize a theme mod value so translation lookups can safely determine
+     * whether the stored option is usable. Historically several service-related
+     * settings were sanitized with `wp_validate_boolean`, which coerced any
+     * non-empty string into a boolean `true`. When that happened the front-end
+     * would print "1" (or fall back to English) for Persian strings. Returning
+     * `null` for those legacy boolean values allows higher-level helpers to
+     * gracefully fall back to proper defaults.
+     *
+     * @param mixed $value Raw value retrieved from `get_theme_mod`.
+     * @return string|null Normalized string or `null` if unusable.
+     */
+    function callamir_normalize_theme_mod_value($value) {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_bool($value)) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+            if ($trimmed === '') {
+                return null;
+            }
+
+            $lower = strtolower($trimmed);
+            if (in_array($lower, array('1', '0', 'true', 'false', 'yes', 'no', 'on', 'off'), true)) {
+                return null;
+            }
+
+            return $trimmed;
+        }
+
+        if (is_numeric($value)) {
+            if ($value == 1 || $value == 0) {
+                return null;
+            }
+
+            return (string) $value;
+        }
+
+        return null;
+    }
+}
+
 if (!function_exists('callamir_mod')) {
     function callamir_mod($key_base, $lang, $default = '') {
-        $key = $key_base . '_' . $lang;
-        return get_theme_mod($key, $default);
+        $candidates = array(
+            $key_base . '_' . $lang,
+            $lang === 'fa' ? $key_base . '_fa' : $key_base . '_en',
+            $lang === 'fa' ? $key_base . '_en' : $key_base . '_fa',
+            $key_base,
+        );
+
+        $candidates = array_values(array_unique(array_filter($candidates)));
+
+        foreach ($candidates as $candidate_key) {
+            $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
+            if ($value !== null) {
+                return $value;
+            }
+        }
+
+        return $default;
     }
 }
 
@@ -2023,8 +2086,9 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
         foreach ($mods as $key => $value) {
             if (substr($key, -3) === '_fa') {
                 $base = substr($key, 0, -3);
-                if (isset($mods[$key]) && $mods[$key] !== '') {
-                    $mods[$base] = $mods[$key];
+                $normalized = callamir_normalize_theme_mod_value($mods[$key]);
+                if ($normalized !== null) {
+                    $mods[$base] = $normalized;
                 }
             }
         }
@@ -2041,12 +2105,22 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
 if (!function_exists('callamir_get_text')) {
     function callamir_get_text($key, $default_en = '', $default_fa = '') {
         $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
-        if ($lang === 'fa') {
-            $val = get_theme_mod($key . '_fa', $default_fa);
-            if ($val !== '') return $val;
+
+        $preferred_default = ($lang === 'fa' && $default_fa !== '') ? $default_fa : $default_en;
+        $value = callamir_mod($key, $lang, $preferred_default);
+
+        if ($lang === 'fa' && ($value === '' || $value === $preferred_default)) {
+            $fallback = callamir_mod($key, 'en', $default_en);
+            if ($fallback !== '') {
+                $value = $fallback;
+            }
         }
-        $val = get_theme_mod($key, $default_en);
-        return $val !== '' ? $val : $default_en;
+
+        if ($value === '') {
+            return $preferred_default;
+        }
+
+        return $value;
     }
 }
 
