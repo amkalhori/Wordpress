@@ -11,7 +11,7 @@ $lang = callamir_get_visitor_lang();
             <h1 class="text-3xl font-bold text-white"><?php the_title(); ?></h1>
             <div class="text-gray-200"><?php the_content(); ?></div>
         <?php endwhile; else : ?>
-            <p class="text-gray-200"><?php echo $lang === 'fa' ? 'محتوایی یافت نشد.' : 'No content found.'; ?></p>
+            <p class="text-gray-200"><?php echo esc_html($lang === 'fa' ? __('محتوایی یافت نشد.', 'callamir') : __('No content found.', 'callamir')); ?></p>
         <?php endif; ?>
     </div>
 </main>
