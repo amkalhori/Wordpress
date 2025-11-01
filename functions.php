@@ -95,6 +95,102 @@ add_action('after_setup_theme', 'callamir_theme_setup');
 add_action('init', 'callamir_register_community_questions');
 
 /* --------------------------------------------------------------------------
+ * Service Utilities
+ * -------------------------------------------------------------------------- */
+function callamir_max_services() {
+    return 6;
+}
+
+function callamir_service_patterns() {
+    return array(
+        'callamir_service_icon_%d',
+        'callamir_service_image_%d',
+        'service_title_%d_en',
+        'service_title_%d_fa',
+        'service_desc_%d_en',
+        'service_desc_%d_fa',
+        'service_full_desc_%d_en',
+        'service_full_desc_%d_fa',
+        'service_price_%d_en',
+        'service_price_%d_fa',
+        'callamir_service_delete_trigger_%d',
+    );
+}
+
+function callamir_sanitize_service_count($value) {
+    $value = absint($value);
+    $max = callamir_max_services();
+
+    if ($value > $max) {
+        $value = $max;
+    }
+
+    return $value;
+}
+
+function callamir_service_control_active($control) {
+    $count_setting = $control->manager->get_setting('callamir_services_count');
+    $count = $count_setting ? absint($count_setting->value()) : 0;
+
+    $is_service_specific = false;
+
+    if (property_exists($control, 'service_id') && $control->service_id) {
+        $is_service_specific = true;
+        return (int) $control->service_id <= $count && $count > 0;
+    }
+
+    if (preg_match('/_(\d+)(?:_|$)/', $control->id, $matches)) {
+        $is_service_specific = true;
+        return $count > 0 && (int) $matches[1] <= $count;
+    }
+
+    return !$is_service_specific ? true : $count > 0;
+}
+
+if (class_exists('WP_Customize_Control') && !class_exists('Callamir_Service_Delete_Control')) {
+    class Callamir_Service_Delete_Control extends WP_Customize_Control {
+        public $type = 'callamir_service_delete';
+
+        public $service_id = 0;
+
+        public function render_content() {
+            if (!$this->service_id) {
+                return;
+            }
+
+            echo '<div class="callamir-service-actions">';
+            printf('<span class="customize-control-title">%s</span>', esc_html(sprintf(__('Service %d actions', 'callamir'), $this->service_id)));
+            printf(
+                '<button type="button" class="button button-secondary callamir-delete-service" data-service-id="%1$s">%2$s</button>',
+                esc_attr($this->service_id),
+                esc_html(sprintf(__('Delete Service %d', 'callamir'), $this->service_id))
+            );
+            echo '<p class="description">' . esc_html__('Remove this service and shift remaining services up.', 'callamir') . '</p>';
+            echo '</div>';
+        }
+    }
+}
+
+function callamir_enqueue_customizer_service_assets() {
+    wp_enqueue_script(
+        'callamir-customizer-services',
+        get_template_directory_uri() . '/js/customizer-services.js',
+        array('customize-controls', 'jquery'),
+        wp_get_theme()->get('Version'),
+        true
+    );
+
+    wp_localize_script('callamir-customizer-services', 'callamirServiceManager', array(
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('callamir_delete_service'),
+        'confirmDelete' => __('Are you sure you want to delete Service %s? This action cannot be undone.', 'callamir'),
+        'success' => __('Service deleted successfully.', 'callamir'),
+        'error' => __('Unable to delete the service. Please try again.', 'callamir'),
+    ));
+}
+add_action('customize_controls_enqueue_scripts', 'callamir_enqueue_customizer_service_assets');
+
+/* --------------------------------------------------------------------------
  * Community Questions Meta Boxes
  * -------------------------------------------------------------------------- */
 function callamir_add_community_questions_meta_boxes() {
@@ -245,6 +341,8 @@ function callamir_enqueue_scripts() {
     wp_localize_script('callamir-theme-js', 'callamirLang', $language_payload);
 
     // Localize theme mods for cosmic effects and services
+    $services_count = callamir_sanitize_service_count(get_theme_mod('callamir_services_count', 3));
+
     $theme_mods = array(
         // Header Stars
         'enable_header_stars' => get_theme_mod('callamir_enable_header_stars', true),
@@ -263,14 +361,14 @@ function callamir_enqueue_scripts() {
         'services_circle_count' => get_theme_mod('callamir_services_circle_count', 50),
         'services_star_count' => get_theme_mod('callamir_services_star_count', 150),
         // Services Count
-        'services_count' => get_theme_mod('callamir_services_count', 3),
+        'services_count' => $services_count,
     );
     wp_localize_script('callamir-theme-js', 'themeMods', $theme_mods);
 
     // Localize service data for JavaScript
     $service_data = array();
     $lang = $current_lang;
-    $count = get_theme_mod('callamir_services_count', 3);
+    $count = $services_count;
     
     for ($i = 1; $i <= $count; $i++) {
         $service_data[$i] = array(
@@ -824,13 +922,15 @@ function callamir_customize_register($wp_customize) {
     // Services Section Settings
     $wp_customize->add_setting('callamir_services_count', array(
         'default' => 3,
-        'sanitize_callback' => 'absint',
+        'sanitize_callback' => 'callamir_sanitize_service_count',
+        'transport' => 'postMessage',
     ));
     $wp_customize->add_control('callamir_services_count', array(
         'label' => __('Number of Services', 'callamir'),
         'section' => 'callamir_modern_services',
         'type' => 'number',
-        'input_attrs' => array('min' => 1, 'max' => 6, 'step' => 1),
+        'input_attrs' => array('min' => 0, 'max' => callamir_max_services(), 'step' => 1),
+        'description' => __('Set to 0 to hide all services.', 'callamir'),
     ));
 
     // Services Section Title and Subtitle
@@ -896,7 +996,7 @@ function callamir_customize_register($wp_customize) {
     ));
 
     // Individual Service Settings
-    for ($i = 1; $i <= 6; $i++) {
+    for ($i = 1; $i <= callamir_max_services(); $i++) {
         // Service Icon
         $wp_customize->add_setting("callamir_service_icon_{$i}", array(
             'default' => 'fa-solid fa-computer',
@@ -907,6 +1007,7 @@ function callamir_customize_register($wp_customize) {
             'section' => 'callamir_modern_services',
             'type' => 'text',
             'description' => __('e.g., fa-solid fa-laptop', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         // Service Image
@@ -918,6 +1019,7 @@ function callamir_customize_register($wp_customize) {
             'label' => __("Service {$i} Image", 'callamir'),
             'section' => 'callamir_modern_services',
             'description' => __('Upload an image for the service modal (recommended: 800x600px)', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         )));
 
         // Service Title (EN/FA)
@@ -929,6 +1031,7 @@ function callamir_customize_register($wp_customize) {
             'label' => __("Service {$i} Title (EN)", 'callamir'),
             'section' => 'callamir_modern_services',
             'type' => 'text',
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         $wp_customize->add_setting("service_title_{$i}_fa", array(
@@ -939,6 +1042,7 @@ function callamir_customize_register($wp_customize) {
             'label' => __("Service {$i} Title (FA)", 'callamir'),
             'section' => 'callamir_modern_services',
             'type' => 'text',
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         // Service Short Description (EN/FA)
@@ -950,6 +1054,7 @@ function callamir_customize_register($wp_customize) {
             'label' => __("Service {$i} Short Description (EN)", 'callamir'),
             'section' => 'callamir_modern_services',
             'type' => 'textarea',
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         $wp_customize->add_setting("service_desc_{$i}_fa", array(
@@ -960,6 +1065,7 @@ function callamir_customize_register($wp_customize) {
             'label' => __("Service {$i} Short Description (FA)", 'callamir'),
             'section' => 'callamir_modern_services',
             'type' => 'textarea',
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         // Service Full Description (EN/FA)
@@ -972,6 +1078,7 @@ function callamir_customize_register($wp_customize) {
             'section' => 'callamir_modern_services',
             'type' => 'textarea',
             'description' => __('This detailed description will be shown in the modal popup when users click "Read More".', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         $wp_customize->add_setting("service_full_desc_{$i}_fa", array(
@@ -983,6 +1090,7 @@ function callamir_customize_register($wp_customize) {
             'section' => 'callamir_modern_services',
             'type' => 'textarea',
             'description' => __('This detailed description will be shown in the modal popup when users click "Read More".', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         // Service Price (EN/FA)
@@ -995,6 +1103,7 @@ function callamir_customize_register($wp_customize) {
             'section' => 'callamir_modern_services',
             'type' => 'text',
             'description' => __('e.g., "Starting from $99/month" or "Contact for pricing"', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         ));
 
         $wp_customize->add_setting("service_price_{$i}_fa", array(
@@ -1006,46 +1115,23 @@ function callamir_customize_register($wp_customize) {
             'section' => 'callamir_modern_services',
             'type' => 'text',
             'description' => __('e.g., "شروع از ۹۹ دلار در ماه" یا "برای قیمت تماس بگیرید"', 'callamir'),
+            'active_callback' => 'callamir_service_control_active',
         ));
+
+        $delete_setting = "callamir_service_delete_trigger_{$i}";
+        $wp_customize->add_setting($delete_setting, array(
+            'default' => '',
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
+        ));
+        $wp_customize->add_control(new Callamir_Service_Delete_Control($wp_customize, $delete_setting, array(
+            'section' => 'callamir_modern_services',
+            'service_id' => $i,
+            'priority' => 200 + $i,
+            'active_callback' => 'callamir_service_control_active',
+        )));
 
     }
-
-    // Service Management Section
-    $wp_customize->add_section('callamir_service_management', array(
-        'title' => __('Service Management', 'callamir'),
-        'priority' => 36,
-        'description' => __('Manage your services - delete unwanted services or reset all services', 'callamir')
-    ));
-
-    // Service Deletion Controls
-    for ($i = 1; $i <= 6; $i++) {
-        $wp_customize->add_setting("callamir_service_delete_{$i}", array(
-            'default' => false,
-            'sanitize_callback' => 'wp_validate_boolean',
-        ));
-        $wp_customize->add_control("callamir_service_delete_{$i}", array(
-            'label' => __("Delete Service {$i}", 'callamir'),
-            'section' => 'callamir_service_management',
-            'type' => 'checkbox',
-            'description' => __('Check this box to delete this service permanently', 'callamir'),
-        ));
-    }
-
-    // Reset All Services
-    $wp_customize->add_setting('callamir_reset_all_services', array(
-        'default' => false,
-        'sanitize_callback' => 'wp_validate_boolean',
-    ));
-    $wp_customize->add_control('callamir_reset_all_services', array(
-        'label' => __('Reset All Services', 'callamir'),
-        'section' => 'callamir_service_management',
-        'type' => 'checkbox',
-        'description' => __('Check this box to reset all services to default values', 'callamir'),
-    ));
-
-    // Add JavaScript for service deletion
-    add_action('customize_controls_print_footer_scripts', 'callamir_service_management_scripts');
-    add_action('wp_footer', 'callamir_service_management_scripts');
 
     // Services Section Styling
     $wp_customize->add_setting('services_card_background', array(
@@ -1532,177 +1618,61 @@ add_action('customize_register', 'callamir_customize_register');
  * Service Management (AJAX)
  * -------------------------------------------------------------------------- */
 function callamir_delete_service() {
-    // Check nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'callamir_nonce')) {
-        wp_send_json_error(array('message' => 'Invalid nonce'));
-    }
-    
+    check_ajax_referer('callamir_delete_service', 'nonce');
+
     if (!current_user_can('edit_theme_options')) {
-        wp_send_json_error(array('message' => 'Insufficient permissions'));
+        wp_send_json_error(array('message' => __('You are not allowed to delete services.', 'callamir')));
     }
-    
-    if (!isset($_POST['service_id'])) {
-        wp_send_json_error(array('message' => 'Missing service ID'));
+
+    $service_id = isset($_POST['service_id']) ? absint($_POST['service_id']) : 0;
+    $max_services = callamir_max_services();
+
+    if ($service_id < 1 || $service_id > $max_services) {
+        wp_send_json_error(array('message' => __('Invalid service identifier.', 'callamir')));
     }
-    
-    $service_id = intval($_POST['service_id']);
-    if ($service_id < 1 || $service_id > 6) {
-        wp_send_json_error(array('message' => 'Invalid service ID'));
-    }
-    
-    // Delete all service-related theme mods
-    $service_keys = array(
-        "callamir_service_icon_{$service_id}",
-        "callamir_service_image_{$service_id}",
-        "service_title_{$service_id}_en",
-        "service_title_{$service_id}_fa",
-        "service_desc_{$service_id}_en",
-        "service_desc_{$service_id}_fa",
-        "service_full_desc_{$service_id}_en",
-        "service_full_desc_{$service_id}_fa",
-        "service_price_{$service_id}_en",
-        "service_price_{$service_id}_fa",
-        "callamir_service_delete_{$service_id}"
-    );
-    
-    $deleted_count = 0;
-    foreach ($service_keys as $key) {
-        if (get_theme_mod($key) !== false) {
-            remove_theme_mod($key);
-            $deleted_count++;
+
+    $patterns = callamir_service_patterns();
+    $sentinel = '__callamir_missing__';
+
+    for ($slot = $service_id; $slot < $max_services; $slot++) {
+        $next_slot = $slot + 1;
+
+        foreach ($patterns as $pattern) {
+            $current_key = sprintf($pattern, $slot);
+
+            if ($next_slot <= $max_services) {
+                $next_key = sprintf($pattern, $next_slot);
+                $value = get_theme_mod($next_key, $sentinel);
+
+                if ($sentinel !== $value) {
+                    set_theme_mod($current_key, $value);
+                } else {
+                    remove_theme_mod($current_key);
+                }
+            }
         }
     }
-    
+
+    foreach ($patterns as $pattern) {
+        $last_key = sprintf($pattern, $max_services);
+        remove_theme_mod($last_key);
+    }
+
+    $current_count = absint(get_theme_mod('callamir_services_count', 3));
+    $new_count = $current_count;
+
+    if ($service_id <= $current_count && $current_count > 0) {
+        $new_count = max(0, $current_count - 1);
+        set_theme_mod('callamir_services_count', $new_count);
+    }
+
     wp_send_json_success(array(
-        'message' => "Service {$service_id} deleted successfully",
-        'deleted_count' => $deleted_count
+        'message' => sprintf(__('Service %d deleted successfully.', 'callamir'), $service_id),
+        'new_count' => $new_count,
+        'service_id' => $service_id,
     ));
 }
 add_action('wp_ajax_callamir_delete_service', 'callamir_delete_service');
-
-function callamir_reset_all_services() {
-    check_ajax_referer('callamir_nonce', 'nonce');
-    if (!current_user_can('edit_theme_options')) {
-        wp_send_json_error(array('message' => 'Insufficient permissions'));
-    }
-    
-    // Reset all service-related theme mods
-    for ($i = 1; $i <= 6; $i++) {
-        $service_keys = array(
-            "callamir_service_icon_{$i}",
-            "callamir_service_image_{$i}",
-            "service_title_{$i}_en",
-            "service_title_{$i}_fa",
-            "service_desc_{$i}_en",
-            "service_desc_{$i}_fa",
-            "service_full_desc_{$i}_en",
-            "service_full_desc_{$i}_fa",
-            "service_price_{$i}_en",
-            "service_price_{$i}_fa",
-            "callamir_service_delete_{$i}"
-        );
-        
-        foreach ($service_keys as $key) {
-            remove_theme_mod($key);
-        }
-    }
-    
-    // Reset services count to default
-    remove_theme_mod('callamir_services_count');
-    
-    wp_send_json_success(array('message' => 'All services reset successfully'));
-}
-add_action('wp_ajax_callamir_reset_all_services', 'callamir_reset_all_services');
-
-/* --------------------------------------------------------------------------
- * Service Management JavaScript
- * -------------------------------------------------------------------------- */
-function callamir_service_management_scripts() {
-    ?>
-    <script type="text/javascript">
-    jQuery(document).ready(function($) {
-        // Service deletion functionality
-        $('.customize-control-checkbox input[type="checkbox"]').on('change', function() {
-            var $this = $(this);
-            var controlId = $this.attr('id');
-            
-            // Check if this is a service deletion checkbox
-            if (controlId && controlId.indexOf('callamir_service_delete_') === 0) {
-                if ($this.is(':checked')) {
-                    var serviceId = controlId.replace('callamir_service_delete_', '');
-                    
-                    if (confirm('Are you sure you want to delete Service ' + serviceId + '? This action cannot be undone.')) {
-                        // Make AJAX request to delete service
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'callamir_delete_service',
-                                service_id: serviceId,
-                                nonce: '<?php echo wp_create_nonce('callamir_nonce'); ?>'
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    alert('Service ' + serviceId + ' deleted successfully!');
-                                    // Uncheck the checkbox
-                                    $this.prop('checked', false);
-                                    // Refresh the customizer
-                                    wp.customize.previewer.refresh();
-                                } else {
-                                    alert('Error deleting service: ' + (response.data || 'Unknown error'));
-                                    $this.prop('checked', false);
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                alert('Error deleting service: ' + error);
-                                $this.prop('checked', false);
-                            }
-                        });
-                    } else {
-                        $this.prop('checked', false);
-                    }
-                }
-            }
-            
-            // Check if this is the reset all services checkbox
-            if (controlId === 'callamir_reset_all_services') {
-                if ($this.is(':checked')) {
-                    if (confirm('Are you sure you want to reset ALL services? This action cannot be undone.')) {
-                        // Make AJAX request to reset all services
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'callamir_reset_all_services',
-                                nonce: '<?php echo wp_create_nonce('callamir_nonce'); ?>'
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    alert('All services reset successfully!');
-                                    // Uncheck the checkbox
-                                    $this.prop('checked', false);
-                                    // Refresh the customizer
-                                    wp.customize.previewer.refresh();
-                                } else {
-                                    alert('Error resetting services: ' + (response.data || 'Unknown error'));
-                                    $this.prop('checked', false);
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                alert('Error resetting services: ' + error);
-                                $this.prop('checked', false);
-                            }
-                        });
-                    } else {
-                        $this.prop('checked', false);
-                    }
-                }
-            }
-        });
-    });
-    </script>
-    <?php
-}
 
 /* --------------------------------------------------------------------------
  * Blog Helper
