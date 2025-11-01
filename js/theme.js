@@ -1,8 +1,12 @@
-console.log('=== THEME.JS FILE LOADED ===');
-console.log('Current time:', new Date().toISOString());
-
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Modern theme.js loaded');
+    const debugEnabled = Boolean(window?.themeMods?.debug_mode);
+    const languageData = window.callamirLang || { current: 'en', supported: [] };
+    const callamirLog = (...args) => {
+        if (debugEnabled && typeof window.console !== 'undefined') {
+            window.console.log(...args);
+        }
+    };
+
 
     // --- Modern Mobile Menu Toggle ---
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
@@ -83,72 +87,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Language Switcher ---
-    console.log('=== LANGUAGE SWITCHER DEBUG ===');
-    
-    // Wait a bit for DOM to be fully ready
-    setTimeout(() => {
-        // Try multiple selectors to find language links
-        const langLinks1 = document.querySelectorAll('.lang-flag-link');
-        const langLinks2 = document.querySelectorAll('a[data-lang]');
-        const langLinks3 = document.querySelectorAll('.lang-flags a');
-        const langLinks4 = document.querySelectorAll('.nav-lang-switcher a');
-        
-        console.log('Found .lang-flag-link:', langLinks1.length);
-        console.log('Found a[data-lang]:', langLinks2.length);
-        console.log('Found .lang-flags a:', langLinks3.length);
-        console.log('Found .nav-lang-switcher a:', langLinks4.length);
-        
-        // Use whichever selector finds links
-        const langLinks = langLinks1.length > 0 ? langLinks1 : 
-                          (langLinks2.length > 0 ? langLinks2 : 
-                          (langLinks3.length > 0 ? langLinks3 : langLinks4));
-        
-        console.log('Using links:', langLinks.length);
-        
-        if (langLinks.length > 0) {
-            console.log('Setting up language switcher...');
-            langLinks.forEach((link, index) => {
-                console.log(`Setting up link ${index + 1}:`, link);
-                
-                // Remove any existing listeners
-                link.removeEventListener('click', handleLanguageClick);
-                
-                // Add new listener
-                link.addEventListener('click', handleLanguageClick);
+    const languageLinks = document.querySelectorAll('.lang-flag-link');
+
+    if (languageLinks.length > 0) {
+        languageLinks.forEach((link) => {
+            link.addEventListener('click', (event) => {
+                const lang = link.getAttribute('data-lang');
+
+                if (!lang) {
+                    return;
+                }
+
+                event.preventDefault();
+                if (lang !== languageData.current) {
+                    setCookie('language', lang, 7);
+                }
+
+                const fallback = languageData.supported.find((item) => item.code === lang);
+                const targetUrl = link.getAttribute('href') || (fallback ? fallback.url : null);
+                if (targetUrl) {
+                    window.location.href = targetUrl;
+                }
             });
-        } else {
-            console.log('No language links found!');
-            console.log('All links on page:', document.querySelectorAll('a'));
-            console.log('All elements with data-lang:', document.querySelectorAll('[data-lang]'));
-            console.log('All elements with class lang-flag-link:', document.querySelectorAll('.lang-flag-link'));
-            console.log('All elements with class lang-flags:', document.querySelectorAll('.lang-flags'));
-            console.log('All elements with class nav-lang-switcher:', document.querySelectorAll('.nav-lang-switcher'));
-        }
-    }, 100);
-    
-    // Language click handler
-    function handleLanguageClick(e) {
-        console.log('Language link clicked!');
-        e.preventDefault();
-        const lang = this.getAttribute('data-lang');
-        console.log('Language to switch to:', lang);
-        
-        if (!lang) {
-            console.error('No data-lang attribute found');
-            return;
-        }
-        
-        // Show loading state
-        this.style.opacity = '0.5';
-        this.style.pointerEvents = 'none';
-        
-        // Set cookie immediately
-        setCookie('language', lang, 7);
-        console.log('Cookie set for language:', lang);
-        
-        // Reload page
-        console.log('Reloading page...');
-        window.location.reload();
+        });
     }
 
     // --- Modern Navigation with Smooth Scrolling ---
@@ -277,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Star Animation ---
     const initStarEffect = (canvasId, starCount) => {
         const canvas = document.getElementById(canvasId);
-        console.log(`Star canvas ${canvasId} found:`, canvas);
+        callamirLog(`Star canvas ${canvasId} found:`, canvas);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -309,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 star.y -= star.speed;
                 if (star.y < 0) star.y = canvas.height;
             });
-            console.log('Star animation started for', canvasId);
+            callamirLog('Star animation started for', canvasId);
             requestAnimationFrame(animateStars);
         };
 
@@ -319,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Blackhole Animation (Hero) ---
     const initBlackholeEffect = () => {
         const canvas = document.getElementById('blackhole');
-        console.log('Blackhole canvas found:', canvas);
+        callamirLog('Blackhole canvas found:', canvas);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -368,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
                     ctx.fill();
                 });
-                console.log('Blackhole animation started:', window.themeMods.hero_blackhole_pattern);
+                callamirLog('Blackhole animation started:', window.themeMods.hero_blackhole_pattern);
                 requestAnimationFrame(animate);
             };
 
@@ -486,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 });
-                console.log('Blackhole animation started:', window.themeMods.hero_blackhole_pattern);
+                callamirLog('Blackhole animation started:', window.themeMods.hero_blackhole_pattern);
                 requestAnimationFrame(animate);
             };
             animate();
@@ -507,16 +468,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Services Animation ---
     const initServicesEffect = () => {
         const canvas = document.getElementById('services-canvas');
-        console.log('Services canvas found:', canvas);
+        callamirLog('Services canvas found:', canvas);
         if (!canvas) {
             console.error('Services canvas not found!');
             return;
         }
         
         // Test canvas visibility
-        console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
-        console.log('Canvas position:', canvas.offsetTop, canvas.offsetLeft);
-        console.log('Canvas z-index:', window.getComputedStyle(canvas).zIndex);
+        callamirLog('Canvas dimensions:', canvas.width, 'x', canvas.height);
+        callamirLog('Canvas position:', canvas.offsetTop, canvas.offsetLeft);
+        callamirLog('Canvas z-index:', window.getComputedStyle(canvas).zIndex);
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -524,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Test drawing to ensure canvas is working
         ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        console.log('Canvas test drawing completed');
+        callamirLog('Canvas test drawing completed');
 
         const pattern = window.themeMods ? window.themeMods.services_pattern : 'circular';
         if (pattern === 'circular') {
@@ -570,11 +531,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             animateCircles();
-            console.log('Services circular animation started');
+            callamirLog('Services circular animation started');
             
             // Add a simple test animation to verify it's working
             setTimeout(() => {
-                console.log('Services animation test: Drawing test circles');
+                callamirLog('Services animation test: Drawing test circles');
                 ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
                 ctx.beginPath();
                 ctx.arc(canvas.width/2, canvas.height/2, 20, 0, Math.PI * 2);
@@ -693,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 });
-                console.log('Services animation started:', pattern);
+                callamirLog('Services animation started:', pattern);
                 requestAnimationFrame(animate);
             };
             animate();
@@ -710,37 +671,37 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Initialize Effects ---
-    console.log('themeMods available:', !!window.themeMods);
+    callamirLog('themeMods available:', !!window.themeMods);
     if (window.themeMods) {
-        console.log('themeMods object:', window.themeMods);
+        callamirLog('themeMods object:', window.themeMods);
         if (window.themeMods.enable_header_stars) {
             initStarEffect('stars', window.themeMods.star_count_header);
         } else {
-            console.log('Header stars disabled');
+            callamirLog('Header stars disabled');
         }
         if (window.themeMods.enable_footer_stars) {
             initStarEffect('footer-stars', window.themeMods.star_count_footer);
         } else {
-            console.log('Footer stars disabled');
+            callamirLog('Footer stars disabled');
         }
         if (window.themeMods.enable_hero_effect) {
-            console.log('Initializing hero blackhole effect...');
+            callamirLog('Initializing hero blackhole effect...');
             initBlackholeEffect();
         } else {
-            console.log('Hero blackhole effect disabled');
+            callamirLog('Hero blackhole effect disabled');
         }
         if (window.themeMods.enable_services_effect) {
-            console.log('Initializing services cosmic effect...');
+            callamirLog('Initializing services cosmic effect...');
             initServicesEffect();
         } else {
-            console.log('Services cosmic effect disabled');
+            callamirLog('Services cosmic effect disabled');
         }
     } else {
         console.warn('themeMods not available, trying fallback initialization...');
         // Fallback initialization for services effect
         const servicesCanvas = document.getElementById('services-canvas');
         if (servicesCanvas) {
-            console.log('Fallback: Initializing services cosmic effect...');
+            callamirLog('Fallback: Initializing services cosmic effect...');
             initServicesEffect();
         }
     }
@@ -749,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const servicesCanvas = document.getElementById('services-canvas');
         if (servicesCanvas && !servicesCanvas.hasAttribute('data-initialized')) {
-            console.log('Delayed fallback: Initializing services cosmic effect...');
+            callamirLog('Delayed fallback: Initializing services cosmic effect...');
             servicesCanvas.setAttribute('data-initialized', 'true');
             initServicesEffect();
         }
@@ -819,14 +780,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update contact form
         const formElement = document.getElementById('modal-service-form');
         if (data.contactForm && data.contactForm.trim() !== '') {
-            console.log('Setting contact form HTML:', data.contactForm);
+            callamirLog('Setting contact form HTML:', data.contactForm);
             formElement.innerHTML = data.contactForm;
             formElement.style.display = 'block';
             
             // Initialize Contact Form 7 with our robust function
             initializeContactForm7(formElement);
         } else {
-            console.log('No contact form available for service:', serviceId);
+            callamirLog('No contact form available for service:', serviceId);
             formElement.style.display = 'none';
         }
 
@@ -909,7 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const indicatorsContainer = document.querySelector('.carousel-indicators');
         
         if (!carouselContainer || !track) {
-            console.log('Services carousel elements not found');
+            callamirLog('Services carousel elements not found');
             return;
         }
         
@@ -919,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let cardWidth = 300; // Default card width
         let visibleCards = 3; // Default visible cards
         
-        console.log('Initializing services carousel:', {
+        callamirLog('Initializing services carousel:', {
             totalServices,
             cardWidth,
             visibleCards
@@ -981,7 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const gap = parseFloat(trackStyles.columnGap || trackStyles.gap) || 24;
             const slideWidth = cardWidth + gap;
             
-            console.log('Updating carousel:', {
+            callamirLog('Updating carousel:', {
                 currentSlide,
                 totalSlides,
                 slideWidth,
@@ -1084,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 250);
         });
         
-        console.log('Services carousel initialized successfully');
+        callamirLog('Services carousel initialized successfully');
     };
     
     // Initialize carousel with a small delay to ensure DOM is ready
@@ -1096,39 +1057,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeContactForm7(formElement) {
         if (!formElement) return;
         
-        console.log('Initializing Contact Form 7 for element:', formElement);
+        callamirLog('Initializing Contact Form 7 for element:', formElement);
         
         // Wait for DOM to be ready
         setTimeout(() => {
             // Check if Contact Form 7 is available
-            console.log('wpcf7 available:', typeof wpcf7 !== 'undefined');
-            console.log('jQuery available:', typeof jQuery !== 'undefined');
+            callamirLog('wpcf7 available:', typeof wpcf7 !== 'undefined');
+            callamirLog('jQuery available:', typeof jQuery !== 'undefined');
             
             // Try multiple initialization methods
             if (typeof wpcf7 !== 'undefined') {
-                console.log('wpcf7 object:', wpcf7);
+                callamirLog('wpcf7 object:', wpcf7);
                 if (wpcf7.init) {
-                    console.log('Using wpcf7.init');
+                    callamirLog('Using wpcf7.init');
                     wpcf7.init(formElement);
                 } else if (wpcf7.initForm) {
-                    console.log('Using wpcf7.initForm');
+                    callamirLog('Using wpcf7.initForm');
                     wpcf7.initForm(formElement);
                 } else if (wpcf7.initFormElement) {
-                    console.log('Using wpcf7.initFormElement');
+                    callamirLog('Using wpcf7.initFormElement');
                     wpcf7.initFormElement(formElement);
                 }
             }
             
             // Try jQuery method
             if (typeof jQuery !== 'undefined' && jQuery.fn.wpcf7) {
-                console.log('Using jQuery wpcf7');
+                callamirLog('Using jQuery wpcf7');
                 jQuery(formElement).wpcf7();
             }
             
             // Try vanilla JS method
             const form = formElement.querySelector('form');
             if (form) {
-                console.log('Found form element:', form);
+                callamirLog('Found form element:', form);
                 // Trigger form events
                 const event = new Event('wpcf7mailsent', { bubbles: true });
                 form.dispatchEvent(event);
@@ -1136,23 +1097,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Re-trigger Contact Form 7 scripts
             if (typeof window.wpcf7 !== 'undefined') {
-                console.log('Re-triggering wpcf7.init');
+                callamirLog('Re-triggering wpcf7.init');
                 window.wpcf7.init();
             }
             
             // Force re-initialization of all forms
             const allForms = formElement.querySelectorAll('form');
             allForms.forEach(form => {
-                console.log('Processing form:', form);
+                callamirLog('Processing form:', form);
                 // Add event listeners
                 form.addEventListener('submit', function(e) {
-                    console.log('Form submitted');
+                    callamirLog('Form submitted');
                 });
             });
             
             // Additional fallback: Try to trigger Contact Form 7 scripts manually
             if (typeof window.wpcf7 !== 'undefined' && window.wpcf7.init) {
-                console.log('Manual wpcf7.init trigger');
+                callamirLog('Manual wpcf7.init trigger');
                 try {
                     window.wpcf7.init();
                 } catch (e) {
@@ -1210,5 +1171,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Navigation Button ---
-    console.log('Nav button functionality skipped (no .nav-button in DOM)');
+    callamirLog('Nav button functionality skipped (no .nav-button in DOM)');
 });

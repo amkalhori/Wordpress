@@ -6,32 +6,11 @@ get_header();
 // Helper: Get current visitor language
 $lang = callamir_get_visitor_lang();
 // Utility: Return the theme_mod for chosen language
-if (!function_exists('callamir_mod')) {
-    function callamir_mod($key_base, $lang, $default = '') {
-        $key = $key_base . '_' . $lang;
-        return get_theme_mod($key, $default);
-    }
-}
 ?>
-<style>
-    .callamir-hero, .callamir-section {
-        position: relative;
-        min-height: 400px;
-    }
-    #blackhole, #services-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        pointer-events: none;
-    }
-</style>
 <main id="site-main" role="main" aria-live="polite">
     <!-- Hero Section with Black Hole Effect -->
-    <section id="hero" class="callamir-hero text-center relative overflow-hidden min-h-[400px]" aria-labelledby="hero-title">
-        <canvas id="blackhole" class="absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
+    <section id="hero" class="callamir-hero text-center relative overflow-hidden" aria-labelledby="hero-title">
+        <canvas id="blackhole" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="wrap flex flex-col items-center gap-6 p-4 relative z-10">
             <h1 id="hero-title" class="text-4xl font-bold text-white">
                 <?php echo esc_html(callamir_mod('hero_title', $lang, __('Simplifying Tech for Seniors & Small Businesses', 'callamir'))); ?>
@@ -65,7 +44,7 @@ if (!function_exists('callamir_mod')) {
     </section>
     <!-- Modern Services Section -->
     <section id="services" class="modern-services-section py-16 relative overflow-hidden" aria-labelledby="services-title">
-        <canvas id="services-canvas" class="absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
+        <canvas id="services-canvas" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="services-container">
             <div class="services-header text-center mb-12">
                 <h2 id="services-title" class="services-title">
@@ -78,27 +57,28 @@ if (!function_exists('callamir_mod')) {
             
             <!-- Services Carousel Container -->
             <div class="services-carousel-container">
+                <?php $count = callamir_sanitize_service_count(get_theme_mod('callamir_services_count', 3)); ?>
                 <!-- Navigation Arrows -->
-                <button class="carousel-nav carousel-nav-prev" aria-label="<?php _e('Previous services', 'callamir'); ?>">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <button class="carousel-nav carousel-nav-next" aria-label="<?php _e('Next services', 'callamir'); ?>">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                
+                <?php if ($count > 0) : ?>
+                    <button class="carousel-nav carousel-nav-prev" aria-label="<?php _e('Previous services', 'callamir'); ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-nav carousel-nav-next" aria-label="<?php _e('Next services', 'callamir'); ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                <?php endif; ?>
+
                 <!-- Services Carousel -->
                 <div class="services-carousel">
                     <div class="services-track">
-                        <?php
-                        $count = get_theme_mod('callamir_services_count', 3);
-                        for ($i = 1; $i <= $count; $i++) :
+                        <?php if ($count > 0) :
+                            for ($i = 1; $i <= $count; $i++) :
                             $icon = get_theme_mod("callamir_service_icon_{$i}", 'fa-solid fa-computer');
                             $title = callamir_mod("service_title_{$i}", $lang, "Service $i");
                             $desc = callamir_mod("service_desc_{$i}", $lang, "Description for service $i");
                             $full_desc = callamir_mod("service_full_desc_{$i}", $lang, "Detailed description for service $i");
                             $image = get_theme_mod("callamir_service_image_{$i}", '');
                             $price = callamir_mod("service_price_{$i}", $lang, '');
-                            $contact_form = get_theme_mod("callamir_service_contact_form_{$i}", '');
                         ?>
                             <div class="service-card" data-service="<?php echo $i; ?>">
                         <div class="service-card-inner">
@@ -121,13 +101,20 @@ if (!function_exists('callamir_mod')) {
                         </div>
                     </div>
                         <?php endfor; ?>
+                        <?php else : ?>
+                            <p class="services-empty-message text-center text-white/80">
+                                <?php esc_html_e('No services are available right now. Please check back soon.', 'callamir'); ?>
+                            </p>
+                        <?php endif; ?>
                     </div>
                 </div>
-                
+
                 <!-- Carousel Indicators -->
-                <div class="carousel-indicators">
-                    <!-- Indicators will be generated by JavaScript -->
-                </div>
+                <?php if ($count > 0) : ?>
+                    <div class="carousel-indicators">
+                        <!-- Indicators will be generated by JavaScript -->
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -151,7 +138,15 @@ if (!function_exists('callamir_mod')) {
                     <?php echo esc_html(callamir_mod('community_question_form_desc', $lang, __('Have a question? Ask our community and get helpful answers.', 'callamir'))); ?>
                 </p>
                 <div class="max-w-2xl mx-auto">
-                    <?php echo do_shortcode(get_theme_mod('callamir_community_question_form', '[contact-form-7 id="124" title="Community Question Form"]')); ?>
+                    <?php
+                    $community_form_shortcode = get_theme_mod('callamir_community_question_form', '[contact-form-7 id="124" title="Community Question Form"]');
+                    $community_form_output = do_shortcode($community_form_shortcode);
+                    if (stripos($community_form_output, 'contact form not found') !== false) {
+                        echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the community form shortcode in the Customizer.', 'callamir') . '</div>';
+                    } else {
+                        echo $community_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    }
+                    ?>
                 </div>
             </div>
 
@@ -218,7 +213,13 @@ if (!function_exists('callamir_mod')) {
             </div>
             <div class="w-full md:w-2/3">
                 <?php
-                echo do_shortcode(get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]'));
+                $contact_form_shortcode = get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]');
+                $contact_form_output = do_shortcode($contact_form_shortcode);
+                if (stripos($contact_form_output, 'contact form not found') !== false) {
+                    echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
+                } else {
+                    echo $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
                 ?>
             </div>
         </div>
