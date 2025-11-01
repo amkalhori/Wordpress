@@ -331,6 +331,14 @@ function callamir_generate_dynamic_css() {
     $leave_message_width = esc_attr(get_theme_mod('leave_message_width', '200px'));
     $leave_message_height = esc_attr(get_theme_mod('leave_message_height', '50px'));
     $footer_min_height = esc_attr(get_theme_mod('footer_min_height', '100px'));
+    $body_font_family = callamir_sanitize_font_family(get_theme_mod('body_font_family', "'Roboto', Arial, sans-serif"));
+    $heading_font_family = callamir_sanitize_font_family(get_theme_mod('heading_font_family', "'Montserrat', 'Roboto', Arial, sans-serif"));
+    $base_font_size = callamir_sanitize_dimension(get_theme_mod('base_font_size', '16px'));
+    $container_max_width = callamir_sanitize_dimension(get_theme_mod('container_max_width', '1200px'));
+    $section_vertical_padding = callamir_sanitize_dimension(get_theme_mod('section_vertical_padding', '4rem'));
+    $section_min_height = callamir_sanitize_dimension(get_theme_mod('section_min_height', '320px'));
+    $hero_min_height = callamir_sanitize_dimension(get_theme_mod('hero_min_height', '420px'));
+    $header_min_height = callamir_sanitize_dimension(get_theme_mod('header_min_height', '80px'));
     
     // Services section styling
     $services_card_bg = esc_attr(get_theme_mod('services_card_background', 'rgba(255, 255, 255, 0.05)'));
@@ -371,13 +379,24 @@ function callamir_generate_dynamic_css() {
         --services-icon-size: {$services_icon_size};
         --services-button-font-size: {$services_button_font_size};
         --services-button-border-radius: {$services_button_border_radius};
+        --callamir-body-font: {$body_font_family};
+        --callamir-heading-font: {$heading_font_family};
+        --callamir-base-font-size: {$base_font_size};
+        --callamir-container-width: {$container_max_width};
+        --callamir-section-padding: {$section_vertical_padding};
+        --callamir-section-min-height: {$section_min_height};
+        --callamir-hero-min-height: {$hero_min_height};
+        --callamir-header-min-height: {$header_min_height};
     }
-    body { color: var(--callamir-text); font-family: 'Roboto', Arial, sans-serif; }
+    body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
+    h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
+    .wrap { max-width: var(--callamir-container-width); }
     /* Header - Enhanced Cosmic Gradient */
     .site-header {
         background: " . ($enable_header_stars ? "linear-gradient(90deg, var(--cosmic-primary) 0%, #1B263B 70%, #415A77 100%)" : "var(--callamir-primary)") . ";
         position: sticky; top: 0; z-index: 1000;
         border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        min-height: var(--callamir-header-min-height);
     }
     .stars-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
     .site-header .wrap { display: flex; justify-content: var(--header-justify); align-items: center; padding: 10px 20px; }
@@ -400,12 +419,12 @@ function callamir_generate_dynamic_css() {
     .stars-footer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     /* Hero & Services - Enhanced Effects */
     .callamir-hero {
-        padding: 60px 20px; text-align: center; border-radius: 40px 40px 60px 60px;
+        padding: var(--callamir-section-padding) 20px; text-align: center; border-radius: 40px 40px 60px 60px;
         border-top: 2px solid var(--callamir-border); border-bottom: 2px solid var(--callamir-border);
         margin-bottom: 20px;
         background: " . ($enable_hero_effect ? "radial-gradient(circle at center, var(--cosmic-primary) 0%, #1B263B 50%, #415A77 100%)" : "var(--callamir-section-bg)") . ";
         background-size: 200%; animation: " . ($enable_hero_effect ? "blackholeSwirl 20s ease infinite" : "none") . ";
-        position: relative; z-index: 1; min-height: 400px;
+        position: relative; z-index: 1; min-height: var(--callamir-hero-min-height);
     }
     .callamir-hero h1 { font-size: 2.2rem; color: #ffffff; margin: 0 0 10px; }
     .callamir-hero p { font-size: 1.05rem; margin: 0 0 18px; color: #ffffff; }
@@ -413,10 +432,10 @@ function callamir_generate_dynamic_css() {
     .callamir-btn-call { background: var(--callamir-danger); color: #fff; }
     .callamir-btn-support { background: var(--callamir-accent); color: var(--callamir-primary); }
     .callamir-section {
-        padding: 50px 18px; border-radius: 20px; margin-bottom: 20px;
+        padding: var(--callamir-section-padding) 18px; border-radius: 20px; margin-bottom: 20px;
         background: " . ($enable_services_effect ? "radial-gradient(circle at center, var(--cosmic-primary) 0%, #1B263B 50%, #415A77 100%)" : "var(--callamir-section-bg)") . ";
         background-size: 200%; animation: " . ($enable_services_effect ? "blackholeSwirl 20s ease infinite" : "none") . ";
-        position: relative; z-index: 1; min-height: 400px;
+        position: relative; z-index: 1; min-height: var(--callamir-section-min-height);
     }
     .callamir-service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
     .callamir-card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.03); text-align: center; }
@@ -553,7 +572,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('logo_max_height', array(
         'default' => '80px',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('logo_max_height', array(
         'label' => __('Logo Max Height', 'callamir'),
@@ -563,7 +582,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('leave_message_width', array(
         'default' => '200px',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('leave_message_width', array(
         'label' => __('Leave Message Button Width', 'callamir'),
@@ -573,7 +592,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('leave_message_height', array(
         'default' => '50px',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('leave_message_height', array(
         'label' => __('Leave Message Button Height', 'callamir'),
@@ -583,13 +602,104 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('footer_min_height', array(
         'default' => '100px',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('footer_min_height', array(
         'label' => __('Footer Minimum Height', 'callamir'),
         'section' => 'callamir_header_footer',
         'type' => 'text',
         'description' => __('Enter value with unit, e.g., 100px', 'callamir'),
+    ));
+
+    // Typography & Layout Section
+    $wp_customize->add_section('callamir_typography_layout', array(
+        'title' => __('Typography & Layout', 'callamir'),
+        'priority' => 29,
+        'description' => __('Control fonts and layout spacing used throughout the theme.', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('body_font_family', array(
+        'default' => "'Roboto', Arial, sans-serif",
+        'sanitize_callback' => 'callamir_sanitize_font_family',
+    ));
+    $wp_customize->add_control('body_font_family', array(
+        'label' => __('Body Font Family', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Example: "Roboto, Arial, sans-serif"', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('heading_font_family', array(
+        'default' => "'Montserrat', 'Roboto', Arial, sans-serif",
+        'sanitize_callback' => 'callamir_sanitize_font_family',
+    ));
+    $wp_customize->add_control('heading_font_family', array(
+        'label' => __('Heading Font Family', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('base_font_size', array(
+        'default' => '16px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('base_font_size', array(
+        'label' => __('Base Font Size', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Set the default font size (e.g., 16px).', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('container_max_width', array(
+        'default' => '1200px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('container_max_width', array(
+        'label' => __('Content Max Width', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Maximum width for layout containers (e.g., 1200px).', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('section_vertical_padding', array(
+        'default' => '4rem',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('section_vertical_padding', array(
+        'label' => __('Section Vertical Padding', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Controls top and bottom padding for major sections.', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('section_min_height', array(
+        'default' => '320px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('section_min_height', array(
+        'label' => __('Section Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('hero_min_height', array(
+        'default' => '420px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('hero_min_height', array(
+        'label' => __('Hero Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('header_min_height', array(
+        'default' => '80px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('header_min_height', array(
+        'label' => __('Header Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
     ));
 
     // Cosmic Effects Section
@@ -1044,7 +1154,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_icon_size', array(
         'default' => '32px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_icon_size', array(
         'label' => __('Service Icon Size', 'callamir'),
@@ -1055,7 +1165,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_button_font_size', array(
         'default' => '16px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_button_font_size', array(
         'label' => __('Read More Button Font Size', 'callamir'),
@@ -1066,7 +1176,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_button_border_radius', array(
         'default' => '8px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_button_border_radius', array(
         'label' => __('Read More Button Border Radius', 'callamir'),
@@ -1798,6 +1908,40 @@ if (!function_exists('callamir_sanitize_css_value')) {
         }
 
         return '';
+    }
+}
+
+if (!function_exists('callamir_sanitize_dimension')) {
+    function callamir_sanitize_dimension($value) {
+        $value = callamir_sanitize_css_value($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        if (preg_match('/^calc\(.+\)$/i', $value)) {
+            return $value;
+        }
+
+        if (preg_match('/^-?\d+(?:\.\d+)?(px|em|rem|%|vh|vw|ch|ex)?$/i', $value)) {
+            return $value;
+        }
+
+        return $value;
+    }
+}
+
+if (!function_exists('callamir_sanitize_font_family')) {
+    function callamir_sanitize_font_family($value) {
+        if (!is_string($value)) {
+            return '';
+        }
+
+        $value = wp_strip_all_tags($value);
+        $value = preg_replace("/[^a-zA-Z0-9\s,\-\"']+/", '', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        return trim($value);
     }
 }
 

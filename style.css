@@ -63,6 +63,14 @@
     /* LEGACY SURFACE TOKENS */
     --blog-bg-color: var(--color-section-bg);
     --contact-bg-color: var(--color-section-bg);
+    --callamir-body-font: 'Roboto', Arial, sans-serif;
+    --callamir-heading-font: 'Montserrat', 'Roboto', Arial, sans-serif;
+    --callamir-base-font-size: 16px;
+    --callamir-container-width: 1200px;
+    --callamir-section-padding: 4rem;
+    --callamir-section-min-height: 320px;
+    --callamir-hero-min-height: 420px;
+    --callamir-header-min-height: 80px;
 }
 
 
@@ -72,12 +80,22 @@
  * Adds max-width and centers the content to achieve the 5-10% side distance.
  */ 
 .wrap {
-    max-width: 1200px;
+    max-width: var(--callamir-container-width);
     margin-left: auto;
     margin-right: auto;
     padding-left: 15px;
     padding-right: 15px;
     box-sizing: border-box;
+}
+
+body {
+    font-family: var(--callamir-body-font);
+    font-size: var(--callamir-base-font-size);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--callamir-heading-font);
 }
 
 @media (min-width: 768px) {
@@ -104,6 +122,27 @@ button:hover, .btn:hover, .cta-button:hover, .read-more-btn:hover, .hero-button:
     color: var(--color-light);
 }
 
+.callamir-hero,
+.callamir-section {
+    position: relative;
+    min-height: var(--callamir-section-min-height);
+    padding-top: var(--callamir-section-padding);
+    padding-bottom: var(--callamir-section-padding);
+}
+
+.callamir-hero {
+    min-height: var(--callamir-hero-min-height);
+}
+
+.cosmic-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
 /* Header Base Styles */
 .site-header {
     background: var(--nav-bg-gradient);
@@ -118,6 +157,7 @@ button:hover, .btn:hover, .cta-button:hover, .read-more-btn:hover, .hero-button:
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, box-shadow;
     width: 100%;
+    min-height: var(--callamir-header-min-height);
 }
 
 /* Enhanced sticky header with scroll effects */

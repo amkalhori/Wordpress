@@ -6,32 +6,11 @@ get_header();
 // Helper: Get current visitor language
 $lang = callamir_get_visitor_lang();
 // Utility: Return the theme_mod for chosen language
-if (!function_exists('callamir_mod')) {
-    function callamir_mod($key_base, $lang, $default = '') {
-        $key = $key_base . '_' . $lang;
-        return get_theme_mod($key, $default);
-    }
-}
 ?>
-<style>
-    .callamir-hero, .callamir-section {
-        position: relative;
-        min-height: 400px;
-    }
-    #blackhole, #services-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        pointer-events: none;
-    }
-</style>
 <main id="site-main" role="main" aria-live="polite">
     <!-- Hero Section with Black Hole Effect -->
-    <section id="hero" class="callamir-hero text-center relative overflow-hidden min-h-[400px]" aria-labelledby="hero-title">
-        <canvas id="blackhole" class="absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
+    <section id="hero" class="callamir-hero text-center relative overflow-hidden" aria-labelledby="hero-title">
+        <canvas id="blackhole" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="wrap flex flex-col items-center gap-6 p-4 relative z-10">
             <h1 id="hero-title" class="text-4xl font-bold text-white">
                 <?php echo esc_html(callamir_mod('hero_title', $lang, __('Simplifying Tech for Seniors & Small Businesses', 'callamir'))); ?>
@@ -65,7 +44,7 @@ if (!function_exists('callamir_mod')) {
     </section>
     <!-- Modern Services Section -->
     <section id="services" class="modern-services-section py-16 relative overflow-hidden" aria-labelledby="services-title">
-        <canvas id="services-canvas" class="absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
+        <canvas id="services-canvas" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="services-container">
             <div class="services-header text-center mb-12">
                 <h2 id="services-title" class="services-title">

@@ -5,20 +5,6 @@
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
-    <style>
-        .site-header {
-            position: relative;
-            min-height: 80px;
-        }
-        .stars-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-    </style>
 </head>
 <body <?php body_class(); ?> <?php echo ($current_lang === 'fa') ? 'dir="rtl"' : 'dir="ltr"'; ?>>
 <header class="site-header modern-header">
