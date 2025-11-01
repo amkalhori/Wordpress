@@ -6,6 +6,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Load modular theme components.
+require_once get_template_directory() . '/inc/language.php';
+
 // Theme loaded successfully
 
 /* --------------------------------------------------------------------------
@@ -209,61 +212,37 @@ function callamir_enqueue_scripts() {
     // Enqueue scripts with modern optimizations
     wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.55', true);
     
-    // Localize script for AJAX - CRITICAL for frontend language switching
+    // Localize script for AJAX and language metadata.
     wp_localize_script('callamir-theme-js', 'callamirText', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('callamir_nonce')
+        'nonce' => wp_create_nonce('callamir_nonce'),
     ));
-    
-    // Add inline script to ensure AJAX works on frontend
-    wp_add_inline_script('callamir-theme-js', '
-        // Ensure callamirText is available globally
-        if (typeof callamirText === "undefined") {
-            window.callamirText = {
-                ajaxurl: "' . admin_url('admin-ajax.php') . '",
-                nonce: "' . wp_create_nonce('callamir_nonce') . '"
-            };
-        }
-        
-        // Force language switching to work on frontend
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("Frontend language switcher initializing...");
-            
-            // Find all language links
-            const langLinks = document.querySelectorAll(".lang-flag-link, a[data-lang], .nav-lang-switcher a");
-            console.log("Found language links on frontend:", langLinks.length);
-            
-            langLinks.forEach(function(link) {
-                // Remove any existing listeners
-                link.removeEventListener("click", handleLanguageSwitch);
-                
-                // Add click listener
-                link.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    const lang = this.getAttribute("data-lang");
-                    console.log("Frontend language switch clicked:", lang);
-                    
-                    if (!lang) {
-                        console.error("No data-lang attribute found");
-                        return;
-                    }
-                    
-                    // Set cookie immediately
-                    document.cookie = "language=" + lang + "; path=/; max-age=604800";
-                    console.log("Cookie set:", lang);
-                    
-                    // Reload page
-                    window.location.reload();
-                });
-            });
-        });
-    ');
     
     // Add preload hints for better performance
     add_action('wp_head', function() {
         echo '<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
     });
 
+
+    // Provide the front end with canonical language metadata and URLs so
+    // JavaScript can keep navigation in sync with the visitor selection.
+    $current_lang = callamir_get_visitor_lang();
+    $language_payload = array(
+        'current' => $current_lang,
+        'default' => callamir_get_default_language(),
+        'supported' => array(),
+    );
+
+    foreach (callamir_get_supported_languages() as $code => $meta) {
+        $language_payload['supported'][] = array(
+            'code' => $code,
+            'label' => $meta['label'],
+            'direction' => $meta['direction'],
+            'url' => callamir_localize_url(home_url('/'), $code),
+        );
+    }
+
+    wp_localize_script('callamir-theme-js', 'callamirLang', $language_payload);
 
     // Localize theme mods for cosmic effects and services
     $theme_mods = array(
@@ -290,7 +269,7 @@ function callamir_enqueue_scripts() {
 
     // Localize service data for JavaScript
     $service_data = array();
-    $lang = callamir_get_visitor_lang();
+    $lang = $current_lang;
     $count = get_theme_mod('callamir_services_count', 3);
     
     for ($i = 1; $i <= $count; $i++) {
@@ -1550,41 +1529,6 @@ function callamir_customize_register($wp_customize) {
 add_action('customize_register', 'callamir_customize_register');
 
 /* --------------------------------------------------------------------------
- * Language Switcher (AJAX)
- * -------------------------------------------------------------------------- */
-function callamir_switch_language() {
-    // Check nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'callamir_nonce')) {
-        wp_send_json_error(array('message' => 'Invalid nonce'));
-    }
-    
-    if (!isset($_POST['lang'])) {
-        wp_send_json_error(array('message' => 'Missing lang parameter'));
-    }
-    
-    $lang = sanitize_text_field($_POST['lang']);
-    if (!in_array($lang, array('en', 'fa'), true)) {
-        wp_send_json_error(array('message' => 'Invalid language: ' . $lang));
-    }
-    
-    // Set cookie with proper path and domain
-    $cookie_set = setcookie('language', $lang, time() + 7 * DAY_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN);
-    
-    if ($cookie_set) {
-    $_COOKIE['language'] = $lang;
-        wp_send_json_success(array(
-            'lang' => $lang,
-            'message' => 'Language switched successfully',
-            'cookie_set' => $cookie_set
-        ));
-    } else {
-        wp_send_json_error(array('message' => 'Failed to set cookie'));
-    }
-}
-add_action('wp_ajax_callamir_switch_language', 'callamir_switch_language');
-add_action('wp_ajax_nopriv_callamir_switch_language', 'callamir_switch_language');
-
-/* --------------------------------------------------------------------------
  * Service Management (AJAX)
  * -------------------------------------------------------------------------- */
 function callamir_delete_service() {
@@ -1760,46 +1704,6 @@ function callamir_service_management_scripts() {
     <?php
 }
 
-function callamir_get_visitor_lang($use_theme_mod = true) {
-    if (isset($_GET['lang'])) {
-        $requested_lang = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
-        if (in_array($requested_lang, array('en', 'fa'), true)) {
-            if (!headers_sent()) {
-                $cookie_path = defined('COOKIEPATH') && COOKIEPATH ? COOKIEPATH : '/';
-                @setcookie('language', $requested_lang, time() + WEEK_IN_SECONDS, $cookie_path, defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '', is_ssl());
-            }
-            return $requested_lang;
-        }
-    }
-
-    if (isset($_COOKIE['language'])) {
-        $cookie_lang = sanitize_text_field(wp_unslash($_COOKIE['language']));
-        if (in_array($cookie_lang, array('en', 'fa'), true)) {
-            return $cookie_lang;
-        }
-    }
-
-    if ($use_theme_mod) {
-        $default_lang = get_theme_mod('site_language', 'en');
-        if (in_array($default_lang, array('en', 'fa'), true)) {
-            return $default_lang;
-        }
-    }
-
-    return 'en';
-}
-
-// Language detection working properly
-
-// Add debug function for language switching
-function callamir_debug_language_switching() {
-    if (current_user_can('manage_options')) {
-        echo '<!-- Language Debug: Current=' . callamir_get_visitor_lang() . ', Cookie=' . (isset($_COOKIE['language']) ? $_COOKIE['language'] : 'Not set') . ' -->';
-    }
-}
-add_action('wp_head', 'callamir_debug_language_switching');
-
-
 /* --------------------------------------------------------------------------
  * Blog Helper
  * -------------------------------------------------------------------------- */
@@ -1817,76 +1721,6 @@ function callamir_get_blog_items($posts_per_page = 3, $paged = 1) {
 /* --------------------------------------------------------------------------
  * Theme Mod Helper
  * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_normalize_theme_mod_value')) {
-    /**
-     * Normalize a theme mod value so translation lookups can safely determine
-     * whether the stored option is usable. Historically several service-related
-     * settings were sanitized with `wp_validate_boolean`, which coerced any
-     * non-empty string into a boolean `true`. When that happened the front-end
-     * would print "1" (or fall back to English) for Persian strings. Returning
-     * `null` for those legacy boolean values allows higher-level helpers to
-     * gracefully fall back to proper defaults.
-     *
-     * @param mixed $value Raw value retrieved from `get_theme_mod`.
-     * @return string|null Normalized string or `null` if unusable.
-     */
-    function callamir_normalize_theme_mod_value($value) {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (is_bool($value)) {
-            return null;
-        }
-
-        if (is_string($value)) {
-            $trimmed = trim($value);
-            if ($trimmed === '') {
-                return null;
-            }
-
-            $lower = strtolower($trimmed);
-            if (in_array($lower, array('1', '0', 'true', 'false', 'yes', 'no', 'on', 'off'), true)) {
-                return null;
-            }
-
-            return $trimmed;
-        }
-
-        if (is_numeric($value)) {
-            if ($value == 1 || $value == 0) {
-                return null;
-            }
-
-            return (string) $value;
-        }
-
-        return null;
-    }
-}
-
-if (!function_exists('callamir_mod')) {
-    function callamir_mod($key_base, $lang, $default = '') {
-        $candidates = array(
-            $key_base . '_' . $lang,
-            $lang === 'fa' ? $key_base . '_fa' : $key_base . '_en',
-            $lang === 'fa' ? $key_base . '_en' : $key_base . '_fa',
-            $key_base,
-        );
-
-        $candidates = array_values(array_unique(array_filter($candidates)));
-
-        foreach ($candidates as $candidate_key) {
-            $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
-            if ($value !== null) {
-                return $value;
-            }
-        }
-
-        return $default;
-    }
-}
-
 if (!function_exists('callamir_sanitize_select')) {
     function callamir_sanitize_select($input, $setting) {
         $input = sanitize_key($input);

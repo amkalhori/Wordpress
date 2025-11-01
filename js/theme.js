@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const debugEnabled = Boolean(window?.themeMods?.debug_mode);
+    const languageData = window.callamirLang || { current: 'en', supported: [] };
     const callamirLog = (...args) => {
         if (debugEnabled && typeof window.console !== 'undefined') {
             window.console.log(...args);
@@ -98,9 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 event.preventDefault();
-                setCookie('language', lang, 7);
+                if (lang !== languageData.current) {
+                    setCookie('language', lang, 7);
+                }
 
-                const targetUrl = link.getAttribute('href');
+                const fallback = languageData.supported.find((item) => item.code === lang);
+                const targetUrl = link.getAttribute('href') || (fallback ? fallback.url : null);
                 if (targetUrl) {
                     window.location.href = targetUrl;
                 }

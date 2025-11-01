@@ -42,8 +42,8 @@
                 <div class="lang-flags">
                     <?php
                     $flag_text = function_exists('callamir_mod') ? callamir_mod('flag_text', $current_lang, __('Languages:', 'callamir')) : __('Languages:', 'callamir');
-                    $english_url = add_query_arg('lang', 'en', home_url('/'));
-                    $persian_url = add_query_arg('lang', 'fa', home_url('/'));
+                    $english_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'en') : add_query_arg('lang', 'en', home_url('/'));
+                    $persian_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'fa') : add_query_arg('lang', 'fa', home_url('/'));
                     ?>
                     <span class="flag-text"><?php echo esc_html($flag_text); ?></span>
                     <?php if (get_theme_mod('enable_english', true)) : ?>
@@ -61,7 +61,8 @@
 
             <!-- CTA Button -->
             <div class="nav-cta">
-                <a href="<?php echo esc_url(get_theme_mod('leave_message_url', '#contact')); ?>" class="cta-button">
+                <?php $cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
+                <a href="<?php echo esc_url($cta_url); ?>" class="cta-button">
                     <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
                     <span><?php echo esc_html(function_exists('callamir_mod') ? callamir_mod('leave_message_text', $current_lang, __('Leave a message', 'callamir')) : __('Leave a message', 'callamir')); ?></span>
                 </a>
@@ -90,7 +91,8 @@
                 
                 <!-- Mobile CTA -->
                 <div class="mobile-cta">
-                    <a href="<?php echo esc_url(get_theme_mod('leave_message_url', '#contact')); ?>" class="mobile-cta-button">
+                    <?php $mobile_cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
+                    <a href="<?php echo esc_url($mobile_cta_url); ?>" class="mobile-cta-button">
                         <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
                         <span><?php echo esc_html(function_exists('callamir_mod') ? callamir_mod('leave_message_text', $current_lang, __('Leave a message', 'callamir')) : __('Leave a message', 'callamir')); ?></span>
                     </a>
