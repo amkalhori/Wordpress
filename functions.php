@@ -6,6 +6,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Load modular theme components.
+require_once get_template_directory() . '/inc/language.php';
+
 // Theme loaded successfully
 
 /* --------------------------------------------------------------------------
@@ -209,61 +212,37 @@ function callamir_enqueue_scripts() {
     // Enqueue scripts with modern optimizations
     wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.55', true);
     
-    // Localize script for AJAX - CRITICAL for frontend language switching
+    // Localize script for AJAX and language metadata.
     wp_localize_script('callamir-theme-js', 'callamirText', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('callamir_nonce')
+        'nonce' => wp_create_nonce('callamir_nonce'),
     ));
-    
-    // Add inline script to ensure AJAX works on frontend
-    wp_add_inline_script('callamir-theme-js', '
-        // Ensure callamirText is available globally
-        if (typeof callamirText === "undefined") {
-            window.callamirText = {
-                ajaxurl: "' . admin_url('admin-ajax.php') . '",
-                nonce: "' . wp_create_nonce('callamir_nonce') . '"
-            };
-        }
-        
-        // Force language switching to work on frontend
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("Frontend language switcher initializing...");
-            
-            // Find all language links
-            const langLinks = document.querySelectorAll(".lang-flag-link, a[data-lang], .nav-lang-switcher a");
-            console.log("Found language links on frontend:", langLinks.length);
-            
-            langLinks.forEach(function(link) {
-                // Remove any existing listeners
-                link.removeEventListener("click", handleLanguageSwitch);
-                
-                // Add click listener
-                link.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    const lang = this.getAttribute("data-lang");
-                    console.log("Frontend language switch clicked:", lang);
-                    
-                    if (!lang) {
-                        console.error("No data-lang attribute found");
-                        return;
-                    }
-                    
-                    // Set cookie immediately
-                    document.cookie = "language=" + lang + "; path=/; max-age=604800";
-                    console.log("Cookie set:", lang);
-                    
-                    // Reload page
-                    window.location.reload();
-                });
-            });
-        });
-    ');
     
     // Add preload hints for better performance
     add_action('wp_head', function() {
         echo '<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
     });
 
+
+    // Provide the front end with canonical language metadata and URLs so
+    // JavaScript can keep navigation in sync with the visitor selection.
+    $current_lang = callamir_get_visitor_lang();
+    $language_payload = array(
+        'current' => $current_lang,
+        'default' => callamir_get_default_language(),
+        'supported' => array(),
+    );
+
+    foreach (callamir_get_supported_languages() as $code => $meta) {
+        $language_payload['supported'][] = array(
+            'code' => $code,
+            'label' => $meta['label'],
+            'direction' => $meta['direction'],
+            'url' => callamir_localize_url(home_url('/'), $code),
+        );
+    }
+
+    wp_localize_script('callamir-theme-js', 'callamirLang', $language_payload);
 
     // Localize theme mods for cosmic effects and services
     $theme_mods = array(
@@ -290,7 +269,7 @@ function callamir_enqueue_scripts() {
 
     // Localize service data for JavaScript
     $service_data = array();
-    $lang = callamir_get_visitor_lang();
+    $lang = $current_lang;
     $count = get_theme_mod('callamir_services_count', 3);
     
     for ($i = 1; $i <= $count; $i++) {
@@ -331,6 +310,14 @@ function callamir_generate_dynamic_css() {
     $leave_message_width = esc_attr(get_theme_mod('leave_message_width', '200px'));
     $leave_message_height = esc_attr(get_theme_mod('leave_message_height', '50px'));
     $footer_min_height = esc_attr(get_theme_mod('footer_min_height', '100px'));
+    $body_font_family = callamir_sanitize_font_family(get_theme_mod('body_font_family', "'Roboto', Arial, sans-serif"));
+    $heading_font_family = callamir_sanitize_font_family(get_theme_mod('heading_font_family', "'Montserrat', 'Roboto', Arial, sans-serif"));
+    $base_font_size = callamir_sanitize_dimension(get_theme_mod('base_font_size', '16px'));
+    $container_max_width = callamir_sanitize_dimension(get_theme_mod('container_max_width', '1200px'));
+    $section_vertical_padding = callamir_sanitize_dimension(get_theme_mod('section_vertical_padding', '4rem'));
+    $section_min_height = callamir_sanitize_dimension(get_theme_mod('section_min_height', '320px'));
+    $hero_min_height = callamir_sanitize_dimension(get_theme_mod('hero_min_height', '420px'));
+    $header_min_height = callamir_sanitize_dimension(get_theme_mod('header_min_height', '80px'));
     
     // Services section styling
     $services_card_bg = esc_attr(get_theme_mod('services_card_background', 'rgba(255, 255, 255, 0.05)'));
@@ -371,13 +358,24 @@ function callamir_generate_dynamic_css() {
         --services-icon-size: {$services_icon_size};
         --services-button-font-size: {$services_button_font_size};
         --services-button-border-radius: {$services_button_border_radius};
+        --callamir-body-font: {$body_font_family};
+        --callamir-heading-font: {$heading_font_family};
+        --callamir-base-font-size: {$base_font_size};
+        --callamir-container-width: {$container_max_width};
+        --callamir-section-padding: {$section_vertical_padding};
+        --callamir-section-min-height: {$section_min_height};
+        --callamir-hero-min-height: {$hero_min_height};
+        --callamir-header-min-height: {$header_min_height};
     }
-    body { color: var(--callamir-text); font-family: 'Roboto', Arial, sans-serif; }
+    body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
+    h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
+    .wrap { max-width: var(--callamir-container-width); }
     /* Header - Enhanced Cosmic Gradient */
     .site-header {
         background: " . ($enable_header_stars ? "linear-gradient(90deg, var(--cosmic-primary) 0%, #1B263B 70%, #415A77 100%)" : "var(--callamir-primary)") . ";
         position: sticky; top: 0; z-index: 1000;
         border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        min-height: var(--callamir-header-min-height);
     }
     .stars-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
     .site-header .wrap { display: flex; justify-content: var(--header-justify); align-items: center; padding: 10px 20px; }
@@ -400,12 +398,12 @@ function callamir_generate_dynamic_css() {
     .stars-footer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     /* Hero & Services - Enhanced Effects */
     .callamir-hero {
-        padding: 60px 20px; text-align: center; border-radius: 40px 40px 60px 60px;
+        padding: var(--callamir-section-padding) 20px; text-align: center; border-radius: 40px 40px 60px 60px;
         border-top: 2px solid var(--callamir-border); border-bottom: 2px solid var(--callamir-border);
         margin-bottom: 20px;
         background: " . ($enable_hero_effect ? "radial-gradient(circle at center, var(--cosmic-primary) 0%, #1B263B 50%, #415A77 100%)" : "var(--callamir-section-bg)") . ";
         background-size: 200%; animation: " . ($enable_hero_effect ? "blackholeSwirl 20s ease infinite" : "none") . ";
-        position: relative; z-index: 1; min-height: 400px;
+        position: relative; z-index: 1; min-height: var(--callamir-hero-min-height);
     }
     .callamir-hero h1 { font-size: 2.2rem; color: #ffffff; margin: 0 0 10px; }
     .callamir-hero p { font-size: 1.05rem; margin: 0 0 18px; color: #ffffff; }
@@ -413,10 +411,10 @@ function callamir_generate_dynamic_css() {
     .callamir-btn-call { background: var(--callamir-danger); color: #fff; }
     .callamir-btn-support { background: var(--callamir-accent); color: var(--callamir-primary); }
     .callamir-section {
-        padding: 50px 18px; border-radius: 20px; margin-bottom: 20px;
+        padding: var(--callamir-section-padding) 18px; border-radius: 20px; margin-bottom: 20px;
         background: " . ($enable_services_effect ? "radial-gradient(circle at center, var(--cosmic-primary) 0%, #1B263B 50%, #415A77 100%)" : "var(--callamir-section-bg)") . ";
         background-size: 200%; animation: " . ($enable_services_effect ? "blackholeSwirl 20s ease infinite" : "none") . ";
-        position: relative; z-index: 1; min-height: 400px;
+        position: relative; z-index: 1; min-height: var(--callamir-section-min-height);
     }
     .callamir-service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
     .callamir-card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.03); text-align: center; }
@@ -507,7 +505,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('header_justify_content', array(
         'default' => 'space-between',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_select',
     ));
     $wp_customize->add_control('header_justify_content', array(
         'label' => __('Header Justify Content', 'callamir'),
@@ -523,7 +521,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('header_justify_content_mobile', array(
         'default' => 'space-between',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_select',
     ));
     $wp_customize->add_control('header_justify_content_mobile', array(
         'label' => __('Header Justify Content (Mobile)', 'callamir'),
@@ -539,7 +537,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('header_logo_alignment', array(
         'default' => 'left',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_select',
     ));
     $wp_customize->add_control('header_logo_alignment', array(
         'label' => __('Logo Alignment', 'callamir'),
@@ -553,7 +551,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('logo_max_height', array(
         'default' => '80px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('logo_max_height', array(
         'label' => __('Logo Max Height', 'callamir'),
@@ -563,7 +561,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('leave_message_width', array(
         'default' => '200px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('leave_message_width', array(
         'label' => __('Leave Message Button Width', 'callamir'),
@@ -573,7 +571,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('leave_message_height', array(
         'default' => '50px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('leave_message_height', array(
         'label' => __('Leave Message Button Height', 'callamir'),
@@ -583,13 +581,104 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('footer_min_height', array(
         'default' => '100px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('footer_min_height', array(
         'label' => __('Footer Minimum Height', 'callamir'),
         'section' => 'callamir_header_footer',
         'type' => 'text',
         'description' => __('Enter value with unit, e.g., 100px', 'callamir'),
+    ));
+
+    // Typography & Layout Section
+    $wp_customize->add_section('callamir_typography_layout', array(
+        'title' => __('Typography & Layout', 'callamir'),
+        'priority' => 29,
+        'description' => __('Control fonts and layout spacing used throughout the theme.', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('body_font_family', array(
+        'default' => "'Roboto', Arial, sans-serif",
+        'sanitize_callback' => 'callamir_sanitize_font_family',
+    ));
+    $wp_customize->add_control('body_font_family', array(
+        'label' => __('Body Font Family', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Example: "Roboto, Arial, sans-serif"', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('heading_font_family', array(
+        'default' => "'Montserrat', 'Roboto', Arial, sans-serif",
+        'sanitize_callback' => 'callamir_sanitize_font_family',
+    ));
+    $wp_customize->add_control('heading_font_family', array(
+        'label' => __('Heading Font Family', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('base_font_size', array(
+        'default' => '16px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('base_font_size', array(
+        'label' => __('Base Font Size', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Set the default font size (e.g., 16px).', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('container_max_width', array(
+        'default' => '1200px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('container_max_width', array(
+        'label' => __('Content Max Width', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Maximum width for layout containers (e.g., 1200px).', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('section_vertical_padding', array(
+        'default' => '4rem',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('section_vertical_padding', array(
+        'label' => __('Section Vertical Padding', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+        'description' => __('Controls top and bottom padding for major sections.', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('section_min_height', array(
+        'default' => '320px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('section_min_height', array(
+        'label' => __('Section Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('hero_min_height', array(
+        'default' => '420px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('hero_min_height', array(
+        'label' => __('Hero Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('header_min_height', array(
+        'default' => '80px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+    ));
+    $wp_customize->add_control('header_min_height', array(
+        'label' => __('Header Minimum Height', 'callamir'),
+        'section' => 'callamir_typography_layout',
+        'type' => 'text',
     ));
 
     // Cosmic Effects Section
@@ -650,7 +739,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('callamir_hero_blackhole_pattern', array(
         'default' => 'circular',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_select',
     ));
     $wp_customize->add_control('callamir_hero_blackhole_pattern', array(
         'label' => __('Hero Blackhole Pattern', 'callamir'),
@@ -693,7 +782,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('callamir_services_pattern', array(
         'default' => 'circular',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_select',
     ));
     $wp_customize->add_control('callamir_services_pattern', array(
         'label' => __('Services Pattern', 'callamir'),
@@ -747,7 +836,7 @@ function callamir_customize_register($wp_customize) {
     // Services Section Title and Subtitle
     $wp_customize->add_setting('services_title_en', array(
         'default' => __('Our Services', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('services_title_en', array(
         'label' => __('Services Section Title (EN)', 'callamir'),
@@ -757,7 +846,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_title_fa', array(
         'default' => __('خدمات ما', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('services_title_fa', array(
         'label' => __('Services Section Title (FA)', 'callamir'),
@@ -788,7 +877,7 @@ function callamir_customize_register($wp_customize) {
     // Read More Button Text
     $wp_customize->add_setting('read_more_text_en', array(
         'default' => __('Read More', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('read_more_text_en', array(
         'label' => __('Read More Button Text (EN)', 'callamir'),
@@ -798,7 +887,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('read_more_text_fa', array(
         'default' => __('بیشتر بخوانید', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('read_more_text_fa', array(
         'label' => __('Read More Button Text (FA)', 'callamir'),
@@ -811,7 +900,7 @@ function callamir_customize_register($wp_customize) {
         // Service Icon
         $wp_customize->add_setting("callamir_service_icon_{$i}", array(
             'default' => 'fa-solid fa-computer',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("callamir_service_icon_{$i}", array(
             'label' => __("Service {$i} Icon (FontAwesome class)", 'callamir'),
@@ -834,7 +923,7 @@ function callamir_customize_register($wp_customize) {
         // Service Title (EN/FA)
         $wp_customize->add_setting("service_title_{$i}_en", array(
             'default' => __("Service {$i}", 'callamir'),
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_title_{$i}_en", array(
             'label' => __("Service {$i} Title (EN)", 'callamir'),
@@ -844,7 +933,7 @@ function callamir_customize_register($wp_customize) {
 
         $wp_customize->add_setting("service_title_{$i}_fa", array(
             'default' => __("خدمت {$i}", 'callamir'),
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_title_{$i}_fa", array(
             'label' => __("Service {$i} Title (FA)", 'callamir'),
@@ -899,7 +988,7 @@ function callamir_customize_register($wp_customize) {
         // Service Price (EN/FA)
         $wp_customize->add_setting("service_price_{$i}_en", array(
             'default' => '',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_price_{$i}_en", array(
             'label' => __("Service {$i} Price (EN)", 'callamir'),
@@ -910,7 +999,7 @@ function callamir_customize_register($wp_customize) {
 
         $wp_customize->add_setting("service_price_{$i}_fa", array(
             'default' => '',
-            'sanitize_callback' => 'wp_validate_boolean',
+            'sanitize_callback' => 'sanitize_text_field',
         ));
         $wp_customize->add_control("service_price_{$i}_fa", array(
             'label' => __("Service {$i} Price (FA)", 'callamir'),
@@ -961,7 +1050,7 @@ function callamir_customize_register($wp_customize) {
     // Services Section Styling
     $wp_customize->add_setting('services_card_background', array(
         'default' => 'rgba(255, 255, 255, 0.05)',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
     ));
     $wp_customize->add_control('services_card_background', array(
         'label' => __('Service Card Background', 'callamir'),
@@ -972,7 +1061,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_card_border_color', array(
         'default' => 'rgba(255, 255, 255, 0.1)',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
     ));
     $wp_customize->add_control('services_card_border_color', array(
         'label' => __('Service Card Border Color', 'callamir'),
@@ -1001,7 +1090,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_description_color', array(
         'default' => 'rgba(255, 255, 255, 0.8)',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
     ));
     $wp_customize->add_control('services_description_color', array(
         'label' => __('Service Description Color', 'callamir'),
@@ -1012,7 +1101,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_button_background', array(
         'default' => 'linear-gradient(135deg, #FFD700, #FFA500)',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
     ));
     $wp_customize->add_control('services_button_background', array(
         'label' => __('Read More Button Background', 'callamir'),
@@ -1044,7 +1133,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_icon_size', array(
         'default' => '32px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_icon_size', array(
         'label' => __('Service Icon Size', 'callamir'),
@@ -1055,7 +1144,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_button_font_size', array(
         'default' => '16px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_button_font_size', array(
         'label' => __('Read More Button Font Size', 'callamir'),
@@ -1066,7 +1155,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('services_button_border_radius', array(
         'default' => '8px',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
     ));
     $wp_customize->add_control('services_button_border_radius', array(
         'label' => __('Read More Button Border Radius', 'callamir'),
@@ -1093,7 +1182,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('contact_phone', array(
         'default' => '416-123-4567',
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('contact_phone', array(
         'label' => __('Contact Phone Number', 'callamir'),
@@ -1102,7 +1191,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('hero_btn_call_en', array(
         'default' => __('Call Now', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_btn_call_en', array(
         'label' => __('Call Button Text (EN)', 'callamir'),
@@ -1111,7 +1200,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('hero_btn_call_fa', array(
         'default' => __('اکنون تماس بگیرید', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_btn_call_fa', array(
         'label' => __('Call Button Text (FA)', 'callamir'),
@@ -1120,7 +1209,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('hero_btn_support_en', array(
         'default' => __('Get IT Support', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_btn_support_en', array(
         'label' => __('Support Button Text (EN)', 'callamir'),
@@ -1129,7 +1218,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('hero_btn_support_fa', array(
         'default' => __('دریافت پشتیبانی آی تی', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_btn_support_fa', array(
         'label' => __('Support Button Text (FA)', 'callamir'),
@@ -1138,7 +1227,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('whatsapp_text_en', array(
         'default' => __('WhatsApp', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('whatsapp_text_en', array(
         'label' => __('WhatsApp Button Text (EN)', 'callamir'),
@@ -1147,7 +1236,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('whatsapp_text_fa', array(
         'default' => __('واتساپ', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('whatsapp_text_fa', array(
         'label' => __('WhatsApp Button Text (FA)', 'callamir'),
@@ -1156,7 +1245,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('telegram_text_en', array(
         'default' => __('Telegram', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('telegram_text_en', array(
         'label' => __('Telegram Button Text (EN)', 'callamir'),
@@ -1165,7 +1254,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('telegram_text_fa', array(
         'default' => __('تلگرام', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('telegram_text_fa', array(
         'label' => __('Telegram Button Text (FA)', 'callamir'),
@@ -1198,7 +1287,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('blog_title_en', array(
         'default' => __('Tips & Daily Quotes', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('blog_title_en', array(
         'label' => __('Blog Section Title (EN)', 'callamir'),
@@ -1207,7 +1296,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('blog_title_fa', array(
         'default' => __('نکات و نقل قول‌های روزانه', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('blog_title_fa', array(
         'label' => __('Blog Section Title (FA)', 'callamir'),
@@ -1216,7 +1305,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('blog_desc_en', array(
         'default' => __('Latest insights, IT tips, and motivational posts.', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_textarea_field',
     ));
     $wp_customize->add_control('blog_desc_en', array(
         'label' => __('Blog Section Description (EN)', 'callamir'),
@@ -1225,7 +1314,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('blog_desc_fa', array(
         'default' => __('آخرین نکات، ترفندهای آی تی و پست‌های انگیزشی.', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_textarea_field',
     ));
     $wp_customize->add_control('blog_desc_fa', array(
         'label' => __('Blog Section Description (FA)', 'callamir'),
@@ -1300,7 +1389,7 @@ function callamir_customize_register($wp_customize) {
     // Flag Text
     $wp_customize->add_setting('flag_text_en', array(
         'default' => __('Languages:', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('flag_text_en', array(
         'label' => __('Flag Text (EN)', 'callamir'),
@@ -1310,7 +1399,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('flag_text_fa', array(
         'default' => __('زبان‌ها:', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('flag_text_fa', array(
         'label' => __('Flag Text (FA)', 'callamir'),
@@ -1321,7 +1410,7 @@ function callamir_customize_register($wp_customize) {
     // Flag Alt Text
     $wp_customize->add_setting('english_flag_alt', array(
         'default' => __('English', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('english_flag_alt', array(
         'label' => __('English Flag Alt Text', 'callamir'),
@@ -1331,7 +1420,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('persian_flag_alt', array(
         'default' => __('Persian', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('persian_flag_alt', array(
         'label' => __('Persian Flag Alt Text', 'callamir'),
@@ -1346,7 +1435,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('community_title_en', array(
         'default' => __('Community Questions', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('community_title_en', array(
         'label' => __('Community Section Title (EN)', 'callamir'),
@@ -1355,7 +1444,7 @@ function callamir_customize_register($wp_customize) {
     ));
     $wp_customize->add_setting('community_title_fa', array(
         'default' => __('سوالات جامعه', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('community_title_fa', array(
         'label' => __('Community Section Title (FA)', 'callamir'),
@@ -1367,7 +1456,7 @@ function callamir_customize_register($wp_customize) {
     // Community Question Form Title
     $wp_customize->add_setting('community_question_form_title_en', array(
         'default' => __('Ask a Question', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('community_question_form_title_en', array(
         'label' => __('Question Form Title (EN)', 'callamir'),
@@ -1377,7 +1466,7 @@ function callamir_customize_register($wp_customize) {
     
     $wp_customize->add_setting('community_question_form_title_fa', array(
         'default' => __('سوال بپرسید', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('community_question_form_title_fa', array(
         'label' => __('Question Form Title (FA)', 'callamir'),
@@ -1409,7 +1498,7 @@ function callamir_customize_register($wp_customize) {
     // Add missing language settings for better Persian support
     $wp_customize->add_setting('hero_title_fa', array(
         'default' => __('ساده‌سازی فناوری برای سالمندان و کسب‌وکارهای کوچک', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_title_fa', array(
         'label' => __('Hero Title (FA)', 'callamir'),
@@ -1419,7 +1508,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('hero_text_fa', array(
         'default' => __('پشتیبانی آی‌تی دوستانه، حرفه‌ای و با قیمت مناسب در تورنتو.', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_text_fa', array(
         'label' => __('Hero Text (FA)', 'callamir'),
@@ -1429,7 +1518,7 @@ function callamir_customize_register($wp_customize) {
 
     $wp_customize->add_setting('hero_short_desc_fa', array(
         'default' => __('ما به کاربران غیرفنی کمک می‌کنیم تا مشکلات فناوری را سریع و مهربان حل کنند.', 'callamir'),
-        'sanitize_callback' => 'wp_validate_boolean',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_short_desc_fa', array(
         'label' => __('Hero Short Description (FA)', 'callamir'),
@@ -1438,41 +1527,6 @@ function callamir_customize_register($wp_customize) {
     ));
 }
 add_action('customize_register', 'callamir_customize_register');
-
-/* --------------------------------------------------------------------------
- * Language Switcher (AJAX)
- * -------------------------------------------------------------------------- */
-function callamir_switch_language() {
-    // Check nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'callamir_nonce')) {
-        wp_send_json_error(array('message' => 'Invalid nonce'));
-    }
-    
-    if (!isset($_POST['lang'])) {
-        wp_send_json_error(array('message' => 'Missing lang parameter'));
-    }
-    
-    $lang = sanitize_text_field($_POST['lang']);
-    if (!in_array($lang, array('en', 'fa'), true)) {
-        wp_send_json_error(array('message' => 'Invalid language: ' . $lang));
-    }
-    
-    // Set cookie with proper path and domain
-    $cookie_set = setcookie('language', $lang, time() + 7 * DAY_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN);
-    
-    if ($cookie_set) {
-    $_COOKIE['language'] = $lang;
-        wp_send_json_success(array(
-            'lang' => $lang,
-            'message' => 'Language switched successfully',
-            'cookie_set' => $cookie_set
-        ));
-    } else {
-        wp_send_json_error(array('message' => 'Failed to set cookie'));
-    }
-}
-add_action('wp_ajax_callamir_switch_language', 'callamir_switch_language');
-add_action('wp_ajax_nopriv_callamir_switch_language', 'callamir_switch_language');
 
 /* --------------------------------------------------------------------------
  * Service Management (AJAX)
@@ -1650,37 +1704,6 @@ function callamir_service_management_scripts() {
     <?php
 }
 
-function callamir_get_visitor_lang($use_theme_mod = true) {
-    // First check if there's a cookie set
-    if (isset($_COOKIE['language'])) {
-        $cookie_lang = sanitize_text_field($_COOKIE['language']);
-        if (in_array($cookie_lang, array('en', 'fa'), true)) {
-            return $cookie_lang;
-        }
-    }
-
-    // Fallback to theme mod default
-    if ($use_theme_mod) {
-        $default_lang = get_theme_mod('site_language', 'en');
-        if (in_array($default_lang, array('en', 'fa'), true)) {
-            return $default_lang;
-        }
-    }
-
-    return 'en';
-}
-
-// Language detection working properly
-
-// Add debug function for language switching
-function callamir_debug_language_switching() {
-    if (current_user_can('manage_options')) {
-        echo '<!-- Language Debug: Current=' . callamir_get_visitor_lang() . ', Cookie=' . (isset($_COOKIE['language']) ? $_COOKIE['language'] : 'Not set') . ' -->';
-    }
-}
-add_action('wp_head', 'callamir_debug_language_switching');
-
-
 /* --------------------------------------------------------------------------
  * Blog Helper
  * -------------------------------------------------------------------------- */
@@ -1698,10 +1721,61 @@ function callamir_get_blog_items($posts_per_page = 3, $paged = 1) {
 /* --------------------------------------------------------------------------
  * Theme Mod Helper
  * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_mod')) {
-    function callamir_mod($key_base, $lang, $default = '') {
-        $key = $key_base . '_' . $lang;
-        return get_theme_mod($key, $default);
+if (!function_exists('callamir_sanitize_select')) {
+    function callamir_sanitize_select($input, $setting) {
+        $input = sanitize_key($input);
+        $control = $setting->manager->get_control($setting->id);
+        if ($control && isset($control->choices[$input])) {
+            return $input;
+        }
+
+        return $setting->default;
+    }
+}
+
+if (!function_exists('callamir_sanitize_css_value')) {
+    function callamir_sanitize_css_value($value) {
+        if (is_string($value)) {
+            $value = wp_strip_all_tags($value);
+            $value = preg_replace('/\s+/', ' ', $value);
+            return trim($value);
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('callamir_sanitize_dimension')) {
+    function callamir_sanitize_dimension($value) {
+        $value = callamir_sanitize_css_value($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        if (preg_match('/^calc\(.+\)$/i', $value)) {
+            return $value;
+        }
+
+        if (preg_match('/^-?\d+(?:\.\d+)?(px|em|rem|%|vh|vw|ch|ex)?$/i', $value)) {
+            return $value;
+        }
+
+        return $value;
+    }
+}
+
+if (!function_exists('callamir_sanitize_font_family')) {
+    function callamir_sanitize_font_family($value) {
+        if (!is_string($value)) {
+            return '';
+        }
+
+        $value = wp_strip_all_tags($value);
+        $value = preg_replace("/[^a-zA-Z0-9\s,\-\"']+/", '', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        return trim($value);
     }
 }
 
@@ -1709,7 +1783,7 @@ if (!function_exists('callamir_mod')) {
  * Fallback Menu Function
  * -------------------------------------------------------------------------- */
 function callamir_fallback_menu() {
-    $lang = get_theme_mod('site_language', 'en');
+    $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
     $menu_items = array(
         array('title' => ($lang === 'fa') ? 'خانه' : 'Home', 'url' => '#home'),
         array('title' => ($lang === 'fa') ? 'خدمات' : 'Services', 'url' => '#services'),
@@ -2023,8 +2097,9 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
         foreach ($mods as $key => $value) {
             if (substr($key, -3) === '_fa') {
                 $base = substr($key, 0, -3);
-                if (isset($mods[$key]) && $mods[$key] !== '') {
-                    $mods[$base] = $mods[$key];
+                $normalized = callamir_normalize_theme_mod_value($mods[$key]);
+                if ($normalized !== null) {
+                    $mods[$base] = $normalized;
                 }
             }
         }
@@ -2041,12 +2116,22 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
 if (!function_exists('callamir_get_text')) {
     function callamir_get_text($key, $default_en = '', $default_fa = '') {
         $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
-        if ($lang === 'fa') {
-            $val = get_theme_mod($key . '_fa', $default_fa);
-            if ($val !== '') return $val;
+
+        $preferred_default = ($lang === 'fa' && $default_fa !== '') ? $default_fa : $default_en;
+        $value = callamir_mod($key, $lang, $preferred_default);
+
+        if ($lang === 'fa' && ($value === '' || $value === $preferred_default)) {
+            $fallback = callamir_mod($key, 'en', $default_en);
+            if ($fallback !== '') {
+                $value = $fallback;
+            }
         }
-        $val = get_theme_mod($key, $default_en);
-        return $val !== '' ? $val : $default_en;
+
+        if ($value === '') {
+            return $preferred_default;
+        }
+
+        return $value;
     }
 }
 
