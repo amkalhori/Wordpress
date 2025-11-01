@@ -211,12 +211,30 @@ if (!function_exists('callamir_mod')) {
      * @return string
      */
     function callamir_mod($key_base, $lang, $default = '') {
-        $candidates = array(
-            $key_base . '_' . $lang,
-            $lang === 'fa' ? $key_base . '_fa' : $key_base . '_en',
-            $lang === 'fa' ? $key_base . '_en' : $key_base . '_fa',
-            $key_base,
-        );
+        $candidates = array();
+
+        if (!empty($lang)) {
+            $candidates[] = $key_base . '_' . $lang;
+        }
+
+        $candidates[] = $key_base;
+
+        if (function_exists('callamir_get_default_language')) {
+            $default_lang = callamir_get_default_language();
+            if ($default_lang && $default_lang !== $lang) {
+                $candidates[] = $key_base . '_' . $default_lang;
+            }
+        }
+
+        if (function_exists('callamir_get_supported_languages')) {
+            foreach (array_keys(callamir_get_supported_languages()) as $supported_lang) {
+                if ($supported_lang === $lang) {
+                    continue;
+                }
+
+                $candidates[] = $key_base . '_' . $supported_lang;
+            }
+        }
 
         $candidates = array_values(array_unique(array_filter($candidates)));
 
