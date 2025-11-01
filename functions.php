@@ -1581,6 +1581,37 @@ function callamir_customize_register($wp_customize) {
         'type' => 'textarea',
     ));
 
+    // Hero Section Language Settings
+    $wp_customize->add_setting('hero_title_en', array(
+        'default' => __('Simplifying Tech for Seniors & Small Businesses', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('hero_title_en', array(
+        'label' => __('Hero Title (EN)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('hero_text_en', array(
+        'default' => __('Friendly, professional, and reasonably priced IT support in Toronto.', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('hero_text_en', array(
+        'label' => __('Hero Text (EN)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('hero_short_desc_en', array(
+        'default' => __('We help non-technical users solve tech problems quickly and kindly.', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('hero_short_desc_en', array(
+        'label' => __('Hero Short Description (EN)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
     // Add missing language settings for better Persian support
     $wp_customize->add_setting('hero_title_fa', array(
         'default' => __('ساده‌سازی فناوری برای سالمندان و کسب‌وکارهای کوچک', 'callamir'),
@@ -1755,10 +1786,22 @@ if (!function_exists('callamir_sanitize_font_family')) {
 function callamir_fallback_menu() {
     $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
     $menu_items = array(
-        array('title' => ($lang === 'fa') ? 'خانه' : 'Home', 'url' => '#home'),
-        array('title' => ($lang === 'fa') ? 'خدمات' : 'Services', 'url' => '#services'),
-        array('title' => ($lang === 'fa') ? 'تماس' : 'Contact', 'url' => '#contact'),
-        array('title' => ($lang === 'fa') ? 'وبلاگ' : 'Blog', 'url' => '#blog'),
+        array(
+            'title' => ($lang === 'fa') ? __('خانه', 'callamir') : __('Home', 'callamir'),
+            'url' => '#home',
+        ),
+        array(
+            'title' => ($lang === 'fa') ? __('خدمات', 'callamir') : __('Services', 'callamir'),
+            'url' => '#services',
+        ),
+        array(
+            'title' => ($lang === 'fa') ? __('تماس', 'callamir') : __('Contact', 'callamir'),
+            'url' => '#contact',
+        ),
+        array(
+            'title' => ($lang === 'fa') ? __('وبلاگ', 'callamir') : __('Blog', 'callamir'),
+            'url' => '#blog',
+        ),
     );
     
     echo '<ul class="nav-menu-desktop">';
