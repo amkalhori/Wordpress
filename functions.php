@@ -302,11 +302,15 @@ add_action('save_post', 'callamir_save_community_question_meta');
  * -------------------------------------------------------------------------- */
 function callamir_enqueue_scripts() {
     // Enqueue styles with performance optimizations
-    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), '1.0.55');
+    $theme_version = '1.0.56';
+
+    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), $theme_version);
+    wp_style_add_data('callamir-style', 'rtl', 'replace');
+
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css', array(), '6.0.0');
 
     // Enqueue scripts with modern optimizations
-    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.55', true);
+    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), $theme_version, true);
     
     // Localize script for AJAX and language metadata.
     wp_localize_script('callamir-theme-js', 'callamirText', array(
@@ -2243,29 +2247,67 @@ function callamir_clear_cache_page() {
  * -------------------------------------------------------------------------- */
 if (!function_exists('callamir_filter_theme_mods_by_lang')) {
     function callamir_filter_theme_mods_by_lang($mods) {
-        if (!is_array($mods)) {
+        if (!is_array($mods) || empty($mods)) {
             return $mods;
         }
-        if (!function_exists('callamir_get_visitor_lang')) {
+
+        if (!function_exists('callamir_get_supported_languages') || !function_exists('callamir_get_visitor_lang')) {
             return $mods;
         }
+
+        $supported = callamir_get_supported_languages();
         $lang = callamir_get_visitor_lang(false);
-        if ($lang === 'en' && isset($mods['site_language']) && $mods['site_language'] === 'fa' && !isset($_GET['lang'])) {
-            $lang = 'fa';
-        }
-        if ($lang !== 'fa') {
-            return $mods;
-        }
-        // For FA: if a *_fa variant exists and is non-empty, override the base key
-        foreach ($mods as $key => $value) {
-            if (substr($key, -3) === '_fa') {
-                $base = substr($key, 0, -3);
-                $normalized = callamir_normalize_theme_mod_value($mods[$key]);
-                if ($normalized !== null) {
-                    $mods[$base] = $normalized;
+
+        // Honour the Customizer default when no explicit language was requested.
+        if ((!is_string($lang) || $lang === '' || !isset($supported[$lang]) || 'en' === $lang) && !isset($_GET['lang'])) {
+            $default_lang = null;
+
+            if (isset($mods['site_language'])) {
+                $default_lang = sanitize_key($mods['site_language']);
+            }
+
+            if ((!$default_lang || !isset($supported[$default_lang])) && function_exists('is_customize_preview') && is_customize_preview() && class_exists('WP_Customize_Manager')) {
+                global $wp_customize;
+
+                if ($wp_customize instanceof WP_Customize_Manager) {
+                    $setting = $wp_customize->get_setting('site_language');
+                    if ($setting) {
+                        $preview_value = $setting->post_value();
+                        if (is_string($preview_value) && $preview_value !== '') {
+                            $default_lang = sanitize_key($preview_value);
+                        }
+                    }
                 }
             }
+
+            if ($default_lang && isset($supported[$default_lang])) {
+                $lang = $default_lang;
+            }
         }
+
+        if (!is_string($lang) || !isset($supported[$lang]) || 'en' === $lang) {
+            return $mods;
+        }
+
+        $suffix = '_' . $lang;
+        $suffix_length = strlen($suffix);
+
+        foreach ($mods as $key => $value) {
+            if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
+                continue;
+            }
+
+            $base = substr($key, 0, -$suffix_length);
+            if ($base === '') {
+                continue;
+            }
+
+            $normalized = callamir_normalize_theme_mod_value($value);
+            if ($normalized !== null) {
+                $mods[$base] = $normalized;
+            }
+        }
+
         return $mods;
     }
     add_filter('option_theme_mods_' . get_stylesheet(), 'callamir_filter_theme_mods_by_lang', 20, 1);

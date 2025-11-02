@@ -2,69 +2,70 @@
  Theme Name: Callamir Theme
  Author: Itlikelife
  Description: A custom WordPress theme for Callamir IT services targeting seniors and small businesses.
- Version: 1.0.54
+ Version: 1.0.56
  Text Domain: callamir
 */
+@import url('https://fonts.cdnfonts.com/css/luctry');
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700&display=swap');
 
 /* === CALLAMIR GLOBAL COLOR SYSTEM (2025 NAVY–GOLD–COSMIC THEME) === */
 :root {
-    /* BRAND CORE */
-    --color-primary: #0D1B3D;           /* Deep navy (trust, technology) */
-    --color-accent: #D4AF37;            /* Rich gold (premium, action) */
-    --color-cosmic-primary: #2E2A5A;    /* Cosmic indigo (modern glow) */
-    --color-cosmic-accent: #6E61D9;     /* Cosmic violet accent */
+    /* COSMIC BRAND CORE */
+    --cosmic-red: #E03C31;
+    --bright-yellow: #FFD93B;
+    --vibrant-green: #4CD137;
+    --cosmic-blue: #0F52BA;
+    --royal-blue-print: #112D4E;
+    --deep-black: #121212;
 
-    /* SUPPORTING */
-    --color-green: #2EAD60;             /* Success */
-    --color-danger: #D64545;            /* Error/alert */
-    --color-text: #0E1A2B;              /* Main readable text */
-    --color-section-bg: #F6F7FB;        /* Light section background */
-    --color-border: #616E7C1F;          /* Soft border */
+    /* LEGACY TOKEN COMPATIBILITY */
+    --color-primary: var(--cosmic-blue);
+    --color-accent: var(--bright-yellow);
+    --color-cosmic-primary: #2E2A5A;
+    --color-cosmic-accent: #6E61D9;
+    --color-green: var(--vibrant-green);
+    --color-danger: var(--cosmic-red);
+    --color-text: var(--deep-black);
+    --color-section-bg: #F5F7FB;
+    --color-border: rgba(97, 110, 124, 0.12);
     --color-light: #FFFFFF;
-    --color-dark: #0A0A0A;
+    --color-dark: var(--deep-black);
 
-    /* COLOR COMPONENTS */
-    --color-primary-rgb: 13, 27, 61;
-    --color-accent-rgb: 212, 175, 55;
-    --color-hover-accent-rgb: 195, 154, 36;
+    --color-primary-rgb: 15, 82, 186;
+    --color-accent-rgb: 255, 217, 59;
+    --color-hover-accent-rgb: 255, 199, 0;
     --color-cosmic-primary-rgb: 46, 42, 90;
     --color-cosmic-accent-rgb: 110, 97, 217;
     --color-light-rgb: 255, 255, 255;
-    --color-dark-rgb: 10, 10, 10;
+    --color-dark-rgb: 18, 18, 18;
 
-    /* GRADIENTS */
-    --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-cosmic-primary) 100%);
-    --gradient-gold: linear-gradient(135deg, var(--color-accent), var(--hover-accent));
-    --gradient-cosmic: linear-gradient(135deg, var(--color-cosmic-primary), var(--color-cosmic-accent));
+    --gradient-primary: linear-gradient(135deg, var(--deep-black) 0%, var(--cosmic-blue) 70%, var(--color-cosmic-accent) 100%);
+    --gradient-gold: linear-gradient(135deg, var(--bright-yellow) 0%, #FFB703 100%);
+    --gradient-cosmic: linear-gradient(135deg, var(--cosmic-blue), var(--color-cosmic-accent));
 
-    /* HOVER STATES */
-    --hover-primary: #0A1630;
-    --hover-accent: #C39A24;
+    --hover-primary: #0C3E85;
+    --hover-accent: #F2C230;
     --hover-cosmic: #26224B;
 
-    /* FOCUS / ACCESSIBILITY */
     --focus-ring: rgba(var(--color-cosmic-accent-rgb), 0.35);
 
-    /* NAVIGATION SYSTEM */
-    --nav-bg-gradient: linear-gradient(135deg, var(--color-dark) 0%, var(--color-cosmic-primary) 50%, var(--color-cosmic-accent) 100%);
-    --nav-shadow: 0 4px 20px rgba(var(--color-dark-rgb), 0.15);
-    --nav-border: 1px solid rgba(var(--color-accent-rgb), 0.2);
+    --nav-bg-gradient: linear-gradient(135deg, var(--deep-black) 0%, var(--cosmic-blue) 50%, var(--color-cosmic-accent) 100%);
+    --nav-shadow: 0 4px 20px rgba(var(--color-dark-rgb), 0.2);
+    --nav-border: 1px solid rgba(var(--color-accent-rgb), 0.25);
     --nav-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --nav-gold: var(--color-accent);
+    --nav-gold: var(--bright-yellow);
     --nav-gold-hover: var(--hover-accent);
     --nav-gold-gradient: var(--gradient-gold);
     --nav-glass-bg: rgba(var(--color-light-rgb), 0.05);
-    --nav-glass-border: rgba(var(--color-light-rgb), 0.1);
-    --nav-glass-hover: rgba(var(--color-accent-rgb), 0.2);
+    --nav-glass-border: rgba(var(--color-light-rgb), 0.12);
+    --nav-glass-hover: rgba(var(--color-accent-rgb), 0.25);
     --nav-button-bg: var(--gradient-gold);
     --nav-button-hover: var(--hover-accent);
 
-    /* LEGACY SURFACE TOKENS */
     --blog-bg-color: var(--color-section-bg);
     --contact-bg-color: var(--color-section-bg);
-    --callamir-body-font: 'Roboto', Arial, sans-serif;
-    --callamir-heading-font: 'Montserrat', 'Roboto', Arial, sans-serif;
+    --callamir-body-font: 'Luctry', 'EB Garamond', 'Roboto', Arial, sans-serif;
+    --callamir-heading-font: 'Luctry', 'Montserrat', 'Roboto', Arial, sans-serif;
     --callamir-base-font-size: 16px;
     --callamir-container-width: 1200px;
     --callamir-section-padding: 4rem;
@@ -92,10 +93,39 @@ body {
     font-family: var(--callamir-body-font);
     font-size: var(--callamir-base-font-size);
     line-height: 1.6;
+    color: var(--deep-black);
+    background-color: #ffffff;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--callamir-heading-font);
+}
+
+a {
+    color: var(--cosmic-blue);
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover,
+a:focus {
+    color: var(--cosmic-red);
+}
+
+.alert-success {
+    background-color: var(--vibrant-green);
+    color: var(--color-light);
+}
+
+.alert-info {
+    background-color: var(--bright-yellow);
+    color: var(--deep-black);
+}
+
+@media print {
+    body {
+        color: var(--royal-blue-print);
+        background: #ffffff;
+    }
 }
 
 @media (min-width: 768px) {
@@ -113,13 +143,16 @@ h1, h2, h3, h4, h5, h6 {
 /* CSS Custom Properties for Performance */
 
 button, .btn, .cta-button, .read-more-btn, .hero-button, .nav-button, .home-button {
-    background: var(--gradient-gold);
-    color: var(--color-dark);
+    background: var(--cosmic-red);
+    color: var(--color-light);
+    border: none;
+    box-shadow: 0 8px 20px rgba(var(--color-dark-rgb), 0.2);
 }
 
 button:hover, .btn:hover, .cta-button:hover, .read-more-btn:hover, .hero-button:hover, .nav-button:hover, .home-button:hover {
-    background: var(--hover-accent);
+    background: var(--hover-primary);
     color: var(--color-light);
+    box-shadow: 0 12px 24px rgba(var(--color-dark-rgb), 0.25);
 }
 
 .callamir-hero,
@@ -620,9 +653,9 @@ body.lang-fa .nav-desktop {
     padding: 1rem 1.5rem;
     margin: 1rem 0;
     border-radius: 0.75rem;
-    border: 1px solid #e52021;
-    background: rgba(229, 32, 33, 0.12);
-    color: #e52021;
+    border: 1px solid var(--cosmic-red);
+    background: rgba(224, 60, 49, 0.12);
+    color: var(--cosmic-red);
     text-align: center;
     font-weight: 600;
 }
