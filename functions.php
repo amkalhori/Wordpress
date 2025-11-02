@@ -2163,7 +2163,7 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
             return $mods;
         }
         $lang = callamir_get_visitor_lang(false);
-        if ($lang === 'en' && isset($mods['site_language']) && $mods['site_language'] === 'fa' && !isset($_GET['lang']) && !isset($_COOKIE['language'])) {
+        if ($lang === 'en' && isset($mods['site_language']) && $mods['site_language'] === 'fa' && !isset($_GET['lang'])) {
             $lang = 'fa';
         }
         if ($lang !== 'fa') {
