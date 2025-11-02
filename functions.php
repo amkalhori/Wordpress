@@ -302,11 +302,15 @@ add_action('save_post', 'callamir_save_community_question_meta');
  * -------------------------------------------------------------------------- */
 function callamir_enqueue_scripts() {
     // Enqueue styles with performance optimizations
-    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), '1.0.55');
+    $theme_version = '1.0.56';
+
+    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), $theme_version);
+    wp_style_add_data('callamir-style', 'rtl', 'replace');
+
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css', array(), '6.0.0');
 
     // Enqueue scripts with modern optimizations
-    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.55', true);
+    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), $theme_version, true);
     
     // Localize script for AJAX and language metadata.
     wp_localize_script('callamir-theme-js', 'callamirText', array(

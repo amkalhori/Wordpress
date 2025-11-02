@@ -1,0 +1,130 @@
+/*
+ * RTL overrides for the Callamir theme.
+ *
+ * This stylesheet is automatically enqueued by WordPress when is_rtl() is true
+ * because functions.php registers it via wp_style_add_data().
+ */
+
+body {
+    direction: rtl;
+    unicode-bidi: embed;
+}
+
+body, .site-header, .site-footer, .callamir-section,
+.callamir-hero, .callamir-services, .callamir-contact {
+    text-align: right;
+}
+
+.site-header .nav-wrapper,
+.nav-menu-desktop,
+.nav-menu-mobile,
+.nav-lang-switcher .lang-flags,
+.nav-cta,
+.nav-logo {
+    direction: rtl;
+}
+
+.nav-menu-desktop {
+    justify-content: flex-end;
+}
+
+.nav-menu-desktop > li {
+    float: right;
+}
+
+.nav-menu-desktop a,
+.nav-menu-mobile a {
+    text-align: right;
+}
+
+.nav-menu-mobile .menu-item-has-children > a::after {
+    right: auto;
+    left: 0;
+}
+
+.nav-menu-mobile .sub-menu {
+    text-align: right;
+}
+
+.mobile-menu-toggle {
+    direction: ltr;
+}
+
+body .lang-flags {
+    flex-direction: row-reverse;
+}
+
+.lang-flags .flag-text {
+    margin-left: 0;
+    margin-right: 0.5rem;
+}
+
+.nav-cta,
+.nav-lang-switcher {
+    margin-left: 0;
+    margin-right: 1.5rem;
+}
+
+.nav-menu-mobile .menu-item {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.callamir-service-card,
+.callamir-faq-item,
+.callamir-timeline-item,
+.callamir-contact-card {
+    text-align: right;
+}
+
+.callamir-timeline-item .timeline-badge {
+    left: auto;
+    right: -12px;
+}
+
+.callamir-timeline-item:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.footer-menu {
+    text-align: right;
+}
+
+.footer-menu li {
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+.footer-social {
+    justify-content: flex-start;
+}
+
+.callamir-form-group label,
+.callamir-form-group input,
+.callamir-form-group textarea {
+    text-align: right;
+}
+
+.callamir-form-group input,
+.callamir-form-group textarea {
+    direction: rtl;
+}
+
+.callamir-contact-form-warning {
+    text-align: right;
+}
+
+@media (max-width: 992px) {
+    .nav-menu-desktop {
+        float: none;
+    }
+
+    .nav-menu-mobile {
+        direction: rtl;
+    }
+
+    .nav-menu-mobile a {
+        padding-left: 1.5rem;
+        padding-right: 2.5rem;
+    }
+}
