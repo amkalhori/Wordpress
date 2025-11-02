@@ -68,6 +68,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Language Switcher ---
     const languageLinks = document.querySelectorAll('.lang-flag-link');
 
+    if (Array.isArray(languageData.supported) && languageData.supported.length > 0) {
+        const activeLanguage = languageData.supported.find((item) => item.code === languageData.current);
+
+        if (activeLanguage) {
+            const html = document.documentElement;
+            const bodyElement = document.body;
+
+            if (html) {
+                html.setAttribute('lang', activeLanguage.code === 'fa' ? 'fa-IR' : 'en-US');
+                html.setAttribute('dir', activeLanguage.direction || 'ltr');
+            }
+
+            if (bodyElement) {
+                bodyElement.setAttribute('dir', activeLanguage.direction || 'ltr');
+            }
+        }
+    }
+
     if (languageLinks.length > 0) {
         languageLinks.forEach((link) => {
             link.addEventListener('click', (event) => {
