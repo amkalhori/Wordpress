@@ -1843,6 +1843,74 @@ if (!function_exists('callamir_sanitize_font_family')) {
 /* --------------------------------------------------------------------------
  * Fallback Menu Function
  * -------------------------------------------------------------------------- */
+if (!function_exists('callamir_adjust_menu_for_persian')) {
+    /**
+     * Ensure the Persian navigation uses RTL ordering and translations.
+     *
+     * @param array   $items Menu items.
+     * @param stdClass $args  Menu arguments.
+     * @return array
+     */
+    function callamir_adjust_menu_for_persian($items, $args) {
+        if (!function_exists('callamir_get_visitor_lang') || callamir_get_visitor_lang() !== 'fa') {
+            return $items;
+        }
+
+        if (empty($items) || !is_array($items)) {
+            return $items;
+        }
+
+        $desired_order = array(
+            '#home' => __('خانه', 'callamir'),
+            '#services' => __('خدمات', 'callamir'),
+            '#contact' => __('تماس', 'callamir'),
+            '#blog' => __('وبلاگ', 'callamir'),
+        );
+
+        $ordered = array();
+        $others = array();
+
+        foreach ($items as $item) {
+            if (!is_object($item) || empty($item->url)) {
+                $others[] = $item;
+                continue;
+            }
+
+            $fragment = '';
+            $hash_position = strpos($item->url, '#');
+            if ($hash_position !== false) {
+                $fragment = substr($item->url, $hash_position);
+            }
+
+            if ($fragment && isset($desired_order[$fragment])) {
+                $item->title = $desired_order[$fragment];
+                $ordered[$fragment] = $item;
+            } else {
+                $others[] = $item;
+            }
+        }
+
+        $result = array();
+        foreach ($desired_order as $fragment => $title) {
+            if (isset($ordered[$fragment])) {
+                $result[] = $ordered[$fragment];
+            }
+        }
+
+        $result = array_merge($result, $others);
+
+        foreach ($result as $index => $item) {
+            if (is_object($item)) {
+                $item->menu_order = $index + 1;
+            }
+        }
+
+        return $result;
+    }
+
+    add_filter('wp_nav_menu_objects', 'callamir_adjust_menu_for_persian', 20, 2);
+}
+
 function callamir_fallback_menu($args = array()) {
     $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
     $menu_class = isset($args['menu_class']) ? (string) $args['menu_class'] : '';
