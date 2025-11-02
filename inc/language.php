@@ -27,34 +27,6 @@ if (!function_exists('callamir_get_supported_languages')) {
     }
 }
 
-if (!function_exists('callamir_set_language_cookie')) {
-    /**
-     * Persist the visitor's chosen language in a secure cookie so their
-     * preference is remembered outside of the Customizer preview.
-     *
-     * @param string $lang Two character locale key (en|fa).
-     * @return void
-     */
-    function callamir_set_language_cookie($lang) {
-        if (headers_sent()) {
-            return;
-        }
-
-        $expire = time() + (defined('MONTH_IN_SECONDS') ? MONTH_IN_SECONDS : 30 * DAY_IN_SECONDS);
-        $secure = is_ssl();
-        $httponly = true;
-        $lang = strtolower($lang);
-        $path = defined('COOKIEPATH') ? COOKIEPATH : '/';
-        $domain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
-
-        setcookie('callamir_lang', $lang, $expire, $path, $domain, $secure, $httponly);
-
-        if (defined('SITECOOKIEPATH') && SITECOOKIEPATH !== $path) {
-            setcookie('callamir_lang', $lang, $expire, SITECOOKIEPATH, $domain, $secure, $httponly);
-        }
-    }
-}
-
 if (!function_exists('callamir_get_default_language')) {
     /**
      * Fetch the default theme language from the Customizer.
@@ -81,15 +53,7 @@ if (!function_exists('callamir_get_visitor_lang')) {
         if (isset($_GET['lang'])) {
             $requested = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
             if (isset($supported[$requested])) {
-                callamir_set_language_cookie($requested);
                 return $requested;
-            }
-        }
-
-        if (isset($_COOKIE['callamir_lang'])) {
-            $cookie_lang = strtolower(sanitize_text_field(wp_unslash($_COOKIE['callamir_lang'])));
-            if (isset($supported[$cookie_lang])) {
-                return $cookie_lang;
             }
         }
 
