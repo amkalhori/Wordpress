@@ -27,6 +27,79 @@ if (!function_exists('callamir_get_supported_languages')) {
     }
 }
 
+if (!function_exists('callamir_get_locale_for_language')) {
+    /**
+     * Map a short language code to a full WordPress locale string.
+     *
+     * @param string $lang Two character language code.
+     * @return string Locale identifier understood by WordPress.
+     */
+    function callamir_get_locale_for_language($lang) {
+        switch ($lang) {
+            case 'fa':
+                return 'fa_IR';
+            case 'en':
+            default:
+                return 'en_US';
+        }
+    }
+}
+
+if (!function_exists('callamir_get_preview_language')) {
+    /**
+     * Inspect the Customizer preview and return the language being previewed.
+     *
+     * @return string|null Two character language code or null when not previewing.
+     */
+    function callamir_get_preview_language() {
+        static $preview_lang = null;
+        static $did_lookup = false;
+
+        if ($did_lookup) {
+            return $preview_lang;
+        }
+
+        $did_lookup = true;
+
+        if (!function_exists('is_customize_preview') || !is_customize_preview()) {
+            return null;
+        }
+
+        if (!class_exists('WP_Customize_Manager')) {
+            return null;
+        }
+
+        global $wp_customize;
+
+        if (!$wp_customize instanceof WP_Customize_Manager) {
+            return null;
+        }
+
+        $setting = $wp_customize->get_setting('site_language');
+        if (!$setting) {
+            return null;
+        }
+
+        $value = $setting->post_value();
+        if (!is_string($value) || $value === '') {
+            $value = $setting->value();
+        }
+
+        if (!is_string($value) || $value === '') {
+            return null;
+        }
+
+        $candidate = sanitize_key($value);
+        $supported = callamir_get_supported_languages();
+
+        if (isset($supported[$candidate])) {
+            $preview_lang = $candidate;
+        }
+
+        return $preview_lang;
+    }
+}
+
 if (!function_exists('callamir_get_default_language')) {
     /**
      * Fetch the default theme language from the Customizer.
@@ -35,6 +108,12 @@ if (!function_exists('callamir_get_default_language')) {
      */
     function callamir_get_default_language() {
         $supported = callamir_get_supported_languages();
+
+        $preview_lang = callamir_get_preview_language();
+        if ($preview_lang && isset($supported[$preview_lang])) {
+            return $preview_lang;
+        }
+
         $default = get_theme_mod('site_language', 'en');
         return isset($supported[$default]) ? $default : 'en';
     }
@@ -55,6 +134,11 @@ if (!function_exists('callamir_get_visitor_lang')) {
             if (isset($supported[$requested])) {
                 return $requested;
             }
+        }
+
+        $preview_lang = callamir_get_preview_language();
+        if ($preview_lang) {
+            return $preview_lang;
         }
 
         if ($use_theme_mod) {
@@ -131,6 +215,117 @@ if (!function_exists('callamir_preserve_language_in_nav_menu')) {
     add_filter('nav_menu_link_attributes', 'callamir_preserve_language_in_nav_menu', 10, 2);
 }
 
+if (!function_exists('callamir_filter_theme_mods_by_lang')) {
+    /**
+     * Make theme mods aware of the active visitor language.
+     *
+     * @param array<string, mixed> $mods Theme modifications loaded by WordPress.
+     * @return array<string, mixed>
+     */
+    function callamir_filter_theme_mods_by_lang($mods) {
+        if (!is_array($mods) || empty($mods)) {
+            return $mods;
+        }
+
+        if (!function_exists('callamir_get_supported_languages') || !function_exists('callamir_get_visitor_lang')) {
+            return $mods;
+        }
+
+        $supported = callamir_get_supported_languages();
+        $lang = callamir_get_visitor_lang(false);
+
+        if ((!is_string($lang) || $lang === '' || !isset($supported[$lang]) || 'en' === $lang) && !isset($_GET['lang'])) {
+            $default_lang = null;
+
+            if (isset($mods['site_language'])) {
+                $default_lang = sanitize_key($mods['site_language']);
+            }
+
+            if ((!$default_lang || !isset($supported[$default_lang]))) {
+                $preview_lang = callamir_get_preview_language();
+                if ($preview_lang && isset($supported[$preview_lang])) {
+                    $default_lang = $preview_lang;
+                }
+            }
+
+            if ($default_lang && isset($supported[$default_lang])) {
+                $lang = $default_lang;
+            }
+        }
+
+        if (!is_string($lang) || !isset($supported[$lang]) || 'en' === $lang) {
+            return $mods;
+        }
+
+        $suffix = '_' . $lang;
+        $suffix_length = strlen($suffix);
+
+        foreach ($mods as $key => $value) {
+            if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
+                continue;
+            }
+
+            $base = substr($key, 0, -$suffix_length);
+            if ($base === '') {
+                continue;
+            }
+
+            $normalized = callamir_normalize_theme_mod_value($value);
+            if ($normalized !== null) {
+                $mods[$base] = $normalized;
+            }
+        }
+
+        return $mods;
+    }
+
+    add_filter('option_theme_mods_' . get_stylesheet(), 'callamir_filter_theme_mods_by_lang', 20, 1);
+}
+
+if (!function_exists('callamir_get_text')) {
+    /**
+     * Helper for retrieving a translated theme mod value.
+     *
+     * @param string $key        Theme mod key base.
+     * @param string $default_en Default English text.
+     * @param string $default_fa Default Persian text.
+     * @return string
+     */
+    function callamir_get_text($key, $default_en = '', $default_fa = '') {
+        $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
+
+        $preferred_default = ($lang === 'fa' && $default_fa !== '') ? $default_fa : $default_en;
+        $value = callamir_mod($key, $lang, $preferred_default);
+
+        if ($lang === 'fa' && ($value === '' || $value === $preferred_default)) {
+            $fallback = callamir_mod($key, 'en', $default_en);
+            if ($fallback !== '') {
+                $value = $fallback;
+            }
+        }
+
+        if ($value === '') {
+            return $preferred_default;
+        }
+
+        return $value;
+    }
+}
+
+if (!function_exists('callamir_t')) {
+    /**
+     * Inline literal translator for template strings.
+     *
+     * @param string $en English string.
+     * @param string $fa Persian string.
+     * @return string
+     */
+    function callamir_t($en, $fa) {
+        $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
+        return ($lang === 'fa') ? $fa : $en;
+    }
+}
+
 if (!function_exists('callamir_language_body_class')) {
     /**
      * Append the active language to the body classes for styling hooks.
@@ -144,6 +339,69 @@ if (!function_exists('callamir_language_body_class')) {
     }
 
     add_filter('body_class', 'callamir_language_body_class');
+}
+
+if (!function_exists('callamir_filter_locale_for_frontend')) {
+    /**
+     * Ensure WordPress boots with the correct locale for the active visitor language.
+     *
+     * Without this the front-end can render with LTR defaults even when the
+     * visitor has switched to a RTL language because WordPress would continue
+     * using the site default locale.
+     *
+     * @param string $locale Current locale detected by WordPress.
+     * @return string
+     */
+    function callamir_filter_locale_for_frontend($locale) {
+        if (is_admin() && !wp_doing_ajax() && !wp_doing_rest()) {
+            return $locale;
+        }
+
+        $active = callamir_get_visitor_lang();
+        return callamir_get_locale_for_language($active);
+    }
+
+    add_filter('locale', 'callamir_filter_locale_for_frontend');
+}
+
+if (!function_exists('callamir_language_attributes')) {
+    /**
+     * Override the <html> tag attributes so they reflect the visitor's chosen language.
+     *
+     * @param string $output Existing attribute string.
+     * @param string $doctype Doctype slug provided by WordPress.
+     * @return string
+     */
+    function callamir_language_attributes($output, $doctype) {
+        if ('html' !== $doctype) {
+            return $output;
+        }
+
+        $lang = callamir_get_visitor_lang();
+        $supported = callamir_get_supported_languages();
+
+        if (!isset($supported[$lang])) {
+            return $output;
+        }
+
+        $attributes = array(
+            'lang' => str_replace('_', '-', callamir_get_locale_for_language($lang)),
+            'dir' => $supported[$lang]['direction'],
+        );
+
+        $fragments = array();
+        foreach ($attributes as $key => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            $fragments[] = sprintf('%s="%s"', $key, esc_attr($value));
+        }
+
+        return implode(' ', $fragments);
+    }
+
+    add_filter('language_attributes', 'callamir_language_attributes', 10, 2);
 }
 
 if (!function_exists('callamir_normalize_theme_mod_value')) {

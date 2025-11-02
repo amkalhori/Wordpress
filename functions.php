@@ -8,6 +8,7 @@ if (!defined('ABSPATH')) {
 
 // Load modular theme components.
 require_once get_template_directory() . '/inc/language.php';
+require_once get_template_directory() . '/inc/navigation.php';
 
 // Theme loaded successfully
 
@@ -302,11 +303,15 @@ add_action('save_post', 'callamir_save_community_question_meta');
  * -------------------------------------------------------------------------- */
 function callamir_enqueue_scripts() {
     // Enqueue styles with performance optimizations
-    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), '1.0.55');
+    $theme_version = '1.0.56';
+
+    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), $theme_version);
+    wp_style_add_data('callamir-style', 'rtl', 'replace');
+
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css', array(), '6.0.0');
 
     // Enqueue scripts with modern optimizations
-    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.55', true);
+    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), $theme_version, true);
     
     // Localize script for AJAX and language metadata.
     wp_localize_script('callamir-theme-js', 'callamirText', array(
@@ -1841,124 +1846,6 @@ if (!function_exists('callamir_sanitize_font_family')) {
 }
 
 /* --------------------------------------------------------------------------
- * Fallback Menu Function
- * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_adjust_menu_for_persian')) {
-    /**
-     * Ensure the Persian navigation uses RTL ordering and translations.
-     *
-     * @param array   $items Menu items.
-     * @param stdClass $args  Menu arguments.
-     * @return array
-     */
-    function callamir_adjust_menu_for_persian($items, $args) {
-        if (!function_exists('callamir_get_visitor_lang') || callamir_get_visitor_lang() !== 'fa') {
-            return $items;
-        }
-
-        if (empty($items) || !is_array($items)) {
-            return $items;
-        }
-
-        $desired_order = array(
-            '#home' => __('خانه', 'callamir'),
-            '#services' => __('خدمات', 'callamir'),
-            '#contact' => __('تماس', 'callamir'),
-            '#blog' => __('وبلاگ', 'callamir'),
-        );
-
-        $ordered = array();
-        $others = array();
-
-        foreach ($items as $item) {
-            if (!is_object($item) || empty($item->url)) {
-                $others[] = $item;
-                continue;
-            }
-
-            $fragment = '';
-            $hash_position = strpos($item->url, '#');
-            if ($hash_position !== false) {
-                $fragment = substr($item->url, $hash_position);
-            }
-
-            if ($fragment && isset($desired_order[$fragment])) {
-                $item->title = $desired_order[$fragment];
-                $ordered[$fragment] = $item;
-            } else {
-                $others[] = $item;
-            }
-        }
-
-        $result = array();
-        foreach ($desired_order as $fragment => $title) {
-            if (isset($ordered[$fragment])) {
-                $result[] = $ordered[$fragment];
-            }
-        }
-
-        $result = array_merge($result, $others);
-
-        foreach ($result as $index => $item) {
-            if (is_object($item)) {
-                $item->menu_order = $index + 1;
-            }
-        }
-
-        return $result;
-    }
-
-    add_filter('wp_nav_menu_objects', 'callamir_adjust_menu_for_persian', 20, 2);
-}
-
-function callamir_fallback_menu($args = array()) {
-    $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
-    $menu_class = isset($args['menu_class']) ? (string) $args['menu_class'] : '';
-    $is_mobile = $menu_class && strpos($menu_class, 'nav-menu-mobile') !== false;
-
-    $classes = $is_mobile ? 'nav-menu-mobile' : 'nav-menu-desktop';
-
-    if (!empty($menu_class)) {
-        $additional_classes = array_filter(array_map('sanitize_html_class', preg_split('/\s+/', $menu_class)));
-        if (!empty($additional_classes)) {
-            $classes = implode(' ', array_unique(array_merge(array($classes), $additional_classes)));
-        }
-    }
-
-    if ($lang === 'fa') {
-        $rtl_class = $is_mobile ? 'nav-menu-mobile--rtl' : 'nav-menu-desktop--rtl';
-        if (strpos($classes, $rtl_class) === false) {
-            $classes .= ' ' . $rtl_class;
-        }
-    }
-
-    $menu_items = array(
-        array(
-            'title' => ($lang === 'fa') ? __('خانه', 'callamir') : __('Home', 'callamir'),
-            'url' => '#home',
-        ),
-        array(
-            'title' => ($lang === 'fa') ? __('خدمات', 'callamir') : __('Services', 'callamir'),
-            'url' => '#services',
-        ),
-        array(
-            'title' => ($lang === 'fa') ? __('تماس', 'callamir') : __('Contact', 'callamir'),
-            'url' => '#contact',
-        ),
-        array(
-            'title' => ($lang === 'fa') ? __('وبلاگ', 'callamir') : __('Blog', 'callamir'),
-            'url' => '#blog',
-        ),
-    );
-
-    echo '<ul class="' . esc_attr(trim($classes)) . '">';
-    foreach ($menu_items as $item) {
-        echo '<li><a href="' . esc_url($item['url']) . '" class="nav-link">' . esc_html($item['title']) . '</a></li>';
-    }
-    echo '</ul>';
-}
-
-/* --------------------------------------------------------------------------
  * Elementor Compatibility and Optimizations
  * -------------------------------------------------------------------------- */
 function callamir_elementor_support() {
@@ -2235,78 +2122,4 @@ function callamir_clear_cache_page() {
     </div>
     <?php
 }
-/* --------------------------------------------------------------------------
- * Language-Aware Theme Mods (Automatic)
- * This filter makes get_theme_mod('key') return the Farsi value from 'key_fa'
- * automatically whenever the visitor language is 'fa'. This avoids touching
- * template files that already use get_theme_mod() in English.
- * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_filter_theme_mods_by_lang')) {
-    function callamir_filter_theme_mods_by_lang($mods) {
-        if (!is_array($mods)) {
-            return $mods;
-        }
-        if (!function_exists('callamir_get_visitor_lang')) {
-            return $mods;
-        }
-        $lang = callamir_get_visitor_lang(false);
-        if ($lang === 'en' && isset($mods['site_language']) && $mods['site_language'] === 'fa' && !isset($_GET['lang'])) {
-            $lang = 'fa';
-        }
-        if ($lang !== 'fa') {
-            return $mods;
-        }
-        // For FA: if a *_fa variant exists and is non-empty, override the base key
-        foreach ($mods as $key => $value) {
-            if (substr($key, -3) === '_fa') {
-                $base = substr($key, 0, -3);
-                $normalized = callamir_normalize_theme_mod_value($mods[$key]);
-                if ($normalized !== null) {
-                    $mods[$base] = $normalized;
-                }
-            }
-        }
-        return $mods;
-    }
-    add_filter('option_theme_mods_' . get_stylesheet(), 'callamir_filter_theme_mods_by_lang', 20, 1);
-}
-
-/* --------------------------------------------------------------------------
- * Helper: Language-aware text fetcher for customizer keys.
- * Use in templates if you want explicit control:
- * echo callamir_get_text('service_title', 'Service Title', 'عنوان سرویس');
- * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_get_text')) {
-    function callamir_get_text($key, $default_en = '', $default_fa = '') {
-        $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
-
-        $preferred_default = ($lang === 'fa' && $default_fa !== '') ? $default_fa : $default_en;
-        $value = callamir_mod($key, $lang, $preferred_default);
-
-        if ($lang === 'fa' && ($value === '' || $value === $preferred_default)) {
-            $fallback = callamir_mod($key, 'en', $default_en);
-            if ($fallback !== '') {
-                $value = $fallback;
-            }
-        }
-
-        if ($value === '') {
-            return $preferred_default;
-        }
-
-        return $value;
-    }
-}
-
-/* --------------------------------------------------------------------------
- * Helper: Inline literal translator (for hardcoded strings)
- * Example: echo callamir_t('Contact Us', 'تماس با ما');
- * -------------------------------------------------------------------------- */
-if (!function_exists('callamir_t')) {
-    function callamir_t($en, $fa) {
-        $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
-        return ($lang === 'fa') ? $fa : $en;
-    }
-}
-
 ?>
