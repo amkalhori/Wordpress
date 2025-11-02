@@ -1843,8 +1843,27 @@ if (!function_exists('callamir_sanitize_font_family')) {
 /* --------------------------------------------------------------------------
  * Fallback Menu Function
  * -------------------------------------------------------------------------- */
-function callamir_fallback_menu() {
+function callamir_fallback_menu($args = array()) {
     $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
+    $menu_class = isset($args['menu_class']) ? (string) $args['menu_class'] : '';
+    $is_mobile = $menu_class && strpos($menu_class, 'nav-menu-mobile') !== false;
+
+    $classes = $is_mobile ? 'nav-menu-mobile' : 'nav-menu-desktop';
+
+    if (!empty($menu_class)) {
+        $additional_classes = array_filter(array_map('sanitize_html_class', preg_split('/\s+/', $menu_class)));
+        if (!empty($additional_classes)) {
+            $classes = implode(' ', array_unique(array_merge(array($classes), $additional_classes)));
+        }
+    }
+
+    if ($lang === 'fa') {
+        $rtl_class = $is_mobile ? 'nav-menu-mobile--rtl' : 'nav-menu-desktop--rtl';
+        if (strpos($classes, $rtl_class) === false) {
+            $classes .= ' ' . $rtl_class;
+        }
+    }
+
     $menu_items = array(
         array(
             'title' => ($lang === 'fa') ? __('خانه', 'callamir') : __('Home', 'callamir'),
@@ -1863,8 +1882,8 @@ function callamir_fallback_menu() {
             'url' => '#blog',
         ),
     );
-    
-    echo '<ul class="nav-menu-desktop">';
+
+    echo '<ul class="' . esc_attr(trim($classes)) . '">';
     foreach ($menu_items as $item) {
         echo '<li><a href="' . esc_url($item['url']) . '" class="nav-link">' . esc_html($item['title']) . '</a></li>';
     }

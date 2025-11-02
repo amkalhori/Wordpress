@@ -25,11 +25,14 @@
             </div>
 
             <!-- Desktop Navigation -->
+            <?php
+            $desktop_menu_class = 'nav-menu-desktop' . ($current_lang === 'fa' ? ' nav-menu-desktop--rtl' : '');
+            ?>
             <nav class="nav-desktop" role="navigation" aria-label="<?php _e('Main navigation', 'callamir'); ?>">
                 <?php
                 wp_nav_menu(array(
                     'theme_location' => 'one_page_menu',
-                    'menu_class' => 'nav-menu-desktop',
+                    'menu_class' => $desktop_menu_class,
                     'container' => false,
                     'fallback_cb' => 'callamir_fallback_menu',
                     'walker' => class_exists('Callamir_Walker_Nav_Menu_With_FA') ? new Callamir_Walker_Nav_Menu_With_FA() : '',
@@ -77,12 +80,15 @@
         </div>
 
         <!-- Mobile Navigation -->
+        <?php
+        $mobile_menu_class = 'nav-menu-mobile' . ($current_lang === 'fa' ? ' nav-menu-mobile--rtl' : '');
+        ?>
         <nav class="nav-mobile" id="mobile-menu" role="navigation" aria-label="<?php _e('Mobile navigation', 'callamir'); ?>">
             <div class="mobile-menu-content">
                 <?php
                 wp_nav_menu(array(
                     'theme_location' => 'one_page_menu',
-                    'menu_class' => 'nav-menu-mobile',
+                    'menu_class' => $mobile_menu_class,
                     'container' => false,
                     'fallback_cb' => 'callamir_fallback_menu',
                     'walker' => class_exists('Callamir_Walker_Nav_Menu_With_FA') ? new Callamir_Walker_Nav_Menu_With_FA() : '',

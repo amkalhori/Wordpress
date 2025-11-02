@@ -574,11 +574,12 @@ body[dir="rtl"] .nav-wrapper {
     flex-direction: row-reverse;
 }
 
-body[dir="rtl"] .nav-menu-desktop {
+.nav-menu-desktop--rtl {
     flex-direction: row-reverse;
+    direction: rtl;
 }
 
-body[dir="rtl"] .nav-menu-mobile a:hover {
+.nav-menu-mobile--rtl a:hover {
     transform: translateX(-10px);
 }
 
@@ -586,21 +587,25 @@ body[dir="rtl"] .lang-flags {
     flex-direction: row-reverse;
 }
 
-body.lang-fa .nav-desktop {
+.nav-menu-desktop--rtl {
     justify-content: flex-end;
 }
 
-body.lang-fa .nav-menu-desktop {
-    justify-content: flex-end;
+.nav-menu-desktop--rtl li {
+    text-align: right;
 }
 
-body.lang-fa .nav-menu-desktop a {
+.nav-menu-desktop--rtl a {
     flex-direction: row-reverse;
     text-align: right;
 }
 
-body.lang-fa .nav-menu-mobile {
+.nav-menu-mobile--rtl {
     direction: rtl;
+}
+
+body.lang-fa .nav-desktop {
+    justify-content: flex-end;
 }
 
 .footer-rtl {
