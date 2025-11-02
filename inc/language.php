@@ -42,7 +42,7 @@ if (!function_exists('callamir_get_default_language')) {
 
 if (!function_exists('callamir_get_visitor_lang')) {
     /**
-     * Determine the visitor language via query parameter, cookie or default.
+     * Determine the visitor language via query parameter or the saved default.
      *
      * @param bool $use_theme_mod Whether to consider the saved default language.
      * @return string Two character locale key (en|fa).
@@ -53,19 +53,7 @@ if (!function_exists('callamir_get_visitor_lang')) {
         if (isset($_GET['lang'])) {
             $requested = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
             if (isset($supported[$requested])) {
-                if (!headers_sent()) {
-                    $cookie_path = defined('COOKIEPATH') && COOKIEPATH ? COOKIEPATH : '/';
-                    setcookie('language', $requested, time() + WEEK_IN_SECONDS, $cookie_path, defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '', is_ssl());
-                }
-
                 return $requested;
-            }
-        }
-
-        if (isset($_COOKIE['language'])) {
-            $cookie_lang = strtolower(sanitize_text_field(wp_unslash($_COOKIE['language'])));
-            if (isset($supported[$cookie_lang])) {
-                return $cookie_lang;
             }
         }
 
@@ -255,7 +243,7 @@ if (!function_exists('callamir_debug_language_switching')) {
      */
     function callamir_debug_language_switching() {
         if (current_user_can('manage_options')) {
-            echo '<!-- Language Debug: Current=' . callamir_get_visitor_lang() . ', Cookie=' . (isset($_COOKIE['language']) ? sanitize_text_field(wp_unslash($_COOKIE['language'])) : 'Not set') . ' -->';
+            echo '<!-- Language Debug: Current=' . callamir_get_visitor_lang() . ', Default=' . callamir_get_default_language() . ' -->';
         }
     }
 
