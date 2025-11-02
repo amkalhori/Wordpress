@@ -586,6 +586,31 @@ body[dir="rtl"] .lang-flags {
     flex-direction: row-reverse;
 }
 
+body.lang-fa .nav-desktop {
+    justify-content: flex-end;
+}
+
+body.lang-fa .nav-menu-desktop {
+    justify-content: flex-end;
+}
+
+body.lang-fa .nav-menu-desktop a {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+body.lang-fa .nav-menu-mobile {
+    direction: rtl;
+}
+
+.footer-rtl {
+    text-align: right;
+}
+
+.footer-ltr {
+    text-align: left;
+}
+
 .callamir-contact-form-warning {
     padding: 1rem 1.5rem;
     margin: 1rem 0;

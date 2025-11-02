@@ -367,20 +367,58 @@ function callamir_enqueue_scripts() {
 
     // Localize service data for JavaScript
     $service_data = array();
-    $lang = $current_lang;
+    $service_translations = array(
+        'current' => $current_lang,
+        'default' => callamir_get_default_language(),
+        'items' => array(),
+    );
+
+    $supported_languages = callamir_get_supported_languages();
     $count = $services_count;
-    
+
     for ($i = 1; $i <= $count; $i++) {
-        $service_data[$i] = array(
-            'title' => callamir_mod("service_title_{$i}", $lang, "Service $i"),
-            'description' => callamir_mod("service_desc_{$i}", $lang, "Description for service $i"),
-            'fullDescription' => callamir_mod("service_full_desc_{$i}", $lang, "Detailed description for service $i"),
-            'price' => callamir_mod("service_price_{$i}", $lang, ''),
-            'image' => get_theme_mod("callamir_service_image_{$i}", ''),
+        $defaults = array(
+            'title' => array(
+                'en' => sprintf(__('Service %d', 'callamir'), $i),
+                'fa' => sprintf(__('خدمت %d', 'callamir'), $i),
+            ),
+            'description' => array(
+                'en' => sprintf(__('Description for service %d', 'callamir'), $i),
+                'fa' => sprintf(__('توضیح خدمت %d', 'callamir'), $i),
+            ),
+            'fullDescription' => array(
+                'en' => sprintf(__('Detailed description for service %d', 'callamir'), $i),
+                'fa' => sprintf(__('توضیح کامل برای خدمت %d', 'callamir'), $i),
+            ),
         );
+
+        $image = get_theme_mod("callamir_service_image_{$i}", '');
+
+        $service_data[$i] = array(
+            'title' => callamir_mod("service_title_{$i}", $current_lang, $defaults['title'][$current_lang] ?? $defaults['title']['en']),
+            'description' => callamir_mod("service_desc_{$i}", $current_lang, $defaults['description'][$current_lang] ?? $defaults['description']['en']),
+            'fullDescription' => callamir_mod("service_full_desc_{$i}", $current_lang, $defaults['fullDescription'][$current_lang] ?? $defaults['fullDescription']['en']),
+            'price' => callamir_mod("service_price_{$i}", $current_lang, ''),
+            'image' => $image,
+        );
+
+        $service_translations['items'][$i] = array(
+            'image' => $image,
+            'translations' => array(),
+        );
+
+        foreach ($supported_languages as $code => $meta) {
+            $service_translations['items'][$i]['translations'][$code] = array(
+                'title' => callamir_mod("service_title_{$i}", $code, $defaults['title'][$code] ?? $defaults['title']['en']),
+                'description' => callamir_mod("service_desc_{$i}", $code, $defaults['description'][$code] ?? $defaults['description']['en']),
+                'fullDescription' => callamir_mod("service_full_desc_{$i}", $code, $defaults['fullDescription'][$code] ?? $defaults['fullDescription']['en']),
+                'price' => callamir_mod("service_price_{$i}", $code, ''),
+            );
+        }
     }
-    
+
     wp_localize_script('callamir-theme-js', 'serviceData', $service_data);
+    wp_localize_script('callamir-theme-js', 'serviceTranslations', $service_translations);
 }
 add_action('wp_enqueue_scripts', 'callamir_enqueue_scripts');
 
@@ -686,6 +724,28 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_header_footer',
         'type' => 'text',
         'description' => __('Enter value with unit, e.g., 100px', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('copyright_text_en', array(
+        'default' => __('CallAmir. All rights reserved © {year}', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('copyright_text_en', array(
+        'label' => __('Footer Copyright Text (EN)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+        'description' => __('Use {year} to automatically insert the current year.', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('copyright_text_fa', array(
+        'default' => __('کال امیر. کلیه حقوق محفوظ است © {year}', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('copyright_text_fa', array(
+        'label' => __('Footer Copyright Text (FA)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+        'description' => __('Use {year} to automatically insert the current year.', 'callamir'),
     ));
 
     // Typography & Layout Section
@@ -2103,6 +2163,9 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
             return $mods;
         }
         $lang = callamir_get_visitor_lang(false);
+        if ($lang === 'en' && isset($mods['site_language']) && $mods['site_language'] === 'fa' && !isset($_GET['lang']) && !isset($_COOKIE['language'])) {
+            $lang = 'fa';
+        }
         if ($lang !== 'fa') {
             return $mods;
         }

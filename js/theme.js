@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const debugEnabled = Boolean(window?.themeMods?.debug_mode);
     const languageData = window.callamirLang || { current: 'en', supported: [] };
+    const serviceTranslations = window.serviceTranslations || null;
     const callamirLog = (...args) => {
         if (debugEnabled && typeof window.console !== 'undefined') {
             window.console.log(...args);
@@ -725,6 +726,93 @@ document.addEventListener('DOMContentLoaded', () => {
     // Service data storage
     const serviceData = {};
 
+    const resolveServiceTranslation = (serviceId) => {
+        if (!serviceTranslations || !serviceTranslations.items) {
+            return null;
+        }
+
+        const entry = serviceTranslations.items[serviceId];
+        if (!entry) {
+            return null;
+        }
+
+        const translations = entry.translations || {};
+        const candidateLangs = [
+            serviceTranslations.current,
+            languageData.current,
+            serviceTranslations.default,
+            languageData.default,
+            'en',
+        ].filter(Boolean);
+
+        for (const lang of candidateLangs) {
+            if (translations[lang]) {
+                return { data: translations[lang], image: entry.image || '' };
+            }
+        }
+
+        const fallback = Object.values(translations)[0];
+        if (fallback) {
+            return { data: fallback, image: entry.image || '' };
+        }
+
+        return null;
+    };
+
+    const applyServiceTranslations = () => {
+        if (!serviceTranslations || !serviceTranslations.items) {
+            return;
+        }
+
+        document.querySelectorAll('.service-card').forEach((card) => {
+            const serviceId = card.getAttribute('data-service');
+            if (!serviceId) {
+                return;
+            }
+
+            const translation = resolveServiceTranslation(serviceId);
+            if (!translation) {
+                return;
+            }
+
+            const { data, image } = translation;
+            const titleEl = card.querySelector('.service-title');
+            const descEl = card.querySelector('.service-description');
+            const priceEl = card.querySelector('.service-price');
+
+            if (titleEl && data.title) {
+                titleEl.textContent = data.title;
+            }
+
+            if (descEl && data.description) {
+                descEl.textContent = data.description;
+            }
+
+            if (priceEl) {
+                if (data.price) {
+                    priceEl.textContent = data.price;
+                    priceEl.style.display = '';
+                } else {
+                    priceEl.textContent = '';
+                    priceEl.style.display = 'none';
+                }
+            }
+
+            if (!serviceData[serviceId]) {
+                serviceData[serviceId] = {};
+            }
+
+            serviceData[serviceId].title = data.title || serviceData[serviceId].title || '';
+            serviceData[serviceId].description = data.description || serviceData[serviceId].description || '';
+            serviceData[serviceId].fullDescription = data.fullDescription || data.description || serviceData[serviceId].fullDescription || '';
+            serviceData[serviceId].price = data.price || '';
+
+            if (image) {
+                serviceData[serviceId].image = image;
+            }
+        });
+    };
+
     // Initialize service data from PHP
     function initializeServiceData() {
         // Use localized service data from WordPress
@@ -860,6 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize service data
     initializeServiceData();
+    applyServiceTranslations();
 
     // --- Services Carousel Functionality ---
     const initServicesCarousel = () => {
