@@ -25,11 +25,8 @@ body, .site-header, .site-footer, .callamir-section,
 }
 
 .nav-menu-desktop {
+    flex-direction: row-reverse;
     justify-content: flex-end;
-}
-
-.nav-menu-desktop > li {
-    float: right;
 }
 
 .nav-menu-desktop a,
