@@ -14,7 +14,7 @@ function callamir_enqueue_scripts() {
     wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), $theme_version);
     wp_style_add_data('callamir-style', 'rtl', 'replace');
 
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css', array(), '6.0.0');
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
 
     // Enqueue scripts with modern optimizations
     wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), $theme_version, true);
@@ -27,7 +27,7 @@ function callamir_enqueue_scripts() {
     
     // Add preload hints for better performance
     add_action('wp_head', function() {
-        echo '<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
+        echo '<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
     });
 
 
