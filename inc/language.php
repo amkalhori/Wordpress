@@ -372,7 +372,9 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
     function callamir_filter_locale_for_frontend($locale) {
         $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
 
-        if (is_admin() && !wp_doing_ajax() && !$doing_rest) {
+        $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
+
+        if (is_admin() && !$doing_ajax && !$doing_rest) {
             return $locale;
         }
 
@@ -381,6 +383,43 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
     }
 
     add_filter('locale', 'callamir_filter_locale_for_frontend');
+}
+
+if (!function_exists('callamir_prime_frontend_language')) {
+    /**
+     * Switch the runtime locale early so front-end requests honour the visitor selection.
+     *
+     * WordPress determines the locale before the active theme files are loaded which means
+     * filters added here are too late to influence the initial locale calculation. By
+     * explicitly switching locales during `after_setup_theme` we ensure translations and
+     * RTL styles load for the requested language on non-admin requests.
+     */
+    function callamir_prime_frontend_language() {
+        $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
+
+        $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
+
+        if (is_admin() && !$doing_ajax && !$doing_rest) {
+            return;
+        }
+
+        $target_lang = callamir_get_visitor_lang();
+        $target_locale = callamir_get_locale_for_language($target_lang);
+        $current_locale = get_locale();
+
+        if ($target_locale === $current_locale || '' === $target_locale) {
+            return;
+        }
+
+        if (function_exists('switch_to_locale') && switch_to_locale($target_locale)) {
+            return;
+        }
+
+        global $locale;
+        $locale = $target_locale;
+    }
+
+    add_action('after_setup_theme', 'callamir_prime_frontend_language', 0);
 }
 
 if (!function_exists('callamir_language_attributes')) {
