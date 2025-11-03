@@ -177,4 +177,19 @@ function callamir_generate_dynamic_css() {
     ";
     return $css;
 }
-add_action('wp_enqueue_scripts', 'callamir_enqueue_dynamic_css');
+if (!function_exists('callamir_enqueue_dynamic_css')) {
+    /**
+     * Attach generated CSS to the front-end stylesheet.
+     */
+    function callamir_enqueue_dynamic_css() {
+        $css = callamir_generate_dynamic_css();
+
+        if (empty(trim($css))) {
+            return;
+        }
+
+        wp_add_inline_style('callamir-style', $css);
+    }
+}
+
+add_action('wp_enqueue_scripts', 'callamir_enqueue_dynamic_css', 20);
