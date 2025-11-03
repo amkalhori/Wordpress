@@ -573,19 +573,11 @@ if (!function_exists('callamir_mod')) {
                 return $legacy_value;
             }
 
-            if ($default_trimmed !== '') {
-                return $default;
-            }
-
             if ($fallback_value !== null) {
                 return $fallback_value;
             }
 
-            return $default;
-        }
-
-        if ($default_trimmed !== '') {
-            return $default;
+            return $default_trimmed !== '' ? $default : '';
         }
 
         if ($fallback_value !== null) {
@@ -596,7 +588,11 @@ if (!function_exists('callamir_mod')) {
             return $legacy_value;
         }
 
-        return $default;
+        if ($default_trimmed !== '') {
+            return $default;
+        }
+
+        return '';
     }
 }
 
