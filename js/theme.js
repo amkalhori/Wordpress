@@ -715,6 +715,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalClose = document.querySelector('.modal-close');
     const modalOverlay = document.querySelector('.modal-overlay');
 
+    if (!serviceModal) {
+        callamirLog('Service modal not found in DOM; modal functionality disabled.');
+    }
+
     // Service data storage
     const serviceData = {};
 
@@ -833,42 +837,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // Open service modal
     function openServiceModal(serviceId) {
         const data = serviceData[serviceId];
-        if (!data) return;
+        if (!data) {
+            callamirLog('Service data not found for ID:', serviceId);
+            return;
+        }
+
+        if (!serviceModal) {
+            callamirLog('Service modal unavailable; skipping open.');
+            return;
+        }
 
         // Update modal content
-        document.getElementById('modal-service-title').textContent = data.title;
-        document.getElementById('modal-service-description').textContent = data.fullDescription || data.description;
-        
+        const titleElement = document.getElementById('modal-service-title');
+        if (titleElement) {
+            titleElement.textContent = data.title;
+        }
+
+        const descriptionElement = document.getElementById('modal-service-description');
+        if (descriptionElement) {
+            descriptionElement.textContent = data.fullDescription || data.description;
+        }
+
         const priceElement = document.getElementById('modal-service-price');
-        if (data.price) {
-            priceElement.textContent = data.price;
-            priceElement.style.display = 'inline-block';
-        } else {
-            priceElement.style.display = 'none';
+        if (priceElement) {
+            if (data.price) {
+                priceElement.textContent = data.price;
+                priceElement.style.display = 'inline-block';
+            } else {
+                priceElement.style.display = 'none';
+            }
         }
 
         // Update modal image
         const imageElement = document.getElementById('modal-service-image');
-        if (data.image) {
-            imageElement.src = data.image;
-            imageElement.alt = data.title;
-            imageElement.style.display = 'block';
-        } else {
-            imageElement.style.display = 'none';
+        if (imageElement) {
+            if (data.image) {
+                imageElement.src = data.image;
+                imageElement.alt = data.title;
+                imageElement.style.display = 'block';
+            } else {
+                imageElement.style.display = 'none';
+            }
         }
 
         // Update contact form
         const formElement = document.getElementById('modal-service-form');
-        if (data.contactForm && data.contactForm.trim() !== '') {
-            callamirLog('Setting contact form HTML:', data.contactForm);
-            formElement.innerHTML = data.contactForm;
-            formElement.style.display = 'block';
-            
-            // Initialize Contact Form 7 with our robust function
-            initializeContactForm7(formElement);
-        } else {
-            callamirLog('No contact form available for service:', serviceId);
-            formElement.style.display = 'none';
+        if (formElement) {
+            if (data.contactForm && data.contactForm.trim() !== '') {
+                callamirLog('Setting contact form HTML:', data.contactForm);
+                formElement.innerHTML = data.contactForm;
+                formElement.style.display = 'block';
+
+                // Initialize Contact Form 7 with our robust function
+                initializeContactForm7(formElement);
+            } else {
+                callamirLog('No contact form available for service:', serviceId);
+                formElement.style.display = 'none';
+            }
         }
 
         // Show modal
@@ -885,6 +910,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close service modal
     function closeServiceModal() {
+        if (!serviceModal) {
+            callamirLog('Service modal unavailable; skipping close.');
+            return;
+        }
+
         serviceModal.classList.remove('active');
         serviceModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -910,16 +940,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Keyboard navigation for modal
     document.addEventListener('keydown', (e) => {
-        if (serviceModal.classList.contains('active')) {
+        if (serviceModal && serviceModal.classList.contains('active')) {
             if (e.key === 'Escape') {
                 closeServiceModal();
             }
-            
+
             // Trap focus within modal
             if (e.key === 'Tab') {
                 const focusableElements = serviceModal.querySelectorAll(
                     'button, input, textarea, select, a[href], [tabindex]:not([tabindex="-1"])'
                 );
+                if (focusableElements.length === 0) {
+                    return;
+                }
                 const firstElement = focusableElements[0];
                 const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -1135,9 +1168,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 
     // --- Contact Form 7 Integration ---
+    function handleMaybePromise(result, context) {
+        if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
+            result.catch((reason) => {
+                if (reason === null) {
+                    callamirLog(`${context} promise rejected with null; handled gracefully.`);
+                } else {
+                    console.error(`${context} promise rejection:`, reason);
+                }
+            });
+        }
+    }
+
     function initializeContactForm7(formElement) {
         if (!formElement) return;
-        
+
         callamirLog('Initializing Contact Form 7 for element:', formElement);
         
         // Wait for DOM to be ready
@@ -1151,20 +1196,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 callamirLog('wpcf7 object:', wpcf7);
                 if (wpcf7.init) {
                     callamirLog('Using wpcf7.init');
-                    wpcf7.init(formElement);
+                    handleMaybePromise(wpcf7.init(formElement), 'wpcf7.init');
                 } else if (wpcf7.initForm) {
                     callamirLog('Using wpcf7.initForm');
-                    wpcf7.initForm(formElement);
+                    handleMaybePromise(wpcf7.initForm(formElement), 'wpcf7.initForm');
                 } else if (wpcf7.initFormElement) {
                     callamirLog('Using wpcf7.initFormElement');
-                    wpcf7.initFormElement(formElement);
+                    handleMaybePromise(wpcf7.initFormElement(formElement), 'wpcf7.initFormElement');
                 }
             }
             
             // Try jQuery method
             if (typeof jQuery !== 'undefined' && jQuery.fn.wpcf7) {
                 callamirLog('Using jQuery wpcf7');
-                jQuery(formElement).wpcf7();
+                handleMaybePromise(jQuery(formElement).wpcf7(), 'jQuery.wpcf7');
             }
             
             // Try vanilla JS method
@@ -1179,7 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Re-trigger Contact Form 7 scripts
             if (typeof window.wpcf7 !== 'undefined') {
                 callamirLog('Re-triggering wpcf7.init');
-                window.wpcf7.init();
+                handleMaybePromise(window.wpcf7.init(), 'window.wpcf7.init');
             }
             
             // Force re-initialization of all forms
@@ -1196,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof window.wpcf7 !== 'undefined' && window.wpcf7.init) {
                 callamirLog('Manual wpcf7.init trigger');
                 try {
-                    window.wpcf7.init();
+                    handleMaybePromise(window.wpcf7.init(), 'window.wpcf7.init (manual)');
                 } catch (e) {
                     console.error('Error initializing wpcf7:', e);
                 }
