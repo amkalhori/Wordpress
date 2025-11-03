@@ -14,16 +14,33 @@ if (!function_exists('callamir_get_supported_languages')) {
      * @return array<string, array<string, string>>
      */
     function callamir_get_supported_languages() {
-        return array(
+        static $cached = null;
+
+        if (null !== $cached) {
+            return $cached;
+        }
+
+        $languages = array(
             'en' => array(
-                'label' => __('English', 'callamir'),
+                'label' => 'English',
                 'direction' => 'ltr',
             ),
             'fa' => array(
-                'label' => __('Persian', 'callamir'),
+                'label' => 'Persian',
                 'direction' => 'rtl',
             ),
         );
+
+        if (doing_filter('locale')) {
+            return $languages;
+        }
+
+        $languages['en']['label'] = __('English', 'callamir');
+        $languages['fa']['label'] = __('Persian', 'callamir');
+
+        $cached = $languages;
+
+        return $languages;
     }
 }
 
