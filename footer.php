@@ -9,7 +9,7 @@ $default_copyright = array(
     'en' => __('CallAmir. All rights reserved © {year}', 'callamir'),
     'fa' => __('کال امیر. کلیه حقوق محفوظ است © {year}', 'callamir'),
 );
-$raw_copyright = callamir_mod('copyright_text', $lang, $default_copyright[$lang] ?? $default_copyright['en']);
+$raw_copyright = callamir_mod('copyright_text', $default_copyright[$lang] ?? $default_copyright['en']);
 $rendered_copyright = str_replace(
     array('{year}', '{YEAR}', '%year%', '%YEAR%'),
     $current_year,

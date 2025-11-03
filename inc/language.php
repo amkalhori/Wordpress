@@ -136,36 +136,6 @@ if (!function_exists('callamir_get_default_language')) {
     }
 }
 
-if (!function_exists('callamir_get_visitor_lang')) {
-    /**
-     * Determine the visitor language via query parameter or the saved default.
-     *
-     * @param bool $use_theme_mod Whether to consider the saved default language.
-     * @return string Two character locale key (en|fa).
-     */
-    function callamir_get_visitor_lang($use_theme_mod = true) {
-        $supported = callamir_get_supported_languages();
-
-        if (isset($_GET['lang'])) {
-            $requested = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
-            if (isset($supported[$requested])) {
-                return $requested;
-            }
-        }
-
-        $preview_lang = callamir_get_preview_language();
-        if ($preview_lang) {
-            return $preview_lang;
-        }
-
-        if ($use_theme_mod) {
-            return callamir_get_default_language();
-        }
-
-        return 'en';
-    }
-}
-
 if (!function_exists('callamir_localize_url')) {
     /**
      * Append the active language query parameter to internal theme URLs.
@@ -249,26 +219,7 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
         }
 
         $supported = callamir_get_supported_languages();
-        $lang = callamir_get_visitor_lang(false);
-
-        if ((!is_string($lang) || $lang === '' || !isset($supported[$lang]) || 'en' === $lang) && !isset($_GET['lang'])) {
-            $default_lang = null;
-
-            if (isset($mods['site_language'])) {
-                $default_lang = sanitize_key($mods['site_language']);
-            }
-
-            if ((!$default_lang || !isset($supported[$default_lang]))) {
-                $preview_lang = callamir_get_preview_language();
-                if ($preview_lang && isset($supported[$preview_lang])) {
-                    $default_lang = $preview_lang;
-                }
-            }
-
-            if ($default_lang && isset($supported[$default_lang])) {
-                $lang = $default_lang;
-            }
-        }
+        $lang = callamir_get_visitor_lang();
 
         if (!is_string($lang) || !isset($supported[$lang]) || 'en' === $lang) {
             return $mods;
@@ -312,14 +263,7 @@ if (!function_exists('callamir_get_text')) {
         $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
 
         $preferred_default = ($lang === 'fa' && $default_fa !== '') ? $default_fa : $default_en;
-        $value = callamir_mod($key, $lang, $preferred_default);
-
-        if ($lang === 'fa' && ($value === '' || $value === $preferred_default)) {
-            $fallback = callamir_mod($key, 'en', $default_en);
-            if ($fallback !== '') {
-                $value = $fallback;
-            }
-        }
+        $value = callamir_mod($key, $preferred_default);
 
         if ($value === '') {
             return $preferred_default;
@@ -502,97 +446,6 @@ if (!function_exists('callamir_normalize_theme_mod_value')) {
         }
 
         return null;
-    }
-}
-
-if (!function_exists('callamir_mod')) {
-    /**
-     * Retrieve a translated theme mod value with graceful fallbacks.
-     *
-     * @param string $key_base Base key without language suffix.
-     * @param string $lang     Target language code.
-     * @param string $default  Default fallback string.
-     * @return string
-     */
-    function callamir_mod($key_base, $lang, $default = '') {
-        $requested_lang = is_string($lang) ? trim($lang) : '';
-        $default_lang = function_exists('callamir_get_default_language') ? callamir_get_default_language() : 'en';
-        $supported_langs = function_exists('callamir_get_supported_languages') ? array_keys(callamir_get_supported_languages()) : array();
-
-        if ($requested_lang === '' && is_string($default_lang)) {
-            $requested_lang = $default_lang;
-        }
-
-        $primary_candidates = array();
-        if ($requested_lang !== '') {
-            $primary_candidates[] = $key_base . '_' . $requested_lang;
-        }
-
-        $primary_candidates = array_values(array_unique(array_filter($primary_candidates)));
-
-        foreach ($primary_candidates as $candidate_key) {
-            $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
-            if ($value !== null) {
-                return $value;
-            }
-        }
-
-        $legacy_value = callamir_normalize_theme_mod_value(get_theme_mod($key_base, null));
-
-        $fallback_candidates = array();
-        if (!empty($default_lang) && $requested_lang !== $default_lang) {
-            $fallback_candidates[] = $key_base . '_' . $default_lang;
-        }
-
-        if (!empty($supported_langs)) {
-            foreach ($supported_langs as $supported_lang) {
-                if ($supported_lang === $requested_lang || $supported_lang === $default_lang) {
-                    continue;
-                }
-
-                $fallback_candidates[] = $key_base . '_' . $supported_lang;
-            }
-        }
-
-        $fallback_value = null;
-        if (!empty($fallback_candidates)) {
-            foreach (array_values(array_unique($fallback_candidates)) as $candidate_key) {
-                $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
-                if ($value !== null) {
-                    $fallback_value = $value;
-                    break;
-                }
-            }
-        }
-
-        $default_trimmed = trim((string) $default);
-        $effective_lang = $requested_lang !== '' ? $requested_lang : $default_lang;
-
-        if ($effective_lang === $default_lang || $effective_lang === '') {
-            if ($legacy_value !== null) {
-                return $legacy_value;
-            }
-
-            if ($fallback_value !== null) {
-                return $fallback_value;
-            }
-
-            return $default_trimmed !== '' ? $default : '';
-        }
-
-        if ($fallback_value !== null) {
-            return $fallback_value;
-        }
-
-        if ($legacy_value !== null) {
-            return $legacy_value;
-        }
-
-        if ($default_trimmed !== '') {
-            return $default;
-        }
-
-        return '';
     }
 }
 
