@@ -98,6 +98,26 @@ function callamir_customize_register($wp_customize) {
         'type' => 'text',
         'description' => __('Enter value with unit, e.g., 80px', 'callamir'),
     ));
+
+    $wp_customize->add_setting('logo_text_en', array(
+        'default' => __('CallAmir', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('logo_text_en', array(
+        'label' => __('Logo Text (EN)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('logo_text_fa', array(
+        'default' => __('کال امیر', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('logo_text_fa', array(
+        'label' => __('Logo Text (FA)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+    ));
     $wp_customize->add_setting('leave_message_width', array(
         'default' => '200px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
@@ -117,6 +137,26 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_header_footer',
         'type' => 'text',
         'description' => __('Enter value with unit, e.g., 50px', 'callamir'),
+    ));
+
+    $wp_customize->add_setting('leave_message_text_en', array(
+        'default' => __('Leave a message', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('leave_message_text_en', array(
+        'label' => __('Leave Message Text (EN)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('leave_message_text_fa', array(
+        'default' => __('پیام بگذارید', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('leave_message_text_fa', array(
+        'label' => __('Leave Message Text (FA)', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
     ));
     $wp_customize->add_setting('footer_min_height', array(
         'default' => '100px',
@@ -729,12 +769,42 @@ function callamir_customize_register($wp_customize) {
         'title' => __('Contact', 'callamir'),
         'priority' => 40,
     ));
-    $wp_customize->add_setting('contact_phone', array(
+    $wp_customize->add_setting('contact_title_en', array(
+        'default' => __('Contact Us', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('contact_title_en', array(
+        'label' => __('Contact Section Title (EN)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('contact_title_fa', array(
+        'default' => __('تماس با ما', 'callamir'),
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('contact_title_fa', array(
+        'label' => __('Contact Section Title (FA)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('contact_phone_en', array(
         'default' => '416-123-4567',
         'sanitize_callback' => 'sanitize_text_field',
     ));
-    $wp_customize->add_control('contact_phone', array(
-        'label' => __('Contact Phone Number', 'callamir'),
+    $wp_customize->add_control('contact_phone_en', array(
+        'label' => __('Contact Phone Number (EN)', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+    ));
+
+    $wp_customize->add_setting('contact_phone_fa', array(
+        'default' => '416-123-4567',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('contact_phone_fa', array(
+        'label' => __('Contact Phone Number (FA)', 'callamir'),
         'section' => 'callamir_contact',
         'type' => 'text',
     ));
@@ -1000,6 +1070,26 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_community',
         'type' => 'text',
     ));
+
+    $wp_customize->add_setting('community_subtitle_en', array(
+        'default' => __('Common questions and helpful answers from our community', 'callamir'),
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ));
+    $wp_customize->add_control('community_subtitle_en', array(
+        'label' => __('Community Section Subtitle (EN)', 'callamir'),
+        'section' => 'callamir_community',
+        'type' => 'textarea',
+    ));
+
+    $wp_customize->add_setting('community_subtitle_fa', array(
+        'default' => __('سوالات متداول و پاسخ‌های مفید از جامعه ما', 'callamir'),
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ));
+    $wp_customize->add_control('community_subtitle_fa', array(
+        'label' => __('Community Section Subtitle (FA)', 'callamir'),
+        'section' => 'callamir_community',
+        'type' => 'textarea',
+    ));
     
     
     // Community Question Form Title
@@ -1043,6 +1133,53 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_community',
         'type' => 'textarea',
     ));
+
+    for ($i = 1; $i <= 5; $i++) {
+        $default_question_en = $i === 1 ? __('How do I request support?', 'callamir') : '';
+        $default_question_fa = $i === 1 ? __('چگونه درخواست پشتیبانی بدهم؟', 'callamir') : '';
+        $default_answer_en = $i === 1 ? __('Use the Get IT Support button above or WhatsApp/Telegram in Contact.', 'callamir') : '';
+        $default_answer_fa = $i === 1 ? __('از دکمه دریافت پشتیبانی آی تی در بالا یا واتساپ/تلگرام در بخش تماس استفاده کنید.', 'callamir') : '';
+
+        $wp_customize->add_setting("faq_q_{$i}_en", array(
+            'default' => $default_question_en,
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control("faq_q_{$i}_en", array(
+            'label' => sprintf(__('FAQ %d Question (EN)', 'callamir'), $i),
+            'section' => 'callamir_community',
+            'type' => 'text',
+        ));
+
+        $wp_customize->add_setting("faq_q_{$i}_fa", array(
+            'default' => $default_question_fa,
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control("faq_q_{$i}_fa", array(
+            'label' => sprintf(__('FAQ %d Question (FA)', 'callamir'), $i),
+            'section' => 'callamir_community',
+            'type' => 'text',
+        ));
+
+        $wp_customize->add_setting("faq_a_{$i}_en", array(
+            'default' => $default_answer_en,
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ));
+        $wp_customize->add_control("faq_a_{$i}_en", array(
+            'label' => sprintf(__('FAQ %d Answer (EN)', 'callamir'), $i),
+            'section' => 'callamir_community',
+            'type' => 'textarea',
+        ));
+
+        $wp_customize->add_setting("faq_a_{$i}_fa", array(
+            'default' => $default_answer_fa,
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ));
+        $wp_customize->add_control("faq_a_{$i}_fa", array(
+            'label' => sprintf(__('FAQ %d Answer (FA)', 'callamir'), $i),
+            'section' => 'callamir_community',
+            'type' => 'textarea',
+        ));
+    }
 
     // Hero Section Language Settings
     $wp_customize->add_setting('hero_title_en', array(

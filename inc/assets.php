@@ -106,10 +106,10 @@ function callamir_enqueue_scripts() {
         $image = get_theme_mod("callamir_service_image_{$i}", '');
 
         $service_data[$i] = array(
-            'title' => callamir_mod("service_title_{$i}", $current_lang, $defaults['title'][$current_lang] ?? $defaults['title']['en']),
-            'description' => callamir_mod("service_desc_{$i}", $current_lang, $defaults['description'][$current_lang] ?? $defaults['description']['en']),
-            'fullDescription' => callamir_mod("service_full_desc_{$i}", $current_lang, $defaults['fullDescription'][$current_lang] ?? $defaults['fullDescription']['en']),
-            'price' => callamir_mod("service_price_{$i}", $current_lang, ''),
+            'title' => callamir_mod("service_title_{$i}", $defaults['title']['en']),
+            'description' => callamir_mod("service_desc_{$i}", $defaults['description']['en']),
+            'fullDescription' => callamir_mod("service_full_desc_{$i}", $defaults['fullDescription']['en']),
+            'price' => callamir_mod("service_price_{$i}", ''),
             'image' => $image,
         );
 
@@ -120,10 +120,10 @@ function callamir_enqueue_scripts() {
 
         foreach ($supported_languages as $code => $meta) {
             $service_translations['items'][$i]['translations'][$code] = array(
-                'title' => callamir_mod("service_title_{$i}", $code, $defaults['title'][$code] ?? $defaults['title']['en']),
-                'description' => callamir_mod("service_desc_{$i}", $code, $defaults['description'][$code] ?? $defaults['description']['en']),
-                'fullDescription' => callamir_mod("service_full_desc_{$i}", $code, $defaults['fullDescription'][$code] ?? $defaults['fullDescription']['en']),
-                'price' => callamir_mod("service_price_{$i}", $code, ''),
+                'title' => get_theme_mod("service_title_{$i}_{$code}", $defaults['title'][$code] ?? $defaults['title']['en']),
+                'description' => get_theme_mod("service_desc_{$i}_{$code}", $defaults['description'][$code] ?? $defaults['description']['en']),
+                'fullDescription' => get_theme_mod("service_full_desc_{$i}_{$code}", $defaults['fullDescription'][$code] ?? $defaults['fullDescription']['en']),
+                'price' => get_theme_mod("service_price_{$i}_{$code}", ''),
             );
         }
     }
