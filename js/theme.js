@@ -1164,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize carousel with a small delay to ensure DOM is ready
     setTimeout(() => {
-        initServicesCarousel();
+        initServicesCarousel(); 
     }, 100);
 
     // --- Contact Form 7 Integration ---
