@@ -1,4 +1,7 @@
-<?php $current_lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en'; ?>
+<?php
+$current_lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
+$is_rtl_layout = function_exists('is_rtl') ? is_rtl() : ($current_lang === 'fa');
+?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -6,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class(); ?> <?php echo ($current_lang === 'fa') ? 'dir="rtl"' : 'dir="ltr"'; ?>>
+<body <?php body_class(); ?> <?php echo $is_rtl_layout ? 'dir="rtl"' : 'dir="ltr"'; ?>>
 <header class="site-header modern-header">
     <canvas id="stars" class="stars-header" aria-hidden="true"></canvas>
     
@@ -26,7 +29,7 @@
 
             <!-- Desktop Navigation -->
             <?php
-            $desktop_menu_class = 'nav-menu-desktop' . ($current_lang === 'fa' ? ' nav-menu-desktop--rtl' : '');
+            $desktop_menu_class = 'nav-menu-desktop' . ($is_rtl_layout ? ' nav-menu-desktop--rtl' : '');
             ?>
             <nav class="nav-desktop" role="navigation" aria-label="<?php _e('Main navigation', 'callamir'); ?>">
                 <?php
@@ -81,7 +84,7 @@
 
         <!-- Mobile Navigation -->
         <?php
-        $mobile_menu_class = 'nav-menu-mobile' . ($current_lang === 'fa' ? ' nav-menu-mobile--rtl' : '');
+        $mobile_menu_class = 'nav-menu-mobile' . ($is_rtl_layout ? ' nav-menu-mobile--rtl' : '');
         ?>
         <nav class="nav-mobile" id="mobile-menu" role="navigation" aria-label="<?php _e('Mobile navigation', 'callamir'); ?>">
             <div class="mobile-menu-content">
