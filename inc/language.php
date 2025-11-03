@@ -372,7 +372,9 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
     function callamir_filter_locale_for_frontend($locale) {
         $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
 
-        if (is_admin() && !wp_doing_ajax() && !$doing_rest) {
+        $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
+
+        if (is_admin() && !$doing_ajax && !$doing_rest) {
             return $locale;
         }
 
@@ -381,6 +383,43 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
     }
 
     add_filter('locale', 'callamir_filter_locale_for_frontend');
+}
+
+if (!function_exists('callamir_prime_frontend_language')) {
+    /**
+     * Switch the runtime locale early so front-end requests honour the visitor selection.
+     *
+     * WordPress determines the locale before the active theme files are loaded which means
+     * filters added here are too late to influence the initial locale calculation. By
+     * explicitly switching locales during `after_setup_theme` we ensure translations and
+     * RTL styles load for the requested language on non-admin requests.
+     */
+    function callamir_prime_frontend_language() {
+        $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
+
+        $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
+
+        if (is_admin() && !$doing_ajax && !$doing_rest) {
+            return;
+        }
+
+        $target_lang = callamir_get_visitor_lang();
+        $target_locale = callamir_get_locale_for_language($target_lang);
+        $current_locale = get_locale();
+
+        if ($target_locale === $current_locale || '' === $target_locale) {
+            return;
+        }
+
+        if (function_exists('switch_to_locale') && switch_to_locale($target_locale)) {
+            return;
+        }
+
+        global $locale;
+        $locale = $target_locale;
+    }
+
+    add_action('after_setup_theme', 'callamir_prime_frontend_language', 0);
 }
 
 if (!function_exists('callamir_language_attributes')) {
@@ -476,38 +515,85 @@ if (!function_exists('callamir_mod')) {
      * @return string
      */
     function callamir_mod($key_base, $lang, $default = '') {
-        $candidates = array();
+        $requested_lang = is_string($lang) ? trim($lang) : '';
+        $default_lang = function_exists('callamir_get_default_language') ? callamir_get_default_language() : 'en';
+        $supported_langs = function_exists('callamir_get_supported_languages') ? array_keys(callamir_get_supported_languages()) : array();
 
-        if (!empty($lang)) {
-            $candidates[] = $key_base . '_' . $lang;
+        if ($requested_lang === '' && is_string($default_lang)) {
+            $requested_lang = $default_lang;
         }
 
-        $candidates[] = $key_base;
-
-        if (function_exists('callamir_get_default_language')) {
-            $default_lang = callamir_get_default_language();
-            if ($default_lang && $default_lang !== $lang) {
-                $candidates[] = $key_base . '_' . $default_lang;
-            }
+        $primary_candidates = array();
+        if ($requested_lang !== '') {
+            $primary_candidates[] = $key_base . '_' . $requested_lang;
         }
 
-        if (function_exists('callamir_get_supported_languages')) {
-            foreach (array_keys(callamir_get_supported_languages()) as $supported_lang) {
-                if ($supported_lang === $lang) {
-                    continue;
-                }
+        $primary_candidates = array_values(array_unique(array_filter($primary_candidates)));
 
-                $candidates[] = $key_base . '_' . $supported_lang;
-            }
-        }
-
-        $candidates = array_values(array_unique(array_filter($candidates)));
-
-        foreach ($candidates as $candidate_key) {
+        foreach ($primary_candidates as $candidate_key) {
             $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
             if ($value !== null) {
                 return $value;
             }
+        }
+
+        $legacy_value = callamir_normalize_theme_mod_value(get_theme_mod($key_base, null));
+
+        $fallback_candidates = array();
+        if (!empty($default_lang) && $requested_lang !== $default_lang) {
+            $fallback_candidates[] = $key_base . '_' . $default_lang;
+        }
+
+        if (!empty($supported_langs)) {
+            foreach ($supported_langs as $supported_lang) {
+                if ($supported_lang === $requested_lang || $supported_lang === $default_lang) {
+                    continue;
+                }
+
+                $fallback_candidates[] = $key_base . '_' . $supported_lang;
+            }
+        }
+
+        $fallback_value = null;
+        if (!empty($fallback_candidates)) {
+            foreach (array_values(array_unique($fallback_candidates)) as $candidate_key) {
+                $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
+                if ($value !== null) {
+                    $fallback_value = $value;
+                    break;
+                }
+            }
+        }
+
+        $default_trimmed = trim((string) $default);
+        $effective_lang = $requested_lang !== '' ? $requested_lang : $default_lang;
+
+        if ($effective_lang === $default_lang || $effective_lang === '') {
+            if ($legacy_value !== null) {
+                return $legacy_value;
+            }
+
+            if ($default_trimmed !== '') {
+                return $default;
+            }
+
+            if ($fallback_value !== null) {
+                return $fallback_value;
+            }
+
+            return $default;
+        }
+
+        if ($default_trimmed !== '') {
+            return $default;
+        }
+
+        if ($fallback_value !== null) {
+            return $fallback_value;
+        }
+
+        if ($legacy_value !== null) {
+            return $legacy_value;
         }
 
         return $default;
