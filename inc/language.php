@@ -370,7 +370,9 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
      * @return string
      */
     function callamir_filter_locale_for_frontend($locale) {
-        if (is_admin() && !wp_doing_ajax() && !wp_doing_rest()) {
+        $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
+
+        if (is_admin() && !wp_doing_ajax() && !$doing_rest) {
             return $locale;
         }
 
