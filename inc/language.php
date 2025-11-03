@@ -515,38 +515,85 @@ if (!function_exists('callamir_mod')) {
      * @return string
      */
     function callamir_mod($key_base, $lang, $default = '') {
-        $candidates = array();
+        $requested_lang = is_string($lang) ? trim($lang) : '';
+        $default_lang = function_exists('callamir_get_default_language') ? callamir_get_default_language() : 'en';
+        $supported_langs = function_exists('callamir_get_supported_languages') ? array_keys(callamir_get_supported_languages()) : array();
 
-        if (!empty($lang)) {
-            $candidates[] = $key_base . '_' . $lang;
+        if ($requested_lang === '' && is_string($default_lang)) {
+            $requested_lang = $default_lang;
         }
 
-        $candidates[] = $key_base;
-
-        if (function_exists('callamir_get_default_language')) {
-            $default_lang = callamir_get_default_language();
-            if ($default_lang && $default_lang !== $lang) {
-                $candidates[] = $key_base . '_' . $default_lang;
-            }
+        $primary_candidates = array();
+        if ($requested_lang !== '') {
+            $primary_candidates[] = $key_base . '_' . $requested_lang;
         }
 
-        if (function_exists('callamir_get_supported_languages')) {
-            foreach (array_keys(callamir_get_supported_languages()) as $supported_lang) {
-                if ($supported_lang === $lang) {
-                    continue;
-                }
+        $primary_candidates = array_values(array_unique(array_filter($primary_candidates)));
 
-                $candidates[] = $key_base . '_' . $supported_lang;
-            }
-        }
-
-        $candidates = array_values(array_unique(array_filter($candidates)));
-
-        foreach ($candidates as $candidate_key) {
+        foreach ($primary_candidates as $candidate_key) {
             $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
             if ($value !== null) {
                 return $value;
             }
+        }
+
+        $legacy_value = callamir_normalize_theme_mod_value(get_theme_mod($key_base, null));
+
+        $fallback_candidates = array();
+        if (!empty($default_lang) && $requested_lang !== $default_lang) {
+            $fallback_candidates[] = $key_base . '_' . $default_lang;
+        }
+
+        if (!empty($supported_langs)) {
+            foreach ($supported_langs as $supported_lang) {
+                if ($supported_lang === $requested_lang || $supported_lang === $default_lang) {
+                    continue;
+                }
+
+                $fallback_candidates[] = $key_base . '_' . $supported_lang;
+            }
+        }
+
+        $fallback_value = null;
+        if (!empty($fallback_candidates)) {
+            foreach (array_values(array_unique($fallback_candidates)) as $candidate_key) {
+                $value = callamir_normalize_theme_mod_value(get_theme_mod($candidate_key, null));
+                if ($value !== null) {
+                    $fallback_value = $value;
+                    break;
+                }
+            }
+        }
+
+        $default_trimmed = trim((string) $default);
+        $effective_lang = $requested_lang !== '' ? $requested_lang : $default_lang;
+
+        if ($effective_lang === $default_lang || $effective_lang === '') {
+            if ($legacy_value !== null) {
+                return $legacy_value;
+            }
+
+            if ($default_trimmed !== '') {
+                return $default;
+            }
+
+            if ($fallback_value !== null) {
+                return $fallback_value;
+            }
+
+            return $default;
+        }
+
+        if ($default_trimmed !== '') {
+            return $default;
+        }
+
+        if ($fallback_value !== null) {
+            return $fallback_value;
+        }
+
+        if ($legacy_value !== null) {
+            return $legacy_value;
         }
 
         return $default;
