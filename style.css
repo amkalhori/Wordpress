@@ -601,6 +601,21 @@ main#site-main { padding-top: 80px; }
 /* RTL Support */
 body[dir="rtl"] .nav-wrapper {
     flex-direction: row-reverse;
+    justify-content: flex-start;
+    text-align: right;
+}
+
+body[dir="rtl"] .nav-wrapper > * {
+    text-align: right;
+}
+
+body[dir="rtl"] .nav-desktop {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+body[dir="rtl"] .nav-lang-switcher {
+    justify-content: flex-end;
 }
 
 .nav-menu-desktop--rtl {
