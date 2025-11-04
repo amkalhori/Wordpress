@@ -1,16 +1,33 @@
 <?php
 $current_lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : 'en';
 $is_rtl_layout = function_exists('is_rtl') ? is_rtl() : ($current_lang === 'fa');
+
+$html_dir = $is_rtl_layout ? 'rtl' : 'ltr';
+$html_attributes = function_exists('get_language_attributes') ? get_language_attributes() : '';
+
+if ($html_attributes === '') {
+    $language = function_exists('get_bloginfo') ? get_bloginfo('language') : 'en';
+    $html_attributes = sprintf('lang="%s"', esc_attr(str_replace('_', '-', $language)));
+}
+
+$dir_fragment = sprintf('dir="%s"', esc_attr($html_dir));
+
+if (strpos($html_attributes, 'dir=') === false) {
+    $html_attributes = trim($html_attributes . ' ' . $dir_fragment);
+} else {
+    $replaced_attributes = preg_replace('/dir="[^"]*"/i', $dir_fragment, $html_attributes);
+    $html_attributes = is_string($replaced_attributes) ? $replaced_attributes : trim($html_attributes . ' ' . $dir_fragment);
+}
 ?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<html <?php echo $html_attributes; ?>>
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?> <?php echo $is_rtl_layout ? 'dir="rtl"' : 'dir="ltr"'; ?>>
-<header class="site-header modern-header">
+<header class="site-header modern-header"<?php echo $is_rtl_layout ? ' dir="rtl"' : ''; ?>>
     <canvas id="stars" class="stars-header" aria-hidden="true"></canvas>
     
     <!-- Modern Navigation Container -->
