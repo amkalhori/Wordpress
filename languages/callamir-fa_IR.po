@@ -18,6 +18,18 @@ msgstr ""
 msgid "Simplifying Tech for Seniors & Small Businesses"
 msgstr "سادگی تکنولوژی برای سالمندان و کسب و کارهای کوچک"
 
+msgid "Friendly, professional, and reasonably priced IT support in Toronto."
+msgstr "پشتیبانی آی‌تی دوستانه، حرفه‌ای و مقرون‌به‌صرفه در تورنتو."
+
+msgid "We help non-technical users solve tech problems quickly and kindly."
+msgstr "ما به کاربران غیرفنی کمک می‌کنیم تا مشکلات تکنولوژی را سریع و با مهربانی حل کنند."
+
+msgid "Call Now"
+msgstr "اکنون تماس بگیرید"
+
+msgid "Get IT Support"
+msgstr "دریافت پشتیبانی آی‌تی"
+
 msgid "Reliable, friendly, and easy IT support."
 msgstr "پشتیبانی آی تی قابل اعتماد، دوستانه و آسان."
 
@@ -33,6 +45,12 @@ msgstr "اشتراک"
 msgid "Our Services"
 msgstr "خدمات"
 
+msgid "Professional IT solutions tailored to your needs"
+msgstr "راهکارهای حرفه‌ای آی‌تی متناسب با نیاز شما"
+
+msgid "Read More"
+msgstr "بیشتر بخوانید"
+
 msgid "Blog"
 msgstr "وبلاگ"
 
@@ -41,6 +59,15 @@ msgstr "سوال بپرسید"
 
 msgid "Contact Us"
 msgstr "تماس با ما"
+
+msgid "Service %d"
+msgstr "خدمت %d"
+
+msgid "Description for service %d"
+msgstr "توضیح خدمت %d"
+
+msgid "Detailed description for service %d"
+msgstr "توضیح کامل برای خدمت %d"
 
 msgid "Posted on"
 msgstr "ارسال شده در"

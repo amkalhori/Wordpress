@@ -4,6 +4,21 @@ $is_rtl_layout = function_exists('is_rtl') ? is_rtl() : ($current_lang === 'fa')
 
 $html_dir = $is_rtl_layout ? 'rtl' : 'ltr';
 $html_attributes = function_exists('get_language_attributes') ? get_language_attributes() : '';
+$logo_text = function_exists('callamir_get_text') ? callamir_get_text(
+    'logo_text',
+    __('CallAmir', 'callamir'),
+    'کال امیر'
+) : __('CallAmir', 'callamir');
+$flag_text_value = function_exists('callamir_get_text') ? callamir_get_text(
+    'flag_text',
+    __('Languages:', 'callamir'),
+    'زبان‌ها:'
+) : __('Languages:', 'callamir');
+$leave_message_label = function_exists('callamir_get_text') ? callamir_get_text(
+    'leave_message_text',
+    __('Leave a message', 'callamir'),
+    'پیام بگذارید'
+) : __('Leave a message', 'callamir');
 
 if ($html_attributes === '') {
     $language = function_exists('get_bloginfo') ? get_bloginfo('language') : 'en';
@@ -39,7 +54,7 @@ if (strpos($html_attributes, 'dir=') === false) {
                     <?php the_custom_logo(); ?>
                 <?php else : ?>
                     <a href="<?php echo esc_url(home_url('/')); ?>" class="logo-link">
-                        <span class="logo-text"><?php echo esc_html(function_exists('callamir_mod') ? callamir_mod('logo_text', __('CallAmir', 'callamir')) : __('CallAmir', 'callamir')); ?></span>
+                        <span class="logo-text"><?php echo esc_html($logo_text); ?></span>
                     </a>
                 <?php endif; ?>
             </div>
@@ -64,11 +79,10 @@ if (strpos($html_attributes, 'dir=') === false) {
             <div class="nav-lang-switcher">
                 <div class="lang-flags">
                     <?php
-                    $flag_text = function_exists('callamir_mod') ? callamir_mod('flag_text', __('Languages:', 'callamir')) : __('Languages:', 'callamir');
                     $english_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'en') : add_query_arg('lang', 'en', home_url('/'));
                     $persian_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'fa') : add_query_arg('lang', 'fa', home_url('/'));
                     ?>
-                    <span class="flag-text"><?php echo esc_html($flag_text); ?></span>
+                    <span class="flag-text"><?php echo esc_html($flag_text_value); ?></span>
                     <?php if (get_theme_mod('enable_english', true)) : ?>
                         <a href="<?php echo esc_url($english_url); ?>" class="lang-flag-link<?php echo $current_lang === 'en' ? ' is-active' : ''; ?>" data-lang="en" aria-label="<?php _e('Switch to English', 'callamir'); ?>">
                             <img src="<?php echo esc_url(get_theme_mod('english_flag_image', get_template_directory_uri() . '/images/uk-flag.png')); ?>" alt="<?php echo esc_attr(get_theme_mod('english_flag_alt', __('English', 'callamir'))); ?>" class="flag-img">
@@ -87,7 +101,7 @@ if (strpos($html_attributes, 'dir=') === false) {
                 <?php $cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
                 <a href="<?php echo esc_url($cta_url); ?>" class="cta-button">
                     <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
-                    <span><?php echo esc_html(function_exists('callamir_mod') ? callamir_mod('leave_message_text', __('Leave a message', 'callamir')) : __('Leave a message', 'callamir')); ?></span>
+                    <span><?php echo esc_html($leave_message_label); ?></span>
                 </a>
             </div>
 
@@ -120,7 +134,7 @@ if (strpos($html_attributes, 'dir=') === false) {
                     <?php $mobile_cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
                     <a href="<?php echo esc_url($mobile_cta_url); ?>" class="mobile-cta-button">
                         <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
-                        <span><?php echo esc_html(function_exists('callamir_mod') ? callamir_mod('leave_message_text', __('Leave a message', 'callamir')) : __('Leave a message', 'callamir')); ?></span>
+                        <span><?php echo esc_html($leave_message_label); ?></span>
                     </a>
                 </div>
             </div>
