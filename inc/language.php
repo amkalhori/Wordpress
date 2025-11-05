@@ -276,6 +276,12 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
      * @return array<string, mixed>
      */
     function callamir_filter_theme_mods_by_lang($mods) {
+        static $processing = false;
+
+        if ($processing) {
+            return $mods;
+        }
+
         if (!is_array($mods) || empty($mods)) {
             return $mods;
         }
@@ -284,33 +290,36 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
             return $mods;
         }
 
+        $processing = true;
+        $result = $mods;
+
         $supported = callamir_get_supported_languages();
         $lang = callamir_get_visitor_lang();
 
-        if (!is_string($lang) || !isset($supported[$lang]) || 'en' === $lang) {
-            return $mods;
-        }
+        if (is_string($lang) && isset($supported[$lang]) && 'en' !== $lang) {
+            $suffix = '_' . $lang;
+            $suffix_length = strlen($suffix);
 
-        $suffix = '_' . $lang;
-        $suffix_length = strlen($suffix);
+            foreach ($mods as $key => $value) {
+                if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
+                    continue;
+                }
 
-        foreach ($mods as $key => $value) {
-            if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
-                continue;
-            }
+                $base = substr($key, 0, -$suffix_length);
+                if ($base === '') {
+                    continue;
+                }
 
-            $base = substr($key, 0, -$suffix_length);
-            if ($base === '') {
-                continue;
-            }
-
-            $normalized = callamir_normalize_theme_mod_value($value);
-            if ($normalized !== null) {
-                $mods[$base] = $normalized;
+                $normalized = callamir_normalize_theme_mod_value($value);
+                if (null !== $normalized) {
+                    $result[$base] = $normalized;
+                }
             }
         }
 
-        return $mods;
+        $processing = false;
+
+        return $result;
     }
 
     add_filter('option_theme_mods_' . get_stylesheet(), 'callamir_filter_theme_mods_by_lang', 20, 1);
