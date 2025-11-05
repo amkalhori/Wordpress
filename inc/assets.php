@@ -106,9 +106,9 @@ function callamir_enqueue_scripts() {
         $image = get_theme_mod("callamir_service_image_{$i}", '');
 
         $service_data[$i] = array(
-            'title' => callamir_mod("service_title_{$i}", $defaults['title']['en']),
-            'description' => callamir_mod("service_desc_{$i}", $defaults['description']['en']),
-            'fullDescription' => callamir_mod("service_full_desc_{$i}", $defaults['fullDescription']['en']),
+            'title' => callamir_get_text("service_title_{$i}", $defaults['title']['en'], $defaults['title']['fa']),
+            'description' => callamir_get_text("service_desc_{$i}", $defaults['description']['en'], $defaults['description']['fa']),
+            'fullDescription' => callamir_get_text("service_full_desc_{$i}", $defaults['fullDescription']['en'], $defaults['fullDescription']['fa']),
             'price' => callamir_mod("service_price_{$i}", ''),
             'image' => $image,
         );
