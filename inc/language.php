@@ -44,6 +44,45 @@ if (!function_exists('callamir_get_supported_languages')) {
     }
 }
 
+if (!function_exists('callamir_override_load_textdomain')) {
+    /**
+     * Load the theme translations from the human-readable PO files so we do not
+     * need to ship compiled MO binaries. Some hosting platforms disallow
+     * uploading binary files which would otherwise prevent the theme from being
+     * installed or updated.
+     *
+     * @param bool   $override Whether another hook has already handled loading.
+     * @param string $domain   Text domain requested by WordPress.
+     * @param string $mofile   Expected MO file path.
+     * @return bool True when the translations were loaded from the PO file.
+     */
+    function callamir_override_load_textdomain($override, $domain, $mofile) {
+        if ('callamir' !== $domain) {
+            return $override;
+        }
+
+        $po_file = preg_replace('/\.mo$/', '.po', $mofile);
+        if (!$po_file || !file_exists($po_file)) {
+            return false;
+        }
+
+        if (!class_exists('PO')) {
+            require_once ABSPATH . WPINC . '/pomo/po.php';
+        }
+
+        $translations = new PO();
+        if (!$translations->import_from_file($po_file)) {
+            return false;
+        }
+
+        $GLOBALS['l10n'][$domain] = $translations;
+
+        return true;
+    }
+
+    add_filter('override_load_textdomain', 'callamir_override_load_textdomain', 10, 3);
+}
+
 if (!function_exists('callamir_get_locale_for_language')) {
     /**
      * Map a short language code to a full WordPress locale string.
@@ -59,6 +98,33 @@ if (!function_exists('callamir_get_locale_for_language')) {
             default:
                 return 'en_US';
         }
+    }
+}
+
+if (!function_exists('callamir_get_language_from_locale')) {
+    /**
+     * Resolve a WordPress locale back to the theme language code.
+     *
+     * @param string $locale Locale identifier provided by WordPress.
+     * @return string|null Two character language code or null when unknown.
+     */
+    function callamir_get_language_from_locale($locale) {
+        if (!is_string($locale) || $locale === '') {
+            return null;
+        }
+
+        $normalized = strtolower(str_replace('-', '_', $locale));
+        $supported = callamir_get_supported_languages();
+
+        foreach ($supported as $code => $meta) {
+            $locale_code = strtolower(str_replace('-', '_', callamir_get_locale_for_language($code)));
+
+            if ($normalized === $locale_code || $normalized === strtolower($code)) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 }
 
