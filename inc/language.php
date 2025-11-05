@@ -411,6 +411,64 @@ if (!function_exists('callamir_language_body_class')) {
     add_filter('body_class', 'callamir_language_body_class');
 }
 
+if (!function_exists('callamir_resolve_language_for_locale_filter')) {
+    /**
+     * Determine the language a locale filter should enforce without triggering
+     * additional locale lookups that could recurse back into the filter.
+     *
+     * @param string $locale Locale currently being filtered by WordPress.
+     * @return string Two-letter language code.
+     */
+    function callamir_resolve_language_for_locale_filter($locale) {
+        static $cache = array();
+
+        $cache_key = is_string($locale) ? strtolower($locale) : '';
+
+        if (isset($cache[$cache_key])) {
+            return $cache[$cache_key];
+        }
+
+        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : array();
+        $language = null;
+
+        if (isset($_GET['lang'])) {
+            $candidate = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
+            if (isset($supported[$candidate])) {
+                $language = $candidate;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_preview_language')) {
+            $preview = callamir_get_preview_language();
+            if ($preview && isset($supported[$preview])) {
+                $language = $preview;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_default_language')) {
+            $default = callamir_get_default_language();
+            if ($default && isset($supported[$default])) {
+                $language = $default;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_language_from_locale')) {
+            $derived = callamir_get_language_from_locale($locale);
+            if ($derived && isset($supported[$derived])) {
+                $language = $derived;
+            }
+        }
+
+        if (null === $language) {
+            $language = 'en';
+        }
+
+        $cache[$cache_key] = $language;
+
+        return $language;
+    }
+}
+
 if (!function_exists('callamir_filter_locale_for_frontend')) {
     /**
      * Ensure WordPress boots with the correct locale for the active visitor language.
