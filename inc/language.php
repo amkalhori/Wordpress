@@ -498,7 +498,7 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
         $processing = true;
 
         try {
-            $active = callamir_resolve_language_for_locale_filter($locale);
+            $active = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang(false) : 'en';
 
             if (!function_exists('callamir_get_supported_languages')) {
                 return callamir_get_locale_for_language($active);
