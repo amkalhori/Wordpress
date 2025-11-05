@@ -36,51 +36,97 @@ if (!function_exists('callamir_get_visitor_lang')) {
     /**
      * Detect the visitor language from the request context.
      *
+     * @param bool $allow_locale_lookup Whether to inspect the WordPress locale for fallback detection.
      * @return string Two-letter language code.
      */
-    function callamir_get_visitor_lang() {
-        static $detected_lang = null;
+    function callamir_get_visitor_lang($allow_locale_lookup = true) {
+        static $detected_lang = array();
+        static $resolving = false;
 
-        if (null !== $detected_lang) {
-            return $detected_lang;
+        $cache_key = $allow_locale_lookup ? 'full' : 'safe';
+
+        if (isset($detected_lang[$cache_key])) {
+            return $detected_lang[$cache_key];
         }
 
+        if ($resolving) {
+            if (isset($detected_lang['full'])) {
+                return $detected_lang['full'];
+            }
+
+            return 'en';
+        }
+
+        $resolving = true;
+        $previous_flag = isset($GLOBALS['callamir_resolving_language']) ? (bool) $GLOBALS['callamir_resolving_language'] : false;
+        $GLOBALS['callamir_resolving_language'] = true;
+
         $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : array('en' => array());
+        $language = null;
 
         if (isset($_GET['lang'])) {
             $lang = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
 
             if (isset($supported[$lang])) {
-                $detected_lang = $lang;
-                return $detected_lang;
+                $language = $lang;
             }
         }
 
-        if (function_exists('callamir_get_preview_language')) {
+        if (null === $language && function_exists('callamir_get_preview_language')) {
             $preview_lang = callamir_get_preview_language();
             if ($preview_lang && isset($supported[$preview_lang])) {
-                $detected_lang = $preview_lang;
-                return $detected_lang;
+                $language = $preview_lang;
             }
         }
 
-        $locale = function_exists('determine_locale') ? determine_locale() : get_locale();
-        if ($locale) {
-            $locale_lang = function_exists('callamir_get_language_from_locale') ? callamir_get_language_from_locale($locale) : null;
+        if (null === $language) {
+            $locale_lang = null;
+
+            if ($allow_locale_lookup && !doing_filter('locale')) {
+                $locale = function_exists('determine_locale') ? determine_locale() : get_locale();
+                if ($locale && function_exists('callamir_get_language_from_locale')) {
+                    $locale_lang = callamir_get_language_from_locale($locale);
+                }
+            } elseif (!$allow_locale_lookup) {
+                if (isset($detected_lang['full'])) {
+                    $locale_lang = $detected_lang['full'];
+                } else {
+                    $raw_locale = isset($GLOBALS['locale']) ? $GLOBALS['locale'] : '';
+                    if (!$raw_locale) {
+                        $raw_locale = get_option('WPLANG');
+                    }
+
+                    if ($raw_locale && function_exists('callamir_get_language_from_locale')) {
+                        $locale_lang = callamir_get_language_from_locale($raw_locale);
+                    }
+                }
+            }
+
             if ($locale_lang && isset($supported[$locale_lang])) {
-                $detected_lang = $locale_lang;
-                return $detected_lang;
+                $language = $locale_lang;
             }
         }
 
-        $default = function_exists('callamir_get_default_language') ? callamir_get_default_language() : 'en';
-        if (isset($supported[$default])) {
-            $detected_lang = $default;
-            return $detected_lang;
+        if (null === $language && function_exists('callamir_get_default_language')) {
+            $default = callamir_get_default_language();
+            if (isset($supported[$default])) {
+                $language = $default;
+            }
         }
 
-        $detected_lang = 'en';
-        return $detected_lang;
+        if (null === $language || !isset($supported[$language])) {
+            $language = 'en';
+        }
+
+        $detected_lang[$cache_key] = $language;
+        if ($allow_locale_lookup) {
+            $detected_lang['safe'] = $language;
+        }
+
+        $GLOBALS['callamir_resolving_language'] = $previous_flag;
+        $resolving = false;
+
+        return $language;
     }
 }
 

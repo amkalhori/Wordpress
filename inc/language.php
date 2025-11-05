@@ -190,15 +190,45 @@ if (!function_exists('callamir_get_default_language')) {
      * @return string
      */
     function callamir_get_default_language() {
+        static $cached_default = null;
+        static $resolving = false;
+
+        if (null !== $cached_default) {
+            return $cached_default;
+        }
+
+        if ($resolving) {
+            return 'en';
+        }
+
+        $resolving = true;
         $supported = callamir_get_supported_languages();
 
         $preview_lang = callamir_get_preview_language();
         if ($preview_lang && isset($supported[$preview_lang])) {
-            return $preview_lang;
+            $cached_default = $preview_lang;
         }
 
-        $default = get_theme_mod('site_language', 'en');
-        return isset($supported[$default]) ? $default : 'en';
+        if (null === $cached_default) {
+            $previous_flag = isset($GLOBALS['callamir_resolving_language']) ? (bool) $GLOBALS['callamir_resolving_language'] : false;
+            $GLOBALS['callamir_resolving_language'] = true;
+
+            $default = get_theme_mod('site_language', 'en');
+
+            $GLOBALS['callamir_resolving_language'] = $previous_flag;
+
+            if (isset($supported[$default])) {
+                $cached_default = $default;
+            }
+        }
+
+        if (null === $cached_default || !isset($supported[$cached_default])) {
+            $cached_default = 'en';
+        }
+
+        $resolving = false;
+
+        return $cached_default;
     }
 }
 
@@ -279,6 +309,10 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
         static $processing = false;
 
         if ($processing) {
+            return $mods;
+        }
+
+        if (!empty($GLOBALS['callamir_resolving_language'])) {
             return $mods;
         }
 
@@ -389,6 +423,12 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
      * @return string
      */
     function callamir_filter_locale_for_frontend($locale) {
+        static $processing = false;
+
+        if ($processing) {
+            return $locale;
+        }
+
         $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
 
         $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
@@ -397,8 +437,28 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
             return $locale;
         }
 
-        $active = callamir_get_visitor_lang();
-        return callamir_get_locale_for_language($active);
+        $processing = true;
+
+        try {
+            $active = callamir_get_visitor_lang(false);
+
+            if (!function_exists('callamir_get_supported_languages')) {
+                return callamir_get_locale_for_language($active);
+            }
+
+            $supported = callamir_get_supported_languages();
+
+            if (!isset($supported[$active])) {
+                $fallback = function_exists('callamir_get_language_from_locale') ? callamir_get_language_from_locale($locale) : null;
+                if ($fallback && isset($supported[$fallback])) {
+                    $active = $fallback;
+                }
+            }
+
+            return callamir_get_locale_for_language($active);
+        } finally {
+            $processing = false;
+        }
     }
 
     add_filter('locale', 'callamir_filter_locale_for_frontend');
