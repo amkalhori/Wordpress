@@ -44,6 +44,45 @@ if (!function_exists('callamir_get_supported_languages')) {
     }
 }
 
+if (!function_exists('callamir_override_load_textdomain')) {
+    /**
+     * Load the theme translations from the human-readable PO files so we do not
+     * need to ship compiled MO binaries. Some hosting platforms disallow
+     * uploading binary files which would otherwise prevent the theme from being
+     * installed or updated.
+     *
+     * @param bool   $override Whether another hook has already handled loading.
+     * @param string $domain   Text domain requested by WordPress.
+     * @param string $mofile   Expected MO file path.
+     * @return bool True when the translations were loaded from the PO file.
+     */
+    function callamir_override_load_textdomain($override, $domain, $mofile) {
+        if ('callamir' !== $domain) {
+            return $override;
+        }
+
+        $po_file = preg_replace('/\.mo$/', '.po', $mofile);
+        if (!$po_file || !file_exists($po_file)) {
+            return false;
+        }
+
+        if (!class_exists('PO')) {
+            require_once ABSPATH . WPINC . '/pomo/po.php';
+        }
+
+        $translations = new PO();
+        if (!$translations->import_from_file($po_file)) {
+            return false;
+        }
+
+        $GLOBALS['l10n'][$domain] = $translations;
+
+        return true;
+    }
+
+    add_filter('override_load_textdomain', 'callamir_override_load_textdomain', 10, 3);
+}
+
 if (!function_exists('callamir_get_locale_for_language')) {
     /**
      * Map a short language code to a full WordPress locale string.
@@ -59,6 +98,33 @@ if (!function_exists('callamir_get_locale_for_language')) {
             default:
                 return 'en_US';
         }
+    }
+}
+
+if (!function_exists('callamir_get_language_from_locale')) {
+    /**
+     * Resolve a WordPress locale back to the theme language code.
+     *
+     * @param string $locale Locale identifier provided by WordPress.
+     * @return string|null Two character language code or null when unknown.
+     */
+    function callamir_get_language_from_locale($locale) {
+        if (!is_string($locale) || $locale === '') {
+            return null;
+        }
+
+        $normalized = strtolower(str_replace('-', '_', $locale));
+        $supported = callamir_get_supported_languages();
+
+        foreach ($supported as $code => $meta) {
+            $locale_code = strtolower(str_replace('-', '_', callamir_get_locale_for_language($code)));
+
+            if ($normalized === $locale_code || $normalized === strtolower($code)) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 }
 
@@ -124,15 +190,45 @@ if (!function_exists('callamir_get_default_language')) {
      * @return string
      */
     function callamir_get_default_language() {
+        static $cached_default = null;
+        static $resolving = false;
+
+        if (null !== $cached_default) {
+            return $cached_default;
+        }
+
+        if ($resolving) {
+            return 'en';
+        }
+
+        $resolving = true;
         $supported = callamir_get_supported_languages();
 
         $preview_lang = callamir_get_preview_language();
         if ($preview_lang && isset($supported[$preview_lang])) {
-            return $preview_lang;
+            $cached_default = $preview_lang;
         }
 
-        $default = get_theme_mod('site_language', 'en');
-        return isset($supported[$default]) ? $default : 'en';
+        if (null === $cached_default) {
+            $previous_flag = isset($GLOBALS['callamir_resolving_language']) ? (bool) $GLOBALS['callamir_resolving_language'] : false;
+            $GLOBALS['callamir_resolving_language'] = true;
+
+            $default = get_theme_mod('site_language', 'en');
+
+            $GLOBALS['callamir_resolving_language'] = $previous_flag;
+
+            if (isset($supported[$default])) {
+                $cached_default = $default;
+            }
+        }
+
+        if (null === $cached_default || !isset($supported[$cached_default])) {
+            $cached_default = 'en';
+        }
+
+        $resolving = false;
+
+        return $cached_default;
     }
 }
 
@@ -210,6 +306,16 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
      * @return array<string, mixed>
      */
     function callamir_filter_theme_mods_by_lang($mods) {
+        static $processing = false;
+
+        if ($processing) {
+            return $mods;
+        }
+
+        if (!empty($GLOBALS['callamir_resolving_language'])) {
+            return $mods;
+        }
+
         if (!is_array($mods) || empty($mods)) {
             return $mods;
         }
@@ -218,33 +324,36 @@ if (!function_exists('callamir_filter_theme_mods_by_lang')) {
             return $mods;
         }
 
+        $processing = true;
+        $result = $mods;
+
         $supported = callamir_get_supported_languages();
         $lang = callamir_get_visitor_lang();
 
-        if (!is_string($lang) || !isset($supported[$lang]) || 'en' === $lang) {
-            return $mods;
-        }
+        if (is_string($lang) && isset($supported[$lang]) && 'en' !== $lang) {
+            $suffix = '_' . $lang;
+            $suffix_length = strlen($suffix);
 
-        $suffix = '_' . $lang;
-        $suffix_length = strlen($suffix);
+            foreach ($mods as $key => $value) {
+                if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
+                    continue;
+                }
 
-        foreach ($mods as $key => $value) {
-            if (!is_string($key) || substr($key, -$suffix_length) !== $suffix) {
-                continue;
-            }
+                $base = substr($key, 0, -$suffix_length);
+                if ($base === '') {
+                    continue;
+                }
 
-            $base = substr($key, 0, -$suffix_length);
-            if ($base === '') {
-                continue;
-            }
-
-            $normalized = callamir_normalize_theme_mod_value($value);
-            if ($normalized !== null) {
-                $mods[$base] = $normalized;
+                $normalized = callamir_normalize_theme_mod_value($value);
+                if (null !== $normalized) {
+                    $result[$base] = $normalized;
+                }
             }
         }
 
-        return $mods;
+        $processing = false;
+
+        return $result;
     }
 
     add_filter('option_theme_mods_' . get_stylesheet(), 'callamir_filter_theme_mods_by_lang', 20, 1);
@@ -302,6 +411,64 @@ if (!function_exists('callamir_language_body_class')) {
     add_filter('body_class', 'callamir_language_body_class');
 }
 
+if (!function_exists('callamir_resolve_language_for_locale_filter')) {
+    /**
+     * Determine the language a locale filter should enforce without triggering
+     * additional locale lookups that could recurse back into the filter.
+     *
+     * @param string $locale Locale currently being filtered by WordPress.
+     * @return string Two-letter language code.
+     */
+    function callamir_resolve_language_for_locale_filter($locale) {
+        static $cache = array();
+
+        $cache_key = is_string($locale) ? strtolower($locale) : '';
+
+        if (isset($cache[$cache_key])) {
+            return $cache[$cache_key];
+        }
+
+        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : array();
+        $language = null;
+
+        if (isset($_GET['lang'])) {
+            $candidate = strtolower(sanitize_text_field(wp_unslash($_GET['lang'])));
+            if (isset($supported[$candidate])) {
+                $language = $candidate;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_preview_language')) {
+            $preview = callamir_get_preview_language();
+            if ($preview && isset($supported[$preview])) {
+                $language = $preview;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_default_language')) {
+            $default = callamir_get_default_language();
+            if ($default && isset($supported[$default])) {
+                $language = $default;
+            }
+        }
+
+        if (null === $language && function_exists('callamir_get_language_from_locale')) {
+            $derived = callamir_get_language_from_locale($locale);
+            if ($derived && isset($supported[$derived])) {
+                $language = $derived;
+            }
+        }
+
+        if (null === $language) {
+            $language = 'en';
+        }
+
+        $cache[$cache_key] = $language;
+
+        return $language;
+    }
+}
+
 if (!function_exists('callamir_filter_locale_for_frontend')) {
     /**
      * Ensure WordPress boots with the correct locale for the active visitor language.
@@ -314,6 +481,12 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
      * @return string
      */
     function callamir_filter_locale_for_frontend($locale) {
+        static $processing = false;
+
+        if ($processing) {
+            return $locale;
+        }
+
         $doing_rest = function_exists('wp_doing_rest') ? wp_doing_rest() : (defined('REST_REQUEST') && REST_REQUEST);
 
         $doing_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : (defined('DOING_AJAX') && DOING_AJAX);
@@ -322,8 +495,34 @@ if (!function_exists('callamir_filter_locale_for_frontend')) {
             return $locale;
         }
 
-        $active = callamir_get_visitor_lang();
-        return callamir_get_locale_for_language($active);
+        $processing = true;
+
+        try {
+            $active = callamir_resolve_language_for_locale_filter($locale);
+
+            if (!function_exists('callamir_get_supported_languages')) {
+                return callamir_get_locale_for_language($active);
+            }
+
+            $supported = callamir_get_supported_languages();
+
+            if (!isset($supported[$active])) {
+                $fallback = function_exists('callamir_get_language_from_locale') ? callamir_get_language_from_locale($locale) : null;
+                if ($fallback && isset($supported[$fallback])) {
+                    $active = $fallback;
+                }
+            }
+
+            $target_locale = callamir_get_locale_for_language($active);
+
+            if ('' === $target_locale) {
+                return $locale;
+            }
+
+            return $target_locale;
+        } finally {
+            $processing = false;
+        }
     }
 
     add_filter('locale', 'callamir_filter_locale_for_frontend');

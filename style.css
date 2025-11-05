@@ -618,6 +618,34 @@ body[dir="rtl"] .nav-lang-switcher {
     justify-content: flex-end;
 }
 
+.lang-fa .nav-menu-desktop {
+    flex-direction: row-reverse;
+    direction: rtl;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.lang-fa .nav-menu-desktop > li {
+    direction: rtl;
+}
+
+.lang-fa .nav-menu-desktop > li > a {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.lang-fa .nav-menu-mobile {
+    direction: rtl;
+    text-align: right;
+}
+
+.lang-fa .nav-menu-mobile > li > a {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    text-align: right;
+}
+
 .nav-menu-desktop--rtl {
     flex-direction: row-reverse;
     justify-content: flex-end;
