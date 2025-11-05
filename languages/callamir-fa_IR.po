@@ -18,6 +18,18 @@ msgstr ""
 msgid "Simplifying Tech for Seniors & Small Businesses"
 msgstr "سادگی تکنولوژی برای سالمندان و کسب و کارهای کوچک"
 
+msgid "Friendly, professional, and reasonably priced IT support in Toronto."
+msgstr "پشتیبانی آی‌تی دوستانه، حرفه‌ای و مقرون‌به‌صرفه در تورنتو."
+
+msgid "We help non-technical users solve tech problems quickly and kindly."
+msgstr "ما به کاربران غیرفنی کمک می‌کنیم تا مشکلات تکنولوژی را سریع و با مهربانی حل کنند."
+
+msgid "Call Now"
+msgstr "اکنون تماس بگیرید"
+
+msgid "Get IT Support"
+msgstr "دریافت پشتیبانی آی‌تی"
+
 msgid "Reliable, friendly, and easy IT support."
 msgstr "پشتیبانی آی تی قابل اعتماد، دوستانه و آسان."
 
@@ -33,6 +45,12 @@ msgstr "اشتراک"
 msgid "Our Services"
 msgstr "خدمات"
 
+msgid "Professional IT solutions tailored to your needs"
+msgstr "راهکارهای حرفه‌ای آی‌تی متناسب با نیاز شما"
+
+msgid "Read More"
+msgstr "بیشتر بخوانید"
+
 msgid "Blog"
 msgstr "وبلاگ"
 
@@ -41,6 +59,15 @@ msgstr "سوال بپرسید"
 
 msgid "Contact Us"
 msgstr "تماس با ما"
+
+msgid "Service %d"
+msgstr "خدمت %d"
+
+msgid "Description for service %d"
+msgstr "توضیح خدمت %d"
+
+msgid "Detailed description for service %d"
+msgstr "توضیح کامل برای خدمت %d"
 
 msgid "Posted on"
 msgstr "ارسال شده در"
@@ -158,6 +185,54 @@ msgstr "ستاره"
 
 msgid "Rocket"
 msgstr "موشک"
+
+#: header.php inc/customizer.php
+msgid "Leave a message"
+msgstr "پیام بگذارید"
+
+#: index.php
+msgid "Community Questions"
+msgstr "سوالات جامعه"
+
+#: index.php
+msgid "Common questions and helpful answers from our community"
+msgstr "سوالات رایج و پاسخ‌های مفید از جامعه ما"
+
+#: index.php
+msgid "Have a question? Ask our community and get helpful answers."
+msgstr "سوالی دارید؟ از جامعه ما بپرسید و پاسخ‌های مفید دریافت کنید."
+
+#: index.php
+msgid "How do I request support?"
+msgstr "چگونه درخواست پشتیبانی بدهم؟"
+
+#: index.php
+msgid "Use the Get IT Support button above or WhatsApp/Telegram in Contact."
+msgstr "از دکمه دریافت پشتیبانی آی‌تی در بالا یا واتساپ/تلگرام در بخش تماس استفاده کنید."
+
+#: index.php
+msgid "Please update the community form shortcode in the Customizer."
+msgstr "لطفاً شورت‌کد فرم جامعه را در بخش سفارشی‌ساز به‌روزرسانی کنید."
+
+#: index.php
+msgid "Please update the Contact form shortcode in the Customizer."
+msgstr "لطفاً شورت‌کد فرم تماس را در بخش سفارشی‌ساز به‌روزرسانی کنید."
+
+#: index.php inc/customizer.php
+msgid "Tips & Daily Quotes"
+msgstr "نکات و نقل‌قول‌های روزانه"
+
+#: index.php
+msgid "Latest insights, IT tips, and motivational posts."
+msgstr "جدیدترین دیدگاه‌ها، نکات آی‌تی و مطالب انگیزشی."
+
+#: index.php
+msgid "Read more"
+msgstr "ادامه مطلب"
+
+#: index.php
+msgid "No posts yet. Add some posts!"
+msgstr "هنوز پستی وجود ندارد. چند پست اضافه کنید!"
 
 msgid "Paw"
 msgstr "پنجه"
