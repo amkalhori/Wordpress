@@ -657,24 +657,20 @@ body[dir="rtl"] .nav-lang-switcher {
     transform: translateX(-10px);
 }
 
-.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile),
 .nav-menu-desktop--rtl,
 [class*="nav-menu-desktop"][class*="--rtl"],
-.directnav-menu-desktop.nav-menu-desktop--rtl,
-.lang-fa .directnav-menu-desktop {
+.directnav-menu-desktop.nav-menu-desktop--rtl {
     flex-direction: row-reverse !important;
     justify-content: flex-end !important;
     text-align: right;
     direction: rtl;
 }
 
-.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile) > li,
 .nav-menu-desktop--rtl > li,
 [class*="nav-menu-desktop"][class*="--rtl"] > li {
     direction: rtl;
 }
 
-.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile) > li > a,
 .nav-menu-desktop--rtl > li > a,
 [class*="nav-menu-desktop"][class*="--rtl"] > li > a {
     flex-direction: row-reverse;
