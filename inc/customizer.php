@@ -36,6 +36,32 @@ function callamir_customize_register($wp_customize) {
         )));
     }
 
+    $section_color_settings = array(
+        'hero_title_color' => '#ffffff',
+        'hero_text_color' => '#dbeafe',
+        'section_title_color' => '#ffffff',
+        'section_title_accent_color' => '#ffd700',
+        'section_subtitle_color' => '#e5e7eb',
+        'contact_form_background_color' => '#111827',
+        'contact_form_border_color' => '#1f2937',
+        'contact_form_field_background' => '#0b1220',
+        'contact_form_field_color' => '#f9fafb',
+        'contact_form_button_background' => '#facc15',
+        'contact_form_button_color' => '#111827',
+    );
+
+    foreach ($section_color_settings as $key => $default_value) {
+        $wp_customize->add_setting($key, array(
+            'default' => $default_value,
+            'sanitize_callback' => 'sanitize_hex_color',
+        ));
+
+        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, array(
+            'label' => ucwords(str_replace('_', ' ', $key)),
+            'section' => 'theme_colors',
+        )));
+    }
+
     // Header & Footer Settings Section
     $wp_customize->add_section('callamir_header_footer', array(
         'title' => __('Header & Footer Settings', 'callamir'),

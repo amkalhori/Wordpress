@@ -9,20 +9,20 @@ get_header();
     <section id="hero" class="callamir-hero text-center relative overflow-hidden" aria-labelledby="hero-title">
         <canvas id="blackhole" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="wrap flex flex-col items-center gap-6 p-4 relative z-10">
-            <h1 id="hero-title" class="text-4xl font-bold text-white">
-                <?php echo esc_html(callamir_mod('hero_title', __('Simplifying Tech for Seniors & Small Businesses', 'callamir'))); ?>
+            <h1 id="hero-title" class="callamir-hero-title text-4xl font-bold text-white">
+                <?php echo esc_html(callamir_get_text('hero_title', __('Simplifying Tech for Seniors & Small Businesses', 'callamir'), 'سادگی تکنولوژی برای سالمندان و کسب‌وکارهای کوچک')); ?>
             </h1>
-            <p class="hero-sub text-lg text-gray-200">
-                <?php echo esc_html(callamir_mod('hero_text', __('Friendly, professional, and reasonably priced IT support in Toronto.', 'callamir'))); ?>
+            <p class="callamir-hero-text hero-sub text-lg text-gray-200">
+                <?php echo esc_html(callamir_get_text('hero_text', __('Friendly, professional, and reasonably priced IT support in Toronto.', 'callamir'), 'پشتیبانی آی‌تی دوستانه، حرفه‌ای و مقرون‌به‌صرفه در تورنتو.')); ?>
             </p>
-            <p class="hero-short text-base md:text-lg text-gray-200 max-w-2xl">
-                <?php echo esc_html(callamir_mod('hero_short_desc', __('We help non-technical users solve tech problems quickly and kindly.', 'callamir'))); ?>
+            <p class="callamir-hero-text hero-short text-base md:text-lg text-gray-200 max-w-2xl">
+                <?php echo esc_html(callamir_get_text('hero_short_desc', __('We help non-technical users solve tech problems quickly and kindly.', 'callamir'), 'ما به کاربران غیرفنی کمک می‌کنیم تا مشکلات تکنولوژی را سریع و با مهربانی حل کنند.')); ?>
             </p>
             <div class="hero-ctas flex flex-col md:flex-row gap-4" role="group" aria-label="<?php esc_attr_e('Hero actions', 'callamir'); ?>">
                 <?php
-                $phone = callamir_mod('contact_phone', '416-123-4567');
-                $call_label = callamir_mod('hero_btn_call', __('Call Now', 'callamir'));
-                $support_label = callamir_mod('hero_btn_support', __('Get IT Support', 'callamir'));
+                $phone = callamir_get_text('contact_phone', '416-123-4567', '416-123-4567');
+                $call_label = callamir_get_text('hero_btn_call', __('Call Now', 'callamir'), 'اکنون تماس بگیرید');
+                $support_label = callamir_get_text('hero_btn_support', __('Get IT Support', 'callamir'), 'دریافت پشتیبانی آی‌تی');
                 ?>
                 <a class="callamir-btn callamir-btn-call flex items-center gap-2 px-6 py-3 bg-red-600 text-white hover:bg-red-700 rounded-lg"
                    href="tel:<?php echo esc_attr(preg_replace('/\D+/', '', $phone)); ?>"
@@ -44,11 +44,11 @@ get_header();
         <canvas id="services-canvas" class="cosmic-canvas absolute top-0 left-0 w-full h-full z-[1]" aria-hidden="true"></canvas>
         <div class="services-container">
             <div class="services-header text-center mb-12">
-                <h2 id="services-title" class="services-title">
-                    <?php echo esc_html(callamir_mod('services_title', __('Our Services', 'callamir'))); ?>
+                <h2 id="services-title" class="services-title callamir-section-title">
+                    <?php echo esc_html(callamir_get_text('services_title', __('Our Services', 'callamir'), 'خدمات ما')); ?>
                 </h2>
-                <p class="services-subtitle">
-                    <?php echo esc_html(callamir_mod('services_subtitle', __('Professional IT solutions tailored to your needs', 'callamir'))); ?>
+                <p class="services-subtitle callamir-section-subtitle">
+                    <?php echo esc_html(callamir_get_text('services_subtitle', __('Professional IT solutions tailored to your needs', 'callamir'), 'راهکارهای حرفه‌ای آی‌تی متناسب با نیاز شما')); ?>
                 </p>
             </div>
             
@@ -71,9 +71,9 @@ get_header();
                         <?php if ($count > 0) :
                             for ($i = 1; $i <= $count; $i++) :
                             $icon = get_theme_mod("callamir_service_icon_{$i}", 'fa-solid fa-computer');
-                            $title = callamir_mod("service_title_{$i}", "Service $i");
-                            $desc = callamir_mod("service_desc_{$i}", "Description for service $i");
-                            $full_desc = callamir_mod("service_full_desc_{$i}", "Detailed description for service $i");
+                            $title = callamir_get_text("service_title_{$i}", sprintf(__('Service %d', 'callamir'), $i), sprintf('خدمت %d', $i));
+                            $desc = callamir_get_text("service_desc_{$i}", sprintf(__('Description for service %d', 'callamir'), $i), sprintf('توضیح خدمت %d', $i));
+                            $full_desc = callamir_get_text("service_full_desc_{$i}", sprintf(__('Detailed description for service %d', 'callamir'), $i), sprintf('توضیح کامل برای خدمت %d', $i));
                             $image = get_theme_mod("callamir_service_image_{$i}", '');
                             $price = callamir_mod("service_price_{$i}", '');
                         ?>
@@ -92,7 +92,7 @@ get_header();
                             <div class="service-actions">
                                 <button class="read-more-btn" data-service="<?php echo $i; ?>" aria-label="<?php echo esc_attr(sprintf(__('Read more about %s', 'callamir'), $title)); ?>">
                                     <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                                    <span><?php echo esc_html(callamir_mod('read_more_text', __('Read More', 'callamir'))); ?></span>
+                                    <span><?php echo esc_html(callamir_get_text('read_more_text', __('Read More', 'callamir'), 'بیشتر بخوانید')); ?></span>
                                 </button>
                             </div>
                         </div>
@@ -119,20 +119,20 @@ get_header();
     <!-- Community Questions Section -->
     <section id="community" class="callamir-section py-10 relative overflow-hidden min-h-[300px]" aria-labelledby="community-title">
         <div class="services-container">
-            <h2 id="community-title" class="services-title">
-                <?php echo esc_html(callamir_mod('community_title', __('Community Questions', 'callamir'))); ?>
+            <h2 id="community-title" class="services-title callamir-section-title">
+                <?php echo esc_html(callamir_get_text('community_title', __('Community Questions', 'callamir'), 'سوالات جامعه')); ?>
             </h2>
-            <p class="services-subtitle mb-8">
-                <?php echo esc_html(callamir_mod('community_subtitle', __('Common questions and helpful answers from our community', 'callamir'))); ?>
+            <p class="services-subtitle callamir-section-subtitle mb-8">
+                <?php echo esc_html(callamir_get_text('community_subtitle', __('Common questions and helpful answers from our community', 'callamir'), 'سوالات رایج و پاسخ‌های مفید از جامعه ما')); ?>
             </p>
 
             <!-- Community Question Form -->
             <div class="community-question-form mb-12">
-                <h3 class="text-2xl font-bold text-white mb-4">
-                    <?php echo esc_html(callamir_mod('community_question_form_title', __('Ask a Question', 'callamir'))); ?>
+                <h3 class="callamir-section-title text-2xl font-bold text-white mb-4">
+                    <?php echo esc_html(callamir_get_text('community_question_form_title', __('Ask a Question', 'callamir'), 'سوال بپرسید')); ?>
                 </h3>
-                <p class="text-gray-200 mb-6">
-                    <?php echo esc_html(callamir_mod('community_question_form_desc', __('Have a question? Ask our community and get helpful answers.', 'callamir'))); ?>
+                <p class="callamir-section-subtitle text-gray-200 mb-6">
+                    <?php echo esc_html(callamir_get_text('community_question_form_desc', __('Have a question? Ask our community and get helpful answers.', 'callamir'), 'سوالی دارید؟ از جامعه ما بپرسید و پاسخ‌های مفید دریافت کنید.')); ?>
                 </p>
                 <div class="max-w-2xl mx-auto">
                     <?php
@@ -150,8 +150,12 @@ get_header();
             <div class="faq-list" role="list">
                 <?php
                 for ($i = 1; $i <= 5; $i++) :
-                    $q = callamir_mod("faq_q_{$i}", $i === 1 ? __('How do I request support?', 'callamir') : '');
-                    $a = callamir_mod("faq_a_{$i}", $i === 1 ? __('Use the Get IT Support button above or WhatsApp/Telegram in Contact.', 'callamir') : '');
+                    $q_default_en = $i === 1 ? __('How do I request support?', 'callamir') : '';
+                    $q_default_fa = $i === 1 ? 'چگونه درخواست پشتیبانی بدهم؟' : '';
+                    $a_default_en = $i === 1 ? __('Use the Get IT Support button above or WhatsApp/Telegram in Contact.', 'callamir') : '';
+                    $a_default_fa = $i === 1 ? 'از دکمه دریافت پشتیبانی آی‌تی در بالا یا واتساپ/تلگرام در بخش تماس استفاده کنید.' : '';
+                    $q = callamir_get_text("faq_q_{$i}", $q_default_en, $q_default_fa);
+                    $a = callamir_get_text("faq_a_{$i}", $a_default_en, $a_default_fa);
                     if (!$q) continue;
                 ?>
                 <div class="faq-item" role="listitem">
@@ -193,41 +197,43 @@ get_header();
     <!-- Contact Section -->
     <section id="contact" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="contact-title">
         <div class="wrap flex flex-col items-center gap-6 relative z-10">
-            <h2 id="contact-title" class="text-3xl font-bold mb-6 text-white">
-                <?php echo esc_html(callamir_mod('contact_title', __('Contact Us', 'callamir'))); ?>
+            <h2 id="contact-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
+                <?php echo esc_html(callamir_get_text('contact_title', __('Contact Us', 'callamir'), 'تماس با ما')); ?>
             </h2>
             <div class="contact-links flex flex-wrap justify-center gap-4 mb-6">
                 <?php
                 $wh = get_theme_mod('whatsapp_url', '#');
                 $tg = get_theme_mod('telegram_url', '#');
                 if ($wh && $wh !== '#') {
-                    echo '<a class="callamir-btn contact-link whatsapp flex items-center gap-2 px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg" href="' . esc_url($wh) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ' . esc_html(callamir_mod('whatsapp_text', __('WhatsApp', 'callamir'))) . '</a>';
+                    echo '<a class="callamir-btn contact-link whatsapp flex items-center gap-2 px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg" href="' . esc_url($wh) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ' . esc_html(callamir_get_text('whatsapp_text', __('WhatsApp', 'callamir'), 'واتساپ')) . '</a>';
                 }
                 if ($tg && $tg !== '#') {
-                    echo '<a class="callamir-btn contact-link telegram flex items-center gap-2 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg" href="' . esc_url($tg) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ' . esc_html(callamir_mod('telegram_text', __('Telegram', 'callamir'))) . '</a>';
+                    echo '<a class="callamir-btn contact-link telegram flex items-center gap-2 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg" href="' . esc_url($tg) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ' . esc_html(callamir_get_text('telegram_text', __('Telegram', 'callamir'), 'تلگرام')) . '</a>';
                 }
                 ?>
             </div>
             <div class="w-full md:w-2/3">
-                <?php
-                $contact_form_shortcode = get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]');
-                $contact_form_output = do_shortcode($contact_form_shortcode);
-                if (stripos($contact_form_output, 'contact form not found') !== false) {
-                    echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
-                } else {
-                    echo $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                }
-                ?>
+                <div class="callamir-contact-form">
+                    <?php
+                    $contact_form_shortcode = get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]');
+                    $contact_form_output = do_shortcode($contact_form_shortcode);
+                    if (stripos($contact_form_output, 'contact form not found') !== false) {
+                        echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
+                    } else {
+                        echo $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    }
+                    ?>
+                </div>
             </div>
         </div>
     </section>
     <!-- Blog Section -->
     <section id="blog" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="blog-title">
         <div class="wrap flex flex-col items-center gap-6 relative z-10">
-            <h2 id="blog-title" class="text-3xl font-bold mb-6 text-white">
-                <?php echo esc_html(callamir_mod('blog_title', __('Tips & Daily Quotes', 'callamir'))); ?>
+            <h2 id="blog-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
+                <?php echo esc_html(callamir_get_text('blog_title', __('Tips & Daily Quotes', 'callamir'), 'نکات و نقل‌قول‌های روزانه')); ?>
             </h2>
-            <p class="text-center mb-6 text-gray-200"><?php echo esc_html(callamir_mod('blog_desc', __('Latest insights, IT tips, and motivational posts.', 'callamir'))); ?></p>
+            <p class="callamir-section-subtitle text-center mb-6 text-gray-200"><?php echo esc_html(callamir_get_text('blog_desc', __('Latest insights, IT tips, and motivational posts.', 'callamir'), 'جدیدترین دیدگاه‌ها، نکات آی‌تی و مطالب انگیزشی.')); ?></p>
             <?php
             $paged = get_query_var('paged') ? get_query_var('paged') : 1;
             $blog_query = callamir_get_blog_items(3, $paged);
@@ -263,8 +269,8 @@ get_header();
     <!-- Community Section -->
     <section id="community" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="community-title">
         <div class="wrap flex flex-col items-center gap-6 relative z-10">
-            <h2 id="community-title" class="text-3xl font-bold mb-6 text-white">
-                <?php echo esc_html(callamir_mod('community_title', __('Community Questions', 'callamir'))); ?>
+            <h2 id="community-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
+                <?php echo esc_html(callamir_get_text('community_title', __('Community Questions', 'callamir'), 'سوالات جامعه')); ?>
             </h2>
             <?php
             $community_query = new WP_Query(array(

@@ -618,17 +618,12 @@ body[dir="rtl"] .nav-lang-switcher {
     justify-content: flex-end;
 }
 
-.nav-menu-desktop--rtl {
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+.lang-fa .nav-menu-mobile {
+    direction: rtl;
     text-align: right;
 }
 
-.nav-menu-desktop--rtl li {
-    direction: rtl;
-}
-
-.nav-menu-desktop--rtl a {
+.lang-fa .nav-menu-mobile > li > a {
     flex-direction: row-reverse;
     justify-content: flex-end;
     text-align: right;
@@ -660,6 +655,31 @@ body[dir="rtl"] .nav-lang-switcher {
 
 .nav-menu-mobile--rtl a:hover {
     transform: translateX(-10px);
+}
+
+.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile),
+.nav-menu-desktop--rtl,
+[class*="nav-menu-desktop"][class*="--rtl"],
+.directnav-menu-desktop.nav-menu-desktop--rtl,
+.lang-fa .directnav-menu-desktop {
+    flex-direction: row-reverse !important;
+    justify-content: flex-end !important;
+    text-align: right;
+    direction: rtl;
+}
+
+.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile) > li,
+.nav-menu-desktop--rtl > li,
+[class*="nav-menu-desktop"][class*="--rtl"] > li {
+    direction: rtl;
+}
+
+.lang-fa [class*="nav-menu-desktop"]:not(.nav-menu-mobile) > li > a,
+.nav-menu-desktop--rtl > li > a,
+[class*="nav-menu-desktop"][class*="--rtl"] > li > a {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    text-align: right;
 }
 
 body[dir="rtl"] .lang-flags {
@@ -909,12 +929,12 @@ body[dir="rtl"] .hero p {
     margin-bottom: 3rem;
 }
 
+.callamir-section-title,
 .services-title {
-    font-size: 2.5rem;
     font-weight: 700;
-    color: var(--color-light);
+    color: var(--callamir-section-title-color);
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, var(--color-accent), var(--hover-accent), var(--color-accent));
+    background: linear-gradient(45deg, var(--callamir-section-title-color), var(--callamir-section-title-accent), var(--callamir-section-title-color));
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -922,14 +942,19 @@ body[dir="rtl"] .hero p {
     animation: titleShine 3s ease-in-out infinite;
 }
 
+.services-title {
+    font-size: 2.5rem;
+}
+
 @keyframes titleShine {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
 }
 
+.callamir-section-subtitle,
 .services-subtitle {
     font-size: 1.2rem;
-    color: rgba(var(--color-light-rgb), 0.8);
+    color: var(--callamir-section-subtitle-color);
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
