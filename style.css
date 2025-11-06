@@ -660,7 +660,6 @@ body[dir="rtl"] .nav-lang-switcher {
 .nav-menu-desktop--rtl,
 [class*="nav-menu-desktop"][class*="--rtl"],
 .directnav-menu-desktop.nav-menu-desktop--rtl {
-    flex-direction: row-reverse !important;
     justify-content: flex-end !important;
     text-align: right;
     direction: rtl;
