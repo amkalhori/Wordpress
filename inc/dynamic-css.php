@@ -37,6 +37,19 @@ function callamir_generate_dynamic_css() {
     $hero_min_height = callamir_sanitize_dimension(get_theme_mod('hero_min_height', '420px'));
     $header_min_height = callamir_sanitize_dimension(get_theme_mod('header_min_height', '80px'));
     
+    // Section and typography colors
+    $hero_title_color = esc_attr(get_theme_mod('hero_title_color', '#ffffff'));
+    $hero_text_color = esc_attr(get_theme_mod('hero_text_color', '#dbeafe'));
+    $section_title_color = esc_attr(get_theme_mod('section_title_color', '#ffffff'));
+    $section_title_accent = esc_attr(get_theme_mod('section_title_accent_color', '#ffd700'));
+    $section_subtitle_color = esc_attr(get_theme_mod('section_subtitle_color', '#e5e7eb'));
+    $contact_form_background = esc_attr(get_theme_mod('contact_form_background_color', '#111827'));
+    $contact_form_border = esc_attr(get_theme_mod('contact_form_border_color', '#1f2937'));
+    $contact_form_field_background = esc_attr(get_theme_mod('contact_form_field_background', '#0b1220'));
+    $contact_form_field_color = esc_attr(get_theme_mod('contact_form_field_color', '#f9fafb'));
+    $contact_form_button_background = esc_attr(get_theme_mod('contact_form_button_background', '#facc15'));
+    $contact_form_button_color = esc_attr(get_theme_mod('contact_form_button_color', '#111827'));
+
     // Services section styling
     $services_card_bg = esc_attr(get_theme_mod('services_card_background', 'rgba(255, 255, 255, 0.05)'));
     $services_card_border = esc_attr(get_theme_mod('services_card_border_color', 'rgba(255, 255, 255, 0.1)'));
@@ -84,6 +97,17 @@ function callamir_generate_dynamic_css() {
         --callamir-section-min-height: {$section_min_height};
         --callamir-hero-min-height: {$hero_min_height};
         --callamir-header-min-height: {$header_min_height};
+        --callamir-hero-title-color: {$hero_title_color};
+        --callamir-hero-text-color: {$hero_text_color};
+        --callamir-section-title-color: {$section_title_color};
+        --callamir-section-title-accent: {$section_title_accent};
+        --callamir-section-subtitle-color: {$section_subtitle_color};
+        --callamir-contact-form-bg: {$contact_form_background};
+        --callamir-contact-form-border: {$contact_form_border};
+        --callamir-contact-form-field-bg: {$contact_form_field_background};
+        --callamir-contact-form-field-color: {$contact_form_field_color};
+        --callamir-contact-form-button-bg: {$contact_form_button_background};
+        --callamir-contact-form-button-color: {$contact_form_button_color};
     }
     body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
     h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
@@ -123,8 +147,11 @@ function callamir_generate_dynamic_css() {
         background-size: 200%; animation: " . ($enable_hero_effect ? "blackholeSwirl 20s ease infinite" : "none") . ";
         position: relative; z-index: 1; min-height: var(--callamir-hero-min-height);
     }
-    .callamir-hero h1 { font-size: 2.2rem; color: #ffffff; margin: 0 0 10px; }
-    .callamir-hero p { font-size: 1.05rem; margin: 0 0 18px; color: #ffffff; }
+    .callamir-hero-title { color: var(--callamir-hero-title-color) !important; }
+    .callamir-hero p,
+    .callamir-hero-text { color: var(--callamir-hero-text-color) !important; }
+    .callamir-hero h1 { font-size: 2.2rem; margin: 0 0 10px; }
+    .callamir-hero p { font-size: 1.05rem; margin: 0 0 18px; }
     .callamir-btn { display: inline-block; padding: 12px 20px; border-radius: 8px; text-decoration: none; cursor: pointer; margin: 6px; font-weight: 600; }
     .callamir-btn-call { background: var(--callamir-danger); color: #fff; }
     .callamir-btn-support { background: var(--callamir-accent); color: var(--callamir-primary); }
@@ -150,19 +177,31 @@ function callamir_generate_dynamic_css() {
     .service-icon-wrapper i {
         font-size: var(--services-icon-size) !important;
     }
-    .service-title { 
-        color: var(--services-title-color) !important; 
+    .services-title,
+    .callamir-section-title {
+        color: var(--callamir-section-title-color) !important;
+        background: linear-gradient(45deg, var(--callamir-section-title-color), var(--callamir-section-title-accent), var(--callamir-section-title-color));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-    .service-description { 
-        color: var(--services-desc-color) !important; 
+    .service-title {
+        color: var(--services-title-color) !important;
     }
-    .read-more-btn { 
-        background: var(--services-button-bg) !important; 
-        color: var(--services-button-text) !important; 
+    .service-description {
+        color: var(--services-desc-color) !important;
+    }
+    .callamir-section-subtitle,
+    .services-subtitle {
+        color: var(--callamir-section-subtitle-color) !important;
+    }
+    .read-more-btn {
+        background: var(--services-button-bg) !important;
+        color: var(--services-button-text) !important;
         font-size: var(--services-button-font-size) !important;
         border-radius: var(--services-button-border-radius) !important;
     }
-    
+
     /* Conditional Cosmic Effect */
     " . ($services_enable_cosmic_effect ? ".modern-services-section::before { display: block !important; opacity: 1 !important; }" : ".modern-services-section::before { display: none !important; }") . "
     
@@ -175,6 +214,89 @@ function callamir_generate_dynamic_css() {
         100% { background-position: 0% 50%; }
     }
     ";
+
+    $css .= <<<'CSS'
+
+    .callamir-contact-form {
+        background: var(--callamir-contact-form-bg);
+        border: 1px solid var(--callamir-contact-form-border);
+        border-radius: 24px;
+        padding: clamp(1.5rem, 2.5vw, 3rem);
+        box-shadow: 0 30px 60px rgba(6, 10, 22, 0.35);
+    }
+
+    .callamir-contact-form .wpcf7-form,
+    .callamir-contact-form form {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .callamir-contact-form label {
+        color: var(--callamir-section-subtitle-color);
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .callamir-contact-form input[type="text"],
+    .callamir-contact-form input[type="email"],
+    .callamir-contact-form input[type="tel"],
+    .callamir-contact-form select,
+    .callamir-contact-form textarea {
+        background: var(--callamir-contact-form-field-bg);
+        color: var(--callamir-contact-form-field-color);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 0.85rem 1.1rem;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+    }
+
+    .callamir-contact-form input[type="text"]:focus,
+    .callamir-contact-form input[type="email"]:focus,
+    .callamir-contact-form input[type="tel"]:focus,
+    .callamir-contact-form select:focus,
+    .callamir-contact-form textarea:focus {
+        outline: none;
+        border-color: var(--callamir-section-title-accent);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+    }
+
+    .callamir-contact-form textarea {
+        min-height: 160px;
+        resize: vertical;
+    }
+
+    .callamir-contact-form .wpcf7-submit,
+    .callamir-contact-form button[type="submit"],
+    .callamir-contact-form input[type="submit"] {
+        background: var(--callamir-contact-form-button-bg);
+        color: var(--callamir-contact-form-button-color);
+        border: none;
+        border-radius: 999px;
+        padding: 0.9rem 1.75rem;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .callamir-contact-form .wpcf7-submit:hover,
+    .callamir-contact-form button[type="submit"]:hover,
+    .callamir-contact-form input[type="submit"]:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 30px rgba(250, 204, 21, 0.3);
+    }
+
+    .callamir-contact-form .wpcf7-not-valid-tip,
+    .callamir-contact-form .wpcf7-response-output {
+        color: var(--callamir-contact-form-button-bg);
+    }
+
+CSS;
     return $css;
 }
 if (!function_exists('callamir_enqueue_dynamic_css')) {
