@@ -22,6 +22,7 @@ $callamir_includes = array(
     'inc/performance.php',
     'inc/admin-tools.php',
     'inc/theme-colors.php',
+    'inc/footer-youtube.php',
 );
 
 foreach ($callamir_includes as $relative_path) {

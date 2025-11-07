@@ -23,6 +23,8 @@ function callamir_enqueue_scripts() {
     wp_localize_script('callamir-theme-js', 'callamirText', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('callamir_nonce'),
+        'navPrevLabel' => __('Previous menu item', 'callamir'),
+        'navNextLabel' => __('Next menu item', 'callamir'),
     ));
     
     // Add preload hints for better performance

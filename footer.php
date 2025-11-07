@@ -21,6 +21,9 @@ $direction = ($lang === 'fa') ? 'rtl' : 'ltr';
 <footer class="site-footer relative overflow-hidden <?php echo esc_attr($alignment_class); ?>" style="min-height: <?php echo esc_attr($footer_min_height); ?>;" dir="<?php echo esc_attr($direction); ?>">
     <canvas id="footer-stars" class="stars-footer absolute top-0 left-0 w-full h-full z-0" aria-hidden="true"></canvas>
     <div class="wrap flex flex-col items-center gap-4 p-4 relative z-10 text-white">
+        <?php if (function_exists('callamir_render_footer_youtube_section')) { ?>
+            <?php callamir_render_footer_youtube_section(); ?>
+        <?php } ?>
         <div class="copyright" dir="<?php echo esc_attr($direction); ?>">
             <?php echo esc_html($rendered_copyright); ?>
         </div>
