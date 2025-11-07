@@ -492,8 +492,7 @@ main#site-main { padding-top: 80px; }
     display: none;
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     background: linear-gradient(135deg, rgba(var(--color-dark-rgb), 0.95), rgba(var(--color-cosmic-primary-rgb), 0.95));
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(var(--color-accent-rgb), 0.2);
@@ -550,6 +549,22 @@ main#site-main { padding-top: 80px; }
 }
 
 @media (max-width: 768px) {
+    .nav-wrapper {
+        gap: 16px;
+    }
+
+    .nav-desktop {
+        display: none;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    .nav-mobile {
+        display: block;
+    }
+
     .nav-mobile.has-navigator-ready .nav-menu-mobile {
         position: absolute;
         width: 1px;

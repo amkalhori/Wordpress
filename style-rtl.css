@@ -28,6 +28,20 @@ body, .site-header, .site-footer, .callamir-section,
     flex-direction: row-reverse;
 }
 
+@media (max-width: 768px) {
+    .nav-desktop {
+        display: none;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    .nav-mobile {
+        display: block;
+    }
+}
+
 .nav-menu-desktop {
     flex-direction: row-reverse;
     justify-content: flex-end;
