@@ -128,7 +128,19 @@ if (strpos($html_attributes, 'dir=') === false) {
                     'walker' => class_exists('Callamir_Walker_Nav_Menu_With_FA') ? new Callamir_Walker_Nav_Menu_With_FA() : '',
                 ));
                 ?>
-                
+
+                <div class="mobile-menu-navigator" role="navigation" aria-label="<?php _e('Mobile menu navigation', 'callamir'); ?>">
+                    <button type="button" class="mobile-menu-arrow mobile-menu-arrow--prev">
+                        <span class="mobile-menu-arrow-icon" aria-hidden="true">&larr;</span>
+                        <span class="screen-reader-text"><?php _e('Previous menu item', 'callamir'); ?></span>
+                    </button>
+                    <div class="mobile-menu-active-item" aria-live="polite"></div>
+                    <button type="button" class="mobile-menu-arrow mobile-menu-arrow--next">
+                        <span class="mobile-menu-arrow-icon" aria-hidden="true">&rarr;</span>
+                        <span class="screen-reader-text"><?php _e('Next menu item', 'callamir'); ?></span>
+                    </button>
+                </div>
+
                 <!-- Mobile CTA -->
                 <div class="mobile-cta">
                     <?php $mobile_cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>

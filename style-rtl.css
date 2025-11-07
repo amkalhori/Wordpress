@@ -24,6 +24,10 @@ body, .site-header, .site-footer, .callamir-section,
     direction: rtl;
 }
 
+.nav-mobile.has-navigator-ready .mobile-menu-navigator {
+    flex-direction: row-reverse;
+}
+
 .nav-menu-desktop {
     flex-direction: row-reverse;
     justify-content: flex-end;
@@ -94,6 +98,11 @@ body .lang-flags {
 
 .footer-social {
     justify-content: flex-start;
+}
+
+.footer-youtube-subscribe,
+.footer-youtube-text {
+    text-align: center;
 }
 
 .callamir-form-group label,
