@@ -158,12 +158,18 @@ function callamir_get_footer_youtube_data() {
         $logo_color = $logo_custom_color;
     }
 
+    $embed_html = '';
+    if ($channel_url && function_exists('wp_oembed_get')) {
+        $embed_html = wp_oembed_get($channel_url) ?: '';
+    }
+
     return [
         'channel_url' => $channel_url,
         'cta_text' => callamir_get_text('footer_youtube_cta_text', $defaults['cta_en'], $defaults['cta_fa']),
         'button_color' => $button_color ?: $defaults['button_color'],
         'button_hover_color' => $button_hover_color ?: $defaults['button_hover_color'],
         'logo_color' => $logo_color,
+        'embed_html' => $embed_html,
     ];
 }
 
@@ -195,6 +201,21 @@ function callamir_render_footer_youtube_section($echo = true) {
         esc_attr($style_rules),
         esc_attr__('YouTube subscribe prompt', 'callamir')
     );
+    $markup .= '<div class="footer-youtube-embed" aria-hidden="true">';
+    if (!empty($data['embed_html'])) {
+        $markup .= $data['embed_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    } else {
+        $markup .= '<div class="footer-youtube-embed__placeholder">';
+        $markup .= '<span class="footer-youtube-embed__pulse"></span>';
+        $markup .= '<span class="footer-youtube-embed__icon" aria-hidden="true">';
+        $markup .= '<svg viewBox="0 0 24 24" focusable="false">';
+        $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0 .5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';
+        $markup .= '<path d="m9.75 15.02 6.25-3.02-6.25-3.02Z" />';
+        $markup .= '</svg>';
+        $markup .= '</span>';
+        $markup .= '</div>';
+    }
+    $markup .= '</div>';
     $markup .= '<div class="footer-youtube-logo" aria-hidden="true">';
     $markup .= '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">';
     $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0 .5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';

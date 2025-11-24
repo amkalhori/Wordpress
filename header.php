@@ -75,42 +75,44 @@ if (strpos($html_attributes, 'dir=') === false) {
                 ?>
             </nav>
 
-            <!-- Language Switcher -->
-            <div class="nav-lang-switcher">
-                <div class="lang-flags">
-                    <?php
-                    $english_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'en') : add_query_arg('lang', 'en', home_url('/'));
-                    $persian_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'fa') : add_query_arg('lang', 'fa', home_url('/'));
-                    ?>
-                    <span class="flag-text"><?php echo esc_html($flag_text_value); ?></span>
-                    <?php if (get_theme_mod('enable_english', true)) : ?>
-                        <a href="<?php echo esc_url($english_url); ?>" class="lang-flag-link<?php echo $current_lang === 'en' ? ' is-active' : ''; ?>" data-lang="en" aria-label="<?php _e('Switch to English', 'callamir'); ?>">
-                            <img src="<?php echo esc_url(get_theme_mod('english_flag_image', get_template_directory_uri() . '/images/uk-flag.png')); ?>" alt="<?php echo esc_attr(get_theme_mod('english_flag_alt', __('English', 'callamir'))); ?>" class="flag-img">
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_theme_mod('enable_persian', true)) : ?>
-                        <a href="<?php echo esc_url($persian_url); ?>" class="lang-flag-link<?php echo $current_lang === 'fa' ? ' is-active' : ''; ?>" data-lang="fa" aria-label="<?php _e('Switch to Persian', 'callamir'); ?>">
-                            <img src="<?php echo esc_url(get_theme_mod('persian_flag_image', get_template_directory_uri() . '/images/iran-flag.png')); ?>" alt="<?php echo esc_attr(get_theme_mod('persian_flag_alt', __('Persian', 'callamir'))); ?>" class="flag-img">
-                        </a>
-                    <?php endif; ?>
+            <div class="nav-actions">
+                <!-- Language Switcher -->
+                <div class="nav-lang-switcher">
+                    <div class="lang-flags">
+                        <?php
+                        $english_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'en') : add_query_arg('lang', 'en', home_url('/'));
+                        $persian_url = function_exists('callamir_localize_url') ? callamir_localize_url(home_url('/'), 'fa') : add_query_arg('lang', 'fa', home_url('/'));
+                        ?>
+                        <span class="flag-text"><?php echo esc_html($flag_text_value); ?></span>
+                        <?php if (get_theme_mod('enable_english', true)) : ?>
+                            <a href="<?php echo esc_url($english_url); ?>" class="lang-flag-link<?php echo $current_lang === 'en' ? ' is-active' : ''; ?>" data-lang="en" aria-label="<?php _e('Switch to English', 'callamir'); ?>">
+                                <img src="<?php echo esc_url(get_theme_mod('english_flag_image', get_template_directory_uri() . '/images/uk-flag.png')); ?>" alt="<?php echo esc_attr(get_theme_mod('english_flag_alt', __('English', 'callamir'))); ?>" class="flag-img">
+                            </a>
+                        <?php endif; ?>
+                        <?php if (get_theme_mod('enable_persian', true)) : ?>
+                            <a href="<?php echo esc_url($persian_url); ?>" class="lang-flag-link<?php echo $current_lang === 'fa' ? ' is-active' : ''; ?>" data-lang="fa" aria-label="<?php _e('Switch to Persian', 'callamir'); ?>">
+                                <img src="<?php echo esc_url(get_theme_mod('persian_flag_image', get_template_directory_uri() . '/images/iran-flag.png')); ?>" alt="<?php echo esc_attr(get_theme_mod('persian_flag_alt', __('Persian', 'callamir'))); ?>" class="flag-img">
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
 
-            <!-- CTA Button -->
-            <div class="nav-cta">
-                <?php $cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
-                <a href="<?php echo esc_url($cta_url); ?>" class="cta-button">
-                    <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
-                    <span><?php echo esc_html($leave_message_label); ?></span>
-                </a>
-            </div>
+                <!-- CTA Button -->
+                <div class="nav-cta">
+                    <?php $cta_url = function_exists('callamir_localize_url') ? callamir_localize_url(get_theme_mod('leave_message_url', '#contact'), $current_lang) : get_theme_mod('leave_message_url', '#contact'); ?>
+                    <a href="<?php echo esc_url($cta_url); ?>" class="cta-button">
+                        <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
+                        <span><?php echo esc_html($leave_message_label); ?></span>
+                    </a>
+                </div>
 
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-toggle" aria-label="<?php _e('Toggle mobile menu', 'callamir'); ?>" aria-controls="mobile-menu" aria-expanded="false">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-label="<?php _e('Toggle mobile menu', 'callamir'); ?>" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
         </div>
 
         <!-- Mobile Navigation -->
