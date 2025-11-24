@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
  * @return array
  */
 function callamir_get_footer_youtube_defaults() {
-    return array(
+    return [
         'channel_url' => 'https://www.youtube.com/',
         'cta_en' => __('Subscribe to our YouTube channel', 'callamir'),
         'cta_fa' => __('در کانال یوتیوب ما مشترک شوید', 'callamir'),
@@ -21,7 +21,7 @@ function callamir_get_footer_youtube_defaults() {
         'button_hover_color' => '#cc0000',
         'logo_theme' => 'light',
         'logo_custom_color' => '#ff0000',
-    );
+    ];
 }
 
 /**
@@ -33,96 +33,96 @@ function callamir_get_footer_youtube_defaults() {
 function callamir_register_footer_youtube_controls($wp_customize) {
     $defaults = callamir_get_footer_youtube_defaults();
 
-    $wp_customize->add_section('callamir_footer_youtube', array(
+    $wp_customize->add_section('callamir_footer_youtube', [
         'title' => __('Footer YouTube Subscribe', 'callamir'),
         'priority' => 33,
         'description' => __('Configure the YouTube subscribe prompt displayed above the footer copyright.', 'callamir'),
-    ));
+    ]);
 
-    $wp_customize->add_setting('footer_youtube_channel_url', array(
+    $wp_customize->add_setting('footer_youtube_channel_url', [
         'default' => $defaults['channel_url'],
         'sanitize_callback' => 'esc_url_raw',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control('footer_youtube_channel_url', array(
+    ]);
+    $wp_customize->add_control('footer_youtube_channel_url', [
         'label' => __('YouTube Channel URL', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'type' => 'url',
-    ));
+    ]);
 
-    $wp_customize->add_setting('footer_youtube_cta_text_en', array(
+    $wp_customize->add_setting('footer_youtube_cta_text_en', [
         'default' => $defaults['cta_en'],
         'sanitize_callback' => 'sanitize_text_field',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control('footer_youtube_cta_text_en', array(
+    ]);
+    $wp_customize->add_control('footer_youtube_cta_text_en', [
         'label' => __('CTA Text (English)', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'type' => 'text',
-    ));
+    ]);
 
-    $wp_customize->add_setting('footer_youtube_cta_text_fa', array(
+    $wp_customize->add_setting('footer_youtube_cta_text_fa', [
         'default' => $defaults['cta_fa'],
         'sanitize_callback' => 'sanitize_text_field',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control('footer_youtube_cta_text_fa', array(
+    ]);
+    $wp_customize->add_control('footer_youtube_cta_text_fa', [
         'label' => __('CTA Text (Persian)', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'type' => 'text',
-    ));
+    ]);
 
-    $wp_customize->add_setting('footer_youtube_button_color', array(
+    $wp_customize->add_setting('footer_youtube_button_color', [
         'default' => $defaults['button_color'],
         'sanitize_callback' => 'sanitize_hex_color',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_button_color', array(
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_button_color', [
         'label' => __('Subscribe Button Color', 'callamir'),
         'section' => 'callamir_footer_youtube',
-    )));
+    ]));
 
-    $wp_customize->add_setting('footer_youtube_button_hover_color', array(
+    $wp_customize->add_setting('footer_youtube_button_hover_color', [
         'default' => $defaults['button_hover_color'],
         'sanitize_callback' => 'sanitize_hex_color',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_button_hover_color', array(
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_button_hover_color', [
         'label' => __('Subscribe Button Hover Color', 'callamir'),
         'section' => 'callamir_footer_youtube',
-    )));
+    ]));
 
-    $wp_customize->add_setting('footer_youtube_logo_theme', array(
+    $wp_customize->add_setting('footer_youtube_logo_theme', [
         'default' => $defaults['logo_theme'],
         'sanitize_callback' => 'callamir_sanitize_select',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control('footer_youtube_logo_theme', array(
+    ]);
+    $wp_customize->add_control('footer_youtube_logo_theme', [
         'label' => __('Logo Color Theme', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'type' => 'select',
-        'choices' => array(
+        'choices' => [
             'light' => __('Light', 'callamir'),
             'dark' => __('Dark', 'callamir'),
             'custom' => __('Custom', 'callamir'),
-        ),
-    ));
+        ],
+    ]);
 
-    $wp_customize->add_setting('footer_youtube_logo_custom_color', array(
+    $wp_customize->add_setting('footer_youtube_logo_custom_color', [
         'default' => $defaults['logo_custom_color'],
         'sanitize_callback' => 'sanitize_hex_color',
         'transport' => 'postMessage',
-    ));
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_logo_custom_color', array(
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_youtube_logo_custom_color', [
         'label' => __('Logo Custom Color', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'description' => __('Used when the logo color theme is set to Custom.', 'callamir'),
-    )));
+    ]));
 
     if (isset($wp_customize->selective_refresh)) {
-        $wp_customize->selective_refresh->add_partial('footer_youtube_subscribe', array(
+        $wp_customize->selective_refresh->add_partial('footer_youtube_subscribe', [
             'selector' => '.footer-youtube-subscribe',
-            'settings' => array(
+            'settings' => [
                 'footer_youtube_channel_url',
                 'footer_youtube_cta_text_en',
                 'footer_youtube_cta_text_fa',
@@ -130,9 +130,9 @@ function callamir_register_footer_youtube_controls($wp_customize) {
                 'footer_youtube_button_hover_color',
                 'footer_youtube_logo_theme',
                 'footer_youtube_logo_custom_color',
-            ),
+            ],
             'render_callback' => 'callamir_render_footer_youtube_partial',
-        ));
+        ]);
     }
 }
 add_action('customize_register', 'callamir_register_footer_youtube_controls');
@@ -158,13 +158,13 @@ function callamir_get_footer_youtube_data() {
         $logo_color = $logo_custom_color;
     }
 
-    return array(
+    return [
         'channel_url' => $channel_url,
         'cta_text' => callamir_get_text('footer_youtube_cta_text', $defaults['cta_en'], $defaults['cta_fa']),
         'button_color' => $button_color ?: $defaults['button_color'],
         'button_hover_color' => $button_hover_color ?: $defaults['button_hover_color'],
         'logo_color' => $logo_color,
-    );
+    ];
 }
 
 /**

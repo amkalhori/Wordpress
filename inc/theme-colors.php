@@ -7,7 +7,7 @@
 
 // Define default theme colors
 function callamir_get_default_colors() {
-    return array(
+    return [
         'primary_color' => '#0066cc',      // Bright blue for primary elements
         'secondary_color' => '#002b44',    // Darker blue for secondary elements
         'accent_color' => '#ff0000',       // Red for accents
@@ -38,7 +38,7 @@ function callamir_get_default_colors() {
         'nav_menu_text_color' => '#ffffff', // White for navigation menu text
         'nav_container_bg' => '#002b44',    // Dark blue for navigation container
         'nav_menu_bg' => '#001f33'         // Darker blue for navigation menu background
-    );
+    ];
 }
 
 // Export colors to JSON file
@@ -47,7 +47,7 @@ function callamir_export_colors() {
         wp_die(__('You do not have sufficient permissions to access this page.'));
     }
 
-    $colors = array();
+    $colors = [];
     
     // Get all color settings from theme mods
     $default_colors = callamir_get_default_colors();
@@ -84,7 +84,7 @@ function callamir_ajax_export_colors() {
         wp_send_json_error('Insufficient permissions');
     }
 
-    $colors = array();
+    $colors = [];
     
     // Get all color settings from theme mods
     $default_colors = callamir_get_default_colors();
@@ -122,14 +122,14 @@ function callamir_customize_colors($wp_customize) {
     $default_colors = callamir_get_default_colors();
     
     // Add main theme colors section
-    $wp_customize->add_section('theme_colors', array(
+    $wp_customize->add_section('theme_colors', [
         'title' => __('Theme Colors', 'callamir'),
         'priority' => 25,
         'description' => __('Customize the main colors of your theme', 'callamir')
-    ));
+    ]);
     
     // Add main color settings
-    $main_colors = array(
+    $main_colors = [
         'primary_color' => __('Primary Color', 'callamir'),
         'secondary_color' => __('Secondary Color', 'callamir'),
         'accent_color' => __('Accent Color', 'callamir'),
@@ -154,48 +154,48 @@ function callamir_customize_colors($wp_customize) {
         'nav_menu_text_color' => __('Navigation Menu Text Color', 'callamir'),
         'nav_container_bg' => __('Navigation Container Background', 'callamir'),
         'nav_menu_bg' => __('Navigation Menu Background', 'callamir')
-    );
+    ];
     
     foreach ($main_colors as $key => $label) {
-        $wp_customize->add_setting($key, array(
+        $wp_customize->add_setting($key, [
             'default' => $default_colors[$key],
             'sanitize_callback' => 'sanitize_hex_color',
-        ));
+        ]);
         
-        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, array(
+        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, [
             'label' => $label,
             'section' => 'theme_colors',
             'settings' => $key,
-        )));
+        ]));
     }
     
     // Add button colors section
-    $wp_customize->add_section('button_colors', array(
+    $wp_customize->add_section('button_colors', [
         'title' => __('Button Colors', 'callamir'),
         'priority' => 26,
-    ));
+    ]);
     
     // Add button color settings
-    $button_colors = array(
+    $button_colors = [
         'nav_button_bg' => __('Navigation Button Background', 'callamir'),
         'nav_button_hover' => __('Navigation Button Hover', 'callamir'),
         'home_button_bg' => __('Home Button Background', 'callamir'),
         'home_button_hover' => __('Home Button Hover', 'callamir'),
         'hero_button_bg' => __('Hero Button Background', 'callamir'),
         'hero_button_hover' => __('Hero Button Hover', 'callamir')
-    );
+    ];
     
     foreach ($button_colors as $key => $label) {
-        $wp_customize->add_setting($key, array(
+        $wp_customize->add_setting($key, [
             'default' => $default_colors[$key],
             'sanitize_callback' => 'sanitize_hex_color',
-        ));
+        ]);
         
-        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, array(
+        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, [
             'label' => $label,
             'section' => 'button_colors',
             'settings' => $key,
-        )));
+        ]));
     }
 }
 add_action('customize_register', 'callamir_customize_colors');

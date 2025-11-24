@@ -12,7 +12,7 @@ function callamir_max_services() {
 }
 
 function callamir_service_patterns() {
-    return array(
+    return [
         'callamir_service_icon_%d',
         'callamir_service_image_%d',
         'service_title_%d_en',
@@ -24,7 +24,7 @@ function callamir_service_patterns() {
         'service_price_%d_en',
         'service_price_%d_fa',
         'callamir_service_delete_trigger_%d',
-    );
+    ];
 }
 
 function callamir_sanitize_service_count($value) {
@@ -85,18 +85,18 @@ function callamir_enqueue_customizer_service_assets() {
     wp_enqueue_script(
         'callamir-customizer-services',
         get_template_directory_uri() . '/js/customizer-services.js',
-        array('customize-controls', 'jquery'),
+        ['customize-controls', 'jquery'],
         wp_get_theme()->get('Version'),
         true
     );
 
-    wp_localize_script('callamir-customizer-services', 'callamirServiceManager', array(
+    wp_localize_script('callamir-customizer-services', 'callamirServiceManager', [
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('callamir_delete_service'),
         'confirmDelete' => __('Are you sure you want to delete Service %s? This action cannot be undone.', 'callamir'),
         'success' => __('Service deleted successfully.', 'callamir'),
         'error' => __('Unable to delete the service. Please try again.', 'callamir'),
-    ));
+    ]);
 }
 add_action('customize_controls_enqueue_scripts', 'callamir_enqueue_customizer_service_assets');
 
@@ -104,14 +104,14 @@ function callamir_delete_service() {
     check_ajax_referer('callamir_delete_service', 'nonce');
 
     if (!current_user_can('edit_theme_options')) {
-        wp_send_json_error(array('message' => __('You are not allowed to delete services.', 'callamir')));
+        wp_send_json_error(['message' => __('You are not allowed to delete services.', 'callamir')]);
     }
 
     $service_id = isset($_POST['service_id']) ? absint($_POST['service_id']) : 0;
     $max_services = callamir_max_services();
 
     if ($service_id < 1 || $service_id > $max_services) {
-        wp_send_json_error(array('message' => __('Invalid service identifier.', 'callamir')));
+        wp_send_json_error(['message' => __('Invalid service identifier.', 'callamir')]);
     }
 
     $patterns = callamir_service_patterns();
@@ -149,10 +149,10 @@ function callamir_delete_service() {
         set_theme_mod('callamir_services_count', $new_count);
     }
 
-    wp_send_json_success(array(
+    wp_send_json_success([
         'message' => sprintf(__('Service %d deleted successfully.', 'callamir'), $service_id),
         'new_count' => $new_count,
         'service_id' => $service_id,
-    ));
+    ]);
 }
 add_action('wp_ajax_callamir_delete_service', 'callamir_delete_service');

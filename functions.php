@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$callamir_includes = array(
+$callamir_includes = [
     'inc/language.php',
     'inc/navigation.php',
     'inc/sanitization.php',
@@ -23,7 +23,7 @@ $callamir_includes = array(
     'inc/admin-tools.php',
     'inc/theme-colors.php',
     'inc/footer-youtube.php',
-);
+];
 
 foreach ($callamir_includes as $relative_path) {
     $path = get_template_directory() . '/' . $relative_path;
@@ -41,7 +41,7 @@ if (!function_exists('callamir_get_visitor_lang')) {
      * @return string Two-letter language code.
      */
     function callamir_get_visitor_lang($allow_locale_lookup = true) {
-        static $detected_lang = array();
+        static $detected_lang = [];
         static $resolving = false;
 
         $cache_key = $allow_locale_lookup ? 'full' : 'safe';
@@ -59,10 +59,8 @@ if (!function_exists('callamir_get_visitor_lang')) {
         }
 
         $resolving = true;
-        $previous_flag = isset($GLOBALS['callamir_resolving_language']) ? (bool) $GLOBALS['callamir_resolving_language'] : false;
-        $GLOBALS['callamir_resolving_language'] = true;
 
-        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : array('en' => array());
+        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : ['en' => []];
         $language = null;
 
         if (isset($_GET['lang'])) {
@@ -124,7 +122,6 @@ if (!function_exists('callamir_get_visitor_lang')) {
             $detected_lang['safe'] = $language;
         }
 
-        $GLOBALS['callamir_resolving_language'] = $previous_flag;
         $resolving = false;
 
         return $language;

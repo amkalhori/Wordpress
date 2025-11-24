@@ -11,21 +11,21 @@ function callamir_enqueue_scripts() {
     // Enqueue styles with performance optimizations
     $theme_version = '1.0.56';
 
-    wp_enqueue_style('callamir-style', get_stylesheet_uri(), array(), $theme_version);
+    wp_enqueue_style('callamir-style', get_stylesheet_uri(), [], $theme_version);
     wp_style_add_data('callamir-style', 'rtl', 'replace');
 
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', [], '6.4.0');
 
     // Enqueue scripts with modern optimizations
-    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('callamir-theme-js', get_template_directory_uri() . '/js/theme.js', ['jquery'], $theme_version, true);
     
     // Localize script for AJAX and language metadata.
-    wp_localize_script('callamir-theme-js', 'callamirText', array(
+    wp_localize_script('callamir-theme-js', 'callamirText', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('callamir_nonce'),
         'navPrevLabel' => __('Previous menu item', 'callamir'),
         'navNextLabel' => __('Next menu item', 'callamir'),
-    ));
+    ]);
     
     // Add preload hints for better performance
     add_action('wp_head', function() {
@@ -36,19 +36,19 @@ function callamir_enqueue_scripts() {
     // Provide the front end with canonical language metadata and URLs so
     // JavaScript can keep navigation in sync with the visitor selection.
     $current_lang = callamir_get_visitor_lang();
-    $language_payload = array(
+    $language_payload = [
         'current' => $current_lang,
         'default' => callamir_get_default_language(),
-        'supported' => array(),
-    );
+        'supported' => [],
+    ];
 
     foreach (callamir_get_supported_languages() as $code => $meta) {
-        $language_payload['supported'][] = array(
+        $language_payload['supported'][] = [
             'code' => $code,
             'label' => $meta['label'],
             'direction' => $meta['direction'],
             'url' => callamir_localize_url(home_url('/'), $code),
-        );
+        ];
     }
 
     wp_localize_script('callamir-theme-js', 'callamirLang', $language_payload);
@@ -56,7 +56,7 @@ function callamir_enqueue_scripts() {
     // Localize theme mods for cosmic effects and services
     $services_count = callamir_sanitize_service_count(get_theme_mod('callamir_services_count', 3));
 
-    $theme_mods = array(
+    $theme_mods = [
         // Header Stars
         'enable_header_stars' => get_theme_mod('callamir_enable_header_stars', true),
         'star_count_header' => get_theme_mod('callamir_star_count_header', 100),
@@ -75,58 +75,58 @@ function callamir_enqueue_scripts() {
         'services_star_count' => get_theme_mod('callamir_services_star_count', 150),
         // Services Count
         'services_count' => $services_count,
-    );
+    ];
     wp_localize_script('callamir-theme-js', 'themeMods', $theme_mods);
 
     // Localize service data for JavaScript
-    $service_data = array();
-    $service_translations = array(
+    $service_data = [];
+    $service_translations = [
         'current' => $current_lang,
         'default' => callamir_get_default_language(),
-        'items' => array(),
-    );
+        'items' => [],
+    ];
 
     $supported_languages = callamir_get_supported_languages();
     $count = $services_count;
 
     for ($i = 1; $i <= $count; $i++) {
-        $defaults = array(
-            'title' => array(
+        $defaults = [
+            'title' => [
                 'en' => sprintf(__('Service %d', 'callamir'), $i),
                 'fa' => sprintf(__('خدمت %d', 'callamir'), $i),
-            ),
-            'description' => array(
+            ],
+            'description' => [
                 'en' => sprintf(__('Description for service %d', 'callamir'), $i),
                 'fa' => sprintf(__('توضیح خدمت %d', 'callamir'), $i),
-            ),
-            'fullDescription' => array(
+            ],
+            'fullDescription' => [
                 'en' => sprintf(__('Detailed description for service %d', 'callamir'), $i),
                 'fa' => sprintf(__('توضیح کامل برای خدمت %d', 'callamir'), $i),
-            ),
-        );
+            ],
+        ];
 
         $image = get_theme_mod("callamir_service_image_{$i}", '');
 
-        $service_data[$i] = array(
+        $service_data[$i] = [
             'title' => callamir_get_text("service_title_{$i}", $defaults['title']['en'], $defaults['title']['fa']),
             'description' => callamir_get_text("service_desc_{$i}", $defaults['description']['en'], $defaults['description']['fa']),
             'fullDescription' => callamir_get_text("service_full_desc_{$i}", $defaults['fullDescription']['en'], $defaults['fullDescription']['fa']),
             'price' => callamir_mod("service_price_{$i}", ''),
             'image' => $image,
-        );
+        ];
 
-        $service_translations['items'][$i] = array(
+        $service_translations['items'][$i] = [
             'image' => $image,
-            'translations' => array(),
-        );
+            'translations' => [],
+        ];
 
         foreach ($supported_languages as $code => $meta) {
-            $service_translations['items'][$i]['translations'][$code] = array(
+            $service_translations['items'][$i]['translations'][$code] = [
                 'title' => get_theme_mod("service_title_{$i}_{$code}", $defaults['title'][$code] ?? $defaults['title']['en']),
                 'description' => get_theme_mod("service_desc_{$i}_{$code}", $defaults['description'][$code] ?? $defaults['description']['en']),
                 'fullDescription' => get_theme_mod("service_full_desc_{$i}_{$code}", $defaults['fullDescription'][$code] ?? $defaults['fullDescription']['en']),
                 'price' => get_theme_mod("service_price_{$i}_{$code}", ''),
-            );
+            ];
         }
     }
 

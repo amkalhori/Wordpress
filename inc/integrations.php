@@ -30,7 +30,7 @@ function callamir_elementor_optimizations() {
         // Optimize Elementor CSS loading
         add_action('wp_enqueue_scripts', function() {
             wp_dequeue_style('elementor-frontend');
-            wp_enqueue_style('elementor-frontend', ELEMENTOR_URL . 'assets/css/frontend.min.css', array(), ELEMENTOR_VERSION);
+            wp_enqueue_style('elementor-frontend', ELEMENTOR_URL . 'assets/css/frontend.min.css', [], ELEMENTOR_VERSION);
         }, 20);
     }
 }

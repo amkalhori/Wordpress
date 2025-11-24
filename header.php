@@ -65,13 +65,13 @@ if (strpos($html_attributes, 'dir=') === false) {
             ?>
             <nav class="nav-desktop" role="navigation" aria-label="<?php _e('Main navigation', 'callamir'); ?>">
                 <?php
-                wp_nav_menu(array(
+                wp_nav_menu([
                     'theme_location' => 'one_page_menu',
                     'menu_class' => $desktop_menu_class,
                     'container' => false,
                     'fallback_cb' => 'callamir_fallback_menu',
                     'walker' => class_exists('Callamir_Walker_Nav_Menu_With_FA') ? new Callamir_Walker_Nav_Menu_With_FA() : '',
-                ));
+                ]);
                 ?>
             </nav>
 
@@ -120,13 +120,13 @@ if (strpos($html_attributes, 'dir=') === false) {
         <nav class="nav-mobile" id="mobile-menu" role="navigation" aria-label="<?php _e('Mobile navigation', 'callamir'); ?>">
             <div class="mobile-menu-content">
                 <?php
-                wp_nav_menu(array(
+                wp_nav_menu([
                     'theme_location' => 'one_page_menu',
                     'menu_class' => $mobile_menu_class,
                     'container' => false,
                     'fallback_cb' => 'callamir_fallback_menu',
                     'walker' => class_exists('Callamir_Walker_Nav_Menu_With_FA') ? new Callamir_Walker_Nav_Menu_With_FA() : '',
-                ));
+                ]);
                 ?>
 
                 <div class="mobile-menu-navigator" role="navigation" aria-label="<?php _e('Mobile menu navigation', 'callamir'); ?>">

@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 function callamir_register_community_questions() {
-    $labels = array(
+    $labels = [
         'name' => __('Community Questions', 'callamir'),
         'singular_name' => __('Community Question', 'callamir'),
         'menu_name' => __('Community Questions', 'callamir'),
@@ -20,24 +20,24 @@ function callamir_register_community_questions() {
         'search_items' => __('Search Community Questions', 'callamir'),
         'not_found' => __('No community questions found', 'callamir'),
         'not_found_in_trash' => __('No community questions found in trash', 'callamir'),
-    );
+    ];
 
-    $args = array(
+    $args = [
         'labels' => $labels,
         'public' => true,
         'publicly_queryable' => true,
         'show_ui' => true,
         'show_in_menu' => true,
         'query_var' => true,
-        'rewrite' => array('slug' => 'community-question'),
+        'rewrite' => ['slug' => 'community-question'],
         'capability_type' => 'post',
         'has_archive' => true,
         'hierarchical' => false,
         'menu_position' => 20,
         'menu_icon' => 'dashicons-format-chat',
-        'supports' => array('title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments'),
+        'supports' => ['title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments'],
         'show_in_rest' => true,
-    );
+    ];
 
     register_post_type('community_questions', $args);
 }
@@ -101,12 +101,12 @@ function callamir_community_question_details_callback($post) {
             </th>
             <td>
                 <?php
-                wp_editor($question_answer, 'question_answer', array(
+                wp_editor($question_answer, 'question_answer', [
                     'textarea_name' => 'question_answer',
                     'textarea_rows' => 10,
                     'media_buttons' => true,
                     'teeny' => false,
-                ));
+                ]);
                 ?>
                 <p class="description"><?php _e('Provide the answer to this question.', 'callamir'); ?></p>
             </td>
