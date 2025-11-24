@@ -791,9 +791,16 @@ function callamir_customize_register($wp_customize) {
     ]);
 
     // Contact Section
+    $wp_customize->add_panel('callamir_contact_panel', [
+        'title' => __('Contact Section', 'callamir'),
+        'priority' => 40,
+        'description' => __('Manage the contact area and form settings.', 'callamir'),
+    ]);
+
     $wp_customize->add_section('callamir_contact', [
         'title' => __('Contact', 'callamir'),
         'priority' => 40,
+        'panel' => 'callamir_contact_panel',
     ]);
     $wp_customize->add_setting('contact_title_en', [
         'default' => __('Contact Us', 'callamir'),
@@ -915,6 +922,27 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_contact',
         'type' => 'url',
     ]);
+
+    $wp_customize->add_setting('callamir_contact_form_shortcode', [
+        'default' => '[contact-form-7 id="123" title="Contact form 1"]',
+        'sanitize_callback' => 'callamir_sanitize_shortcode',
+        'transport' => 'postMessage',
+    ]);
+
+    $wp_customize->add_control('callamir_contact_form_shortcode', [
+        'label' => __('Contact Form 7 Shortcode', 'callamir'),
+        'section' => 'callamir_contact',
+        'type' => 'text',
+        'description' => __('Paste the Contact Form 7 shortcode, e.g. [contact-form-7 id="123" title="Contact form"]', 'callamir'),
+    ]);
+
+    if (isset($wp_customize->selective_refresh)) {
+        $wp_customize->selective_refresh->add_partial('callamir_contact_form_shortcode', [
+            'selector' => '#contact .callamir-contact-form',
+            'render_callback' => 'callamir_render_contact_form_partial',
+            'fallback_refresh' => true,
+        ]);
+    }
     $wp_customize->add_setting('telegram_url', [
         'default' => '#',
         'sanitize_callback' => 'esc_url_raw',
@@ -1270,3 +1298,17 @@ function callamir_customize_register($wp_customize) {
     ]);
 }
 add_action('customize_register', 'callamir_customize_register');
+
+/**
+ * Render the contact form output for selective refresh.
+ */
+function callamir_render_contact_form_partial() {
+    $contact_form_shortcode = get_theme_mod('callamir_contact_form_shortcode', '[contact-form-7 id="123" title="Contact form 1"]');
+    $contact_form_output = do_shortcode($contact_form_shortcode);
+
+    if (empty($contact_form_shortcode) || stripos($contact_form_output, 'contact form not found') !== false) {
+        return '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
+    }
+
+    return $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}

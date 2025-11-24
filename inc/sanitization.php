@@ -64,3 +64,23 @@ if (!function_exists('callamir_sanitize_font_family')) {
         return trim($value);
     }
 }
+
+if (!function_exists('callamir_sanitize_shortcode')) {
+    /**
+     * Sanitize shortcode strings entered in the Customizer.
+     */
+    function callamir_sanitize_shortcode($value) {
+        if (!is_string($value)) {
+            return '';
+        }
+
+        $value = wp_strip_all_tags($value);
+        $value = trim(preg_replace('/\s+/', ' ', $value));
+
+        if ($value === '') {
+            return '';
+        }
+
+        return $value;
+    }
+}

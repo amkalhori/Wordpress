@@ -196,28 +196,30 @@ get_header();
     </div>
     <!-- Contact Section -->
     <section id="contact" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="contact-title">
-        <div class="wrap flex flex-col items-center gap-6 relative z-10">
-            <h2 id="contact-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
-                <?php echo esc_html(callamir_get_text('contact_title', __('Contact Us', 'callamir'), 'تماس با ما')); ?>
-            </h2>
-            <div class="contact-links flex flex-wrap justify-center gap-4 mb-6">
-                <?php
-                $wh = get_theme_mod('whatsapp_url', '#');
-                $tg = get_theme_mod('telegram_url', '#');
-                if ($wh && $wh !== '#') {
-                    echo '<a class="callamir-btn contact-link whatsapp flex items-center gap-2 px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg" href="' . esc_url($wh) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ' . esc_html(callamir_get_text('whatsapp_text', __('WhatsApp', 'callamir'), 'واتساپ')) . '</a>';
-                }
-                if ($tg && $tg !== '#') {
-                    echo '<a class="callamir-btn contact-link telegram flex items-center gap-2 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg" href="' . esc_url($tg) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ' . esc_html(callamir_get_text('telegram_text', __('Telegram', 'callamir'), 'تلگرام')) . '</a>';
-                }
-                ?>
+        <div class="wrap callamir-contact-grid relative z-10">
+            <div class="callamir-contact-details">
+                <h2 id="contact-title" class="callamir-section-title text-3xl font-bold mb-4 text-white">
+                    <?php echo esc_html(callamir_get_text('contact_title', __('Contact Us', 'callamir'), 'تماس با ما')); ?>
+                </h2>
+                <div class="contact-links flex flex-wrap justify-center md:justify-start gap-4 mb-2">
+                    <?php
+                    $wh = get_theme_mod('whatsapp_url', '#');
+                    $tg = get_theme_mod('telegram_url', '#');
+                    if ($wh && $wh !== '#') {
+                        echo '<a class="callamir-btn contact-link whatsapp flex items-center gap-2 px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg" href="' . esc_url($wh) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ' . esc_html(callamir_get_text('whatsapp_text', __('WhatsApp', 'callamir'), 'واتساپ')) . '</a>';
+                    }
+                    if ($tg && $tg !== '#') {
+                        echo '<a class="callamir-btn contact-link telegram flex items-center gap-2 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg" href="' . esc_url($tg) . '" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ' . esc_html(callamir_get_text('telegram_text', __('Telegram', 'callamir'), 'تلگرام')) . '</a>';
+                    }
+                    ?>
+                </div>
             </div>
-            <div class="w-full md:w-2/3">
+            <div class="callamir-contact-form-panel">
                 <div class="callamir-contact-form">
                     <?php
-                    $contact_form_shortcode = get_theme_mod('callamir_contact_form', '[contact-form-7 id="123" title="Contact form 1"]');
+                    $contact_form_shortcode = get_theme_mod('callamir_contact_form_shortcode', '[contact-form-7 id="123" title="Contact form 1"]');
                     $contact_form_output = do_shortcode($contact_form_shortcode);
-                    if (stripos($contact_form_output, 'contact form not found') !== false) {
+                    if (empty($contact_form_shortcode) || stripos($contact_form_output, 'contact form not found') !== false) {
                         echo '<div class="callamir-contact-form-warning">' . esc_html__('Please update the Contact form shortcode in the Customizer.', 'callamir') . '</div>';
                     } else {
                         echo $contact_form_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
