@@ -28,15 +28,15 @@ if (!function_exists('callamir_adjust_menu_for_persian')) {
             return $items;
         }
 
-        $desired_order = array(
+        $desired_order = [
             '#home' => __('خانه', 'callamir'),
             '#services' => __('خدمات', 'callamir'),
             '#contact' => __('تماس', 'callamir'),
             '#blog' => __('وبلاگ', 'callamir'),
-        );
+        ];
 
-        $ordered = array();
-        $others = array();
+        $ordered = [];
+        $others = [];
 
         foreach ($items as $item) {
             if (!is_object($item) || empty($item->url)) {
@@ -58,7 +58,7 @@ if (!function_exists('callamir_adjust_menu_for_persian')) {
             }
         }
 
-        $result = array();
+        $result = [];
         foreach ($desired_order as $fragment => $title) {
             if (isset($ordered[$fragment])) {
                 $result[] = $ordered[$fragment];
@@ -86,7 +86,7 @@ if (!function_exists('callamir_fallback_menu')) {
      * @param array $args Menu arguments from wp_nav_menu.
      * @return void
      */
-    function callamir_fallback_menu($args = array()) {
+    function callamir_fallback_menu($args = []) {
         $lang = function_exists('callamir_get_visitor_lang') ? callamir_get_visitor_lang() : get_theme_mod('site_language', 'en');
         $menu_class = isset($args['menu_class']) ? (string) $args['menu_class'] : '';
         $is_mobile = $menu_class && strpos($menu_class, 'nav-menu-mobile') !== false;
@@ -96,7 +96,7 @@ if (!function_exists('callamir_fallback_menu')) {
         if (!empty($menu_class)) {
             $additional_classes = array_filter(array_map('sanitize_html_class', preg_split('/\s+/', $menu_class)));
             if (!empty($additional_classes)) {
-                $classes = implode(' ', array_unique(array_merge(array($classes), $additional_classes)));
+                $classes = implode(' ', array_unique(array_merge([$classes], $additional_classes)));
             }
         }
 
@@ -107,24 +107,24 @@ if (!function_exists('callamir_fallback_menu')) {
             }
         }
 
-        $menu_items = array(
-            array(
+        $menu_items = [
+            [
                 'title' => ($lang === 'fa') ? __('خانه', 'callamir') : __('Home', 'callamir'),
                 'url' => '#home',
-            ),
-            array(
+            ],
+            [
                 'title' => ($lang === 'fa') ? __('خدمات', 'callamir') : __('Services', 'callamir'),
                 'url' => '#services',
-            ),
-            array(
+            ],
+            [
                 'title' => ($lang === 'fa') ? __('تماس', 'callamir') : __('Contact', 'callamir'),
                 'url' => '#contact',
-            ),
-            array(
+            ],
+            [
                 'title' => ($lang === 'fa') ? __('وبلاگ', 'callamir') : __('Blog', 'callamir'),
                 'url' => '#blog',
-            ),
-        );
+            ],
+        ];
 
         echo '<ul class="' . esc_attr(trim($classes)) . '">';
         foreach ($menu_items as $item) {

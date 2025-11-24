@@ -5,13 +5,13 @@
 $lang = callamir_get_visitor_lang();
 $footer_min_height = esc_attr(get_theme_mod('footer_min_height', '100px'));
 $current_year = date_i18n('Y');
-$default_copyright = array(
+$default_copyright = [
     'en' => __('CallAmir. All rights reserved © {year}', 'callamir'),
     'fa' => __('کال امیر. کلیه حقوق محفوظ است © {year}', 'callamir'),
-);
+];
 $raw_copyright = callamir_mod('copyright_text', $default_copyright[$lang] ?? $default_copyright['en']);
 $rendered_copyright = str_replace(
-    array('{year}', '{YEAR}', '%year%', '%YEAR%'),
+    ['{year}', '{YEAR}', '%year%', '%YEAR%'],
     $current_year,
     $raw_copyright
 );

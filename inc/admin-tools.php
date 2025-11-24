@@ -7,12 +7,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!function_exists('sanitize_checkbox')) {
-    function sanitize_checkbox($input) {
-        return (bool) $input;
-    }
-}
-
 // Force reset all customizer settings to fix sanitize_checkbox issues
 function callamir_force_reset_customizer() {
     if (current_user_can('manage_options')) {
@@ -77,14 +71,14 @@ function callamir_nuclear_reset() {
 function callamir_reset_sanitization_callbacks() {
     if (current_user_can('manage_options')) {
         // Clear all theme mods that might be causing issues
-        $problematic_keys = array(
+        $problematic_keys = [
             'callamir_enable_header_stars',
-            'callamir_enable_footer_stars', 
+            'callamir_enable_footer_stars',
             'callamir_enable_hero_effect',
             'callamir_enable_services_effect',
             'services_enable_cosmic_effect',
             'services_enable_liquid_effect'
-        );
+        ];
         
         foreach ($problematic_keys as $key) {
             $current_value = get_theme_mod($key);

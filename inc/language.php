@@ -20,16 +20,16 @@ if (!function_exists('callamir_get_supported_languages')) {
             return $cached;
         }
 
-        $languages = array(
-            'en' => array(
+        $languages = [
+            'en' => [
                 'label' => 'English',
                 'direction' => 'ltr',
-            ),
-            'fa' => array(
+            ],
+            'fa' => [
                 'label' => 'Persian',
                 'direction' => 'rtl',
-            ),
-        );
+            ],
+        ];
 
         if (doing_filter('locale')) {
             return $languages;
@@ -420,7 +420,7 @@ if (!function_exists('callamir_resolve_language_for_locale_filter')) {
      * @return string Two-letter language code.
      */
     function callamir_resolve_language_for_locale_filter($locale) {
-        static $cache = array();
+        static $cache = [];
 
         $cache_key = is_string($locale) ? strtolower($locale) : '';
 
@@ -428,7 +428,7 @@ if (!function_exists('callamir_resolve_language_for_locale_filter')) {
             return $cache[$cache_key];
         }
 
-        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : array();
+        $supported = function_exists('callamir_get_supported_languages') ? callamir_get_supported_languages() : [];
         $language = null;
 
         if (isset($_GET['lang'])) {
@@ -585,12 +585,12 @@ if (!function_exists('callamir_language_attributes')) {
             return $output;
         }
 
-        $attributes = array(
+        $attributes = [
             'lang' => str_replace('_', '-', callamir_get_locale_for_language($lang)),
             'dir' => $supported[$lang]['direction'],
-        );
+        ];
 
-        $fragments = array();
+        $fragments = [];
         foreach ($attributes as $key => $value) {
             if ($value === '') {
                 continue;
@@ -629,7 +629,7 @@ if (!function_exists('callamir_normalize_theme_mod_value')) {
             }
 
             $lower = strtolower($trimmed);
-            if (in_array($lower, array('1', '0', 'true', 'false', 'yes', 'no', 'on', 'off'), true)) {
+            if (in_array($lower, ['1', '0', 'true', 'false', 'yes', 'no', 'on', 'off'], true)) {
                 return null;
             }
 
