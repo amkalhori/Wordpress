@@ -1772,6 +1772,55 @@ body[dir="rtl"] .service-icon {
 }
 
 /* Contact Section */
+.callamir-contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (min-width: 768px) {
+    .callamir-contact-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .callamir-contact-grid {
+        grid-template-columns: 1.05fr 0.95fr;
+    }
+}
+
+.callamir-contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .callamir-contact-details {
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
+.callamir-contact-form-panel {
+    width: 100%;
+    background: rgba(var(--color-light-rgb), 0.05);
+    border: 1px solid rgba(var(--color-light-rgb), 0.12);
+    border-radius: 16px;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: 0 12px 30px rgba(var(--color-dark-rgb), 0.18);
+    backdrop-filter: blur(6px);
+}
+
+.callamir-contact-form {
+    display: grid;
+    gap: 1rem;
+}
+
 .contact {
     color: var(--color-text);
     background: var(--contact-bg-color);
