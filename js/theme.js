@@ -1260,27 +1260,6 @@ document.addEventListener('DOMContentLoaded', () => {
             prevSlide();
         }); }
         
-        // Touch/swipe support
-        let startX = 0;
-        let isDragging = false;
-        
-        track.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-        });
-        
-        track.addEventListener('touchend', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            
-            const endX = e.changedTouches[0].clientX;
-            const diffX = startX - endX;
-            
-            if (Math.abs(diffX) > 50) {
-                if (diffX > 0) { nextBtn?.click(); } else { prevBtn?.click(); }
-            }
-        });
-        
         // Initialize
         calculateDimensions();
         createIndicators();
@@ -1456,6 +1435,4 @@ document.addEventListener('DOMContentLoaded', () => {
         animationObserver.observe(card);
     });
 
-    // --- Navigation Button ---
-    callamirLog('Nav button functionality skipped (no .nav-button in DOM)');
 });

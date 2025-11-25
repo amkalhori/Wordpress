@@ -41,8 +41,8 @@ if (strpos($html_attributes, 'dir=') === false) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class(); ?> <?php echo $is_rtl_layout ? 'dir="rtl"' : 'dir="ltr"'; ?>>
-<header class="site-header modern-header"<?php echo $is_rtl_layout ? ' dir="rtl"' : ''; ?>>
+<body <?php body_class(); ?>>
+<header class="site-header modern-header">
     <canvas id="stars" class="stars-header" aria-hidden="true"></canvas>
     
     <!-- Modern Navigation Container -->

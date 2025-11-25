@@ -147,28 +147,6 @@ get_header();
                 </div>
             </div>
 
-            <div class="faq-list" role="list">
-                <?php
-                for ($i = 1; $i <= 5; $i++) :
-                    $q_default_en = $i === 1 ? __('How do I request support?', 'callamir') : '';
-                    $q_default_fa = $i === 1 ? 'چگونه درخواست پشتیبانی بدهم؟' : '';
-                    $a_default_en = $i === 1 ? __('Use the Get IT Support button above or WhatsApp/Telegram in Contact.', 'callamir') : '';
-                    $a_default_fa = $i === 1 ? 'از دکمه دریافت پشتیبانی آی‌تی در بالا یا واتساپ/تلگرام در بخش تماس استفاده کنید.' : '';
-                    $q = callamir_get_text("faq_q_{$i}", $q_default_en, $q_default_fa);
-                    $a = callamir_get_text("faq_a_{$i}", $a_default_en, $a_default_fa);
-                    if (!$q) continue;
-                ?>
-                <div class="faq-item" role="listitem">
-                    <button class="faq-question" aria-expanded="false">
-                        <span class="faq-q-text"><?php echo esc_html($q); ?></span>
-                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                    </button>
-                    <div class="faq-answer" hidden>
-                        <p><?php echo esc_html($a); ?></p>
-                    </div>
-                </div>
-                <?php endfor; ?>
-            </div>
         </div>
     </section>
 
@@ -269,9 +247,9 @@ get_header();
         </div>
     </section>
     <!-- Community Section -->
-    <section id="community" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="community-title">
+    <section id="community-posts" class="callamir-section py-10 relative overflow-hidden min-h-[400px]" aria-labelledby="community-posts-title">
         <div class="wrap flex flex-col items-center gap-6 relative z-10">
-            <h2 id="community-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
+            <h2 id="community-posts-title" class="callamir-section-title text-3xl font-bold mb-6 text-white">
                 <?php echo esc_html(callamir_get_text('community_title', __('Community Questions', 'callamir'), 'سوالات جامعه')); ?>
             </h2>
             <?php

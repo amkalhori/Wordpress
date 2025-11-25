@@ -3,7 +3,7 @@
  * 404 Template for Callamir Theme
  */
 get_header();
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'fa' ? 'fa' : 'en';
+$lang = callamir_get_visitor_lang();
 ?>
 <main>
     <section class="error-404">
