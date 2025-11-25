@@ -12,35 +12,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Modern Mobile Menu Toggle ---
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const mobileMenu = document.querySelector('.nav-mobile');
+    const mobileMenuClose = document.querySelector('.mobile-menu-close');
     const body = document.body;
     let mobileNavigatorController = null;
+
+    const setMobileMenuState = (isOpen) => {
+        if (!mobileMenu || !mobileMenuToggle) {
+            return;
+        }
+
+        mobileMenuToggle.classList.toggle('active', isOpen);
+        mobileMenu.classList.toggle('active', isOpen);
+        mobileMenuToggle.setAttribute('aria-expanded', isOpen);
+        body.classList.toggle('nav-mobile-open', isOpen);
+        body.style.overflow = isOpen ? 'hidden' : '';
+    };
 
     if (mobileMenuToggle && mobileMenu) {
         mobileMenuToggle.addEventListener('click', (e) => {
             e.preventDefault();
             const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
-            
-            // Toggle menu visibility
-            mobileMenuToggle.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
-            
-            // Prevent body scroll when menu is open
-            if (!isExpanded) {
-                body.style.overflow = 'hidden';
-            } else {
-                body.style.overflow = '';
-            }
+            setMobileMenuState(!isExpanded);
         });
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
                 if (mobileMenu.classList.contains('active')) {
-                    mobileMenuToggle.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                    body.style.overflow = '';
+                    setMobileMenuState(false);
                 }
             }
         });
@@ -48,22 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // Close mobile menu on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                mobileMenuToggle.classList.remove('active');
-                mobileMenu.classList.remove('active');
-                mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                body.style.overflow = '';
+                setMobileMenuState(false);
             }
         });
 
         // Close mobile menu when window is resized to desktop
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
-                mobileMenuToggle.classList.remove('active');
-                mobileMenu.classList.remove('active');
-                mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                body.style.overflow = '';
+                setMobileMenuState(false);
             }
         });
+
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', () => setMobileMenuState(false));
+        }
+
+        const mobileMenuLinks = mobileMenu.querySelectorAll('.nav-menu-mobile a');
+        if (mobileMenuLinks.length) {
+            mobileMenuLinks.forEach((link) => {
+                link.addEventListener('click', () => {
+                    setMobileMenuState(false);
+                });
+            });
+        }
     }
 
     const initMobileMenuNavigator = () => {
@@ -1254,27 +1260,6 @@ document.addEventListener('DOMContentLoaded', () => {
             prevSlide();
         }); }
         
-        // Touch/swipe support
-        let startX = 0;
-        let isDragging = false;
-        
-        track.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-        });
-        
-        track.addEventListener('touchend', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            
-            const endX = e.changedTouches[0].clientX;
-            const diffX = startX - endX;
-            
-            if (Math.abs(diffX) > 50) {
-                if (diffX > 0) { nextBtn?.click(); } else { prevBtn?.click(); }
-            }
-        });
-        
         // Initialize
         calculateDimensions();
         createIndicators();
@@ -1450,6 +1435,4 @@ document.addEventListener('DOMContentLoaded', () => {
         animationObserver.observe(card);
     });
 
-    // --- Navigation Button ---
-    callamirLog('Nav button functionality skipped (no .nav-button in DOM)');
 });
