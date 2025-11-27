@@ -149,9 +149,17 @@ function callamir_normalize_youtube_embed_url($channel_url) {
         return '';
     }
 
+    $host = strtolower($parsed['host']);
     $path = isset($parsed['path']) ? trim($parsed['path'], '/') : '';
     $segments = $path !== '' ? explode('/', $path) : [];
     $identifier = '';
+
+    if ($host === 'youtu.be' && $segments) {
+        return sprintf(
+            'https://www.youtube.com/embed/%s',
+            rawurlencode($segments[0])
+        );
+    }
 
     if ($segments) {
         $first_segment = $segments[0];
@@ -161,6 +169,11 @@ function callamir_normalize_youtube_embed_url($channel_url) {
             $identifier = $segments[1];
         } elseif (in_array($first_segment, ['c', 'user'], true) && isset($segments[1])) {
             $identifier = $segments[1];
+        } elseif ($first_segment === 'shorts' && isset($segments[1])) {
+            return sprintf(
+                'https://www.youtube.com/embed/%s',
+                rawurlencode($segments[1])
+            );
         }
     }
 
