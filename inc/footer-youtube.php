@@ -138,6 +138,92 @@ function callamir_register_footer_youtube_controls($wp_customize) {
 add_action('customize_register', 'callamir_register_footer_youtube_controls');
 
 /**
+ * Build an embeddable YouTube URL for channel-style links when oEmbed fails.
+ *
+ * @param string $channel_url Raw YouTube channel URL.
+ * @return string
+ */
+function callamir_normalize_youtube_embed_url($channel_url) {
+    $parsed = wp_parse_url($channel_url);
+    if (empty($parsed['host'])) {
+        return '';
+    }
+
+    $path = isset($parsed['path']) ? trim($parsed['path'], '/') : '';
+    $segments = $path !== '' ? explode('/', $path) : [];
+    $identifier = '';
+
+    if ($segments) {
+        $first_segment = $segments[0];
+        if (strpos($first_segment, '@') === 0) {
+            $identifier = substr($first_segment, 1);
+        } elseif ($first_segment === 'channel' && isset($segments[1])) {
+            $identifier = $segments[1];
+        } elseif (in_array($first_segment, ['c', 'user'], true) && isset($segments[1])) {
+            $identifier = $segments[1];
+        }
+    }
+
+    if ($identifier === '' && !empty($parsed['query'])) {
+        parse_str($parsed['query'], $query_args);
+        if (!empty($query_args['list'])) {
+            return sprintf(
+                'https://www.youtube.com/embed/videoseries?list=%s',
+                rawurlencode($query_args['list'])
+            );
+        }
+
+        if (!empty($query_args['v'])) {
+            return sprintf(
+                'https://www.youtube.com/embed/%s',
+                rawurlencode($query_args['v'])
+            );
+        }
+    }
+
+    if ($identifier === '') {
+        return '';
+    }
+
+    return sprintf(
+        'https://www.youtube.com/embed?listType=user_uploads&list=%s',
+        rawurlencode($identifier)
+    );
+}
+
+/**
+ * Retrieve the embed HTML for the footer YouTube section.
+ *
+ * @param string $channel_url Channel URL configured in the Customizer.
+ * @return string
+ */
+function callamir_get_footer_youtube_embed($channel_url) {
+    if (!$channel_url) {
+        return '';
+    }
+
+    $embed_html = '';
+    if (function_exists('wp_oembed_get')) {
+        $embed_html = wp_oembed_get($channel_url) ?: '';
+    }
+
+    if ($embed_html !== '') {
+        return $embed_html;
+    }
+
+    $embed_url = callamir_normalize_youtube_embed_url($channel_url);
+    if ($embed_url === '') {
+        return '';
+    }
+
+    return sprintf(
+        '<iframe src="%1$s" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="%2$s"></iframe>',
+        esc_url($embed_url),
+        esc_attr__('YouTube player', 'callamir')
+    );
+}
+
+/**
  * Gather the data needed to render the subscribe section.
  *
  * @return array
@@ -146,6 +232,9 @@ function callamir_get_footer_youtube_data() {
     $defaults = callamir_get_footer_youtube_defaults();
 
     $channel_url = get_theme_mod('footer_youtube_channel_url', $defaults['channel_url']);
+    if ($channel_url === '') {
+        $channel_url = $defaults['channel_url'];
+    }
     $button_color = get_theme_mod('footer_youtube_button_color', $defaults['button_color']);
     $button_hover_color = get_theme_mod('footer_youtube_button_hover_color', $defaults['button_hover_color']);
     $logo_theme = get_theme_mod('footer_youtube_logo_theme', $defaults['logo_theme']);
@@ -158,10 +247,7 @@ function callamir_get_footer_youtube_data() {
         $logo_color = $logo_custom_color;
     }
 
-    $embed_html = '';
-    if ($channel_url && function_exists('wp_oembed_get')) {
-        $embed_html = wp_oembed_get($channel_url) ?: '';
-    }
+    $embed_html = callamir_get_footer_youtube_embed($channel_url);
 
     return [
         'channel_url' => $channel_url,
