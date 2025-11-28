@@ -300,6 +300,7 @@ function callamir_render_footer_youtube_section($echo = true) {
         esc_attr($style_rules),
         esc_attr__('YouTube subscribe prompt', 'callamir')
     );
+    $markup .= '<div class="footer-youtube-inner">';
     $markup .= '<div class="footer-youtube-embed" aria-hidden="true">';
     if (!empty($data['embed_html'])) {
         $markup .= $data['embed_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -315,9 +316,10 @@ function callamir_render_footer_youtube_section($echo = true) {
         $markup .= '</div>';
     }
     $markup .= '</div>';
+    $markup .= '<div class="footer-youtube-details">';
     $markup .= '<div class="footer-youtube-logo" aria-hidden="true">';
     $markup .= '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">';
-    $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0 .5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';
+    $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0-.5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';
     $markup .= '<path d="m9.75 15.02 6.25-3.02-6.25-3.02Z" />';
     $markup .= '</svg>';
     $markup .= '</div>';
@@ -331,6 +333,8 @@ function callamir_render_footer_youtube_section($echo = true) {
         esc_html($button_label),
         esc_attr(callamir_t(__('Subscribe to our YouTube channel (opens in a new tab)', 'callamir'), __('اشتراک در کانال یوتیوب ما (در زبانه جدید باز می‌شود)', 'callamir')))
     );
+    $markup .= '</div>';
+    $markup .= '</div>';
     $markup .= '</div>';
 
     if ($echo) {

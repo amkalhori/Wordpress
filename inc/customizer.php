@@ -184,6 +184,26 @@ function callamir_customize_register($wp_customize) {
         'section' => 'callamir_header_footer',
         'type' => 'text',
     ]);
+    $wp_customize->add_setting('leave_message_url', [
+        'default' => '#contact',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control('leave_message_url', [
+        'label' => __('Leave Message Link', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'url',
+        'description' => __('Target URL for the Leave a Message button', 'callamir'),
+    ]);
+    $wp_customize->add_setting('leave_message_icon', [
+        'default' => 'fa-solid fa-envelope',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('leave_message_icon', [
+        'label' => __('Leave Message Icon Class', 'callamir'),
+        'section' => 'callamir_header_footer',
+        'type' => 'text',
+        'description' => __('Font Awesome class used beside the Leave a Message button', 'callamir'),
+    ]);
     $wp_customize->add_setting('footer_min_height', [
         'default' => '100px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
