@@ -29,6 +29,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting($key, [
             'default' => $default_value,
             'sanitize_callback' => 'sanitize_hex_color',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, [
             'label' => ucwords(str_replace('_', ' ', $key)),
@@ -54,6 +55,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting($key, [
             'default' => $default_value,
             'sanitize_callback' => 'sanitize_hex_color',
+            'transport' => 'postMessage',
         ]);
 
         $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $key, [
@@ -71,6 +73,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('header_justify_content', [
         'default' => 'space-between',
         'sanitize_callback' => 'callamir_sanitize_select',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('header_justify_content', [
         'label' => __('Header Justify Content', 'callamir'),
@@ -87,6 +90,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('header_justify_content_mobile', [
         'default' => 'space-between',
         'sanitize_callback' => 'callamir_sanitize_select',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('header_justify_content_mobile', [
         'label' => __('Header Justify Content (Mobile)', 'callamir'),
@@ -103,6 +107,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('header_logo_alignment', [
         'default' => 'left',
         'sanitize_callback' => 'callamir_sanitize_select',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('header_logo_alignment', [
         'label' => __('Logo Alignment', 'callamir'),
@@ -117,6 +122,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('logo_max_height', [
         'default' => '80px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('logo_max_height', [
         'label' => __('Logo Max Height', 'callamir'),
@@ -128,6 +134,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('logo_text_en', [
         'default' => __('CallAmir', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('logo_text_en', [
         'label' => __('Logo Text (EN)', 'callamir'),
@@ -138,6 +145,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('logo_text_fa', [
         'default' => __('کال امیر', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('logo_text_fa', [
         'label' => __('Logo Text (FA)', 'callamir'),
@@ -147,6 +155,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_width', [
         'default' => '200px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_width', [
         'label' => __('Leave Message Button Width', 'callamir'),
@@ -157,6 +166,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_height', [
         'default' => '50px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_height', [
         'label' => __('Leave Message Button Height', 'callamir'),
@@ -168,6 +178,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_text_en', [
         'default' => __('Leave a message', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_text_en', [
         'label' => __('Leave Message Text (EN)', 'callamir'),
@@ -178,6 +189,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_text_fa', [
         'default' => __('پیام بگذارید', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_text_fa', [
         'label' => __('Leave Message Text (FA)', 'callamir'),
@@ -187,6 +199,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_url', [
         'default' => '#contact',
         'sanitize_callback' => 'esc_url_raw',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_url', [
         'label' => __('Leave Message Link', 'callamir'),
@@ -197,6 +210,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('leave_message_icon', [
         'default' => 'fa-solid fa-envelope',
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('leave_message_icon', [
         'label' => __('Leave Message Icon Class', 'callamir'),
@@ -207,6 +221,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('footer_min_height', [
         'default' => '100px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('footer_min_height', [
         'label' => __('Footer Minimum Height', 'callamir'),
@@ -218,6 +233,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('copyright_text_en', [
         'default' => __('CallAmir. All rights reserved © {year}', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('copyright_text_en', [
         'label' => __('Footer Copyright Text (EN)', 'callamir'),
@@ -229,6 +245,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('copyright_text_fa', [
         'default' => __('کال امیر. کلیه حقوق محفوظ است © {year}', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('copyright_text_fa', [
         'label' => __('Footer Copyright Text (FA)', 'callamir'),
@@ -247,6 +264,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('body_font_family', [
         'default' => "'Roboto', Arial, sans-serif",
         'sanitize_callback' => 'callamir_sanitize_font_family',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('body_font_family', [
         'label' => __('Body Font Family', 'callamir'),
@@ -258,6 +276,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('heading_font_family', [
         'default' => "'Montserrat', 'Roboto', Arial, sans-serif",
         'sanitize_callback' => 'callamir_sanitize_font_family',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('heading_font_family', [
         'label' => __('Heading Font Family', 'callamir'),
@@ -268,6 +287,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('base_font_size', [
         'default' => '16px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('base_font_size', [
         'label' => __('Base Font Size', 'callamir'),
@@ -279,6 +299,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('container_max_width', [
         'default' => '1200px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('container_max_width', [
         'label' => __('Content Max Width', 'callamir'),
@@ -290,6 +311,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('section_vertical_padding', [
         'default' => '4rem',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('section_vertical_padding', [
         'label' => __('Section Vertical Padding', 'callamir'),
@@ -301,6 +323,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('section_min_height', [
         'default' => '320px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('section_min_height', [
         'label' => __('Section Minimum Height', 'callamir'),
@@ -311,6 +334,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('hero_min_height', [
         'default' => '420px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('hero_min_height', [
         'label' => __('Hero Minimum Height', 'callamir'),
@@ -321,6 +345,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('header_min_height', [
         'default' => '80px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('header_min_height', [
         'label' => __('Header Minimum Height', 'callamir'),
@@ -338,6 +363,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_enable_header_stars', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_enable_header_stars', [
         'label' => __('Enable Header Stars', 'callamir'),
@@ -347,6 +373,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_star_count_header', [
         'default' => 100,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_star_count_header', [
         'label' => __('Header Star Count', 'callamir'),
@@ -358,6 +385,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_enable_footer_stars', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_enable_footer_stars', [
         'label' => __('Enable Footer Stars', 'callamir'),
@@ -367,6 +395,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_star_count_footer', [
         'default' => 100,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_star_count_footer', [
         'label' => __('Footer Star Count', 'callamir'),
@@ -378,6 +407,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_enable_hero_effect', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_enable_hero_effect', [
         'label' => __('Enable Hero Cosmic Effect', 'callamir'),
@@ -387,6 +417,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_hero_blackhole_pattern', [
         'default' => 'circular',
         'sanitize_callback' => 'callamir_sanitize_select',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_hero_blackhole_pattern', [
         'label' => __('Hero Blackhole Pattern', 'callamir'),
@@ -400,6 +431,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_hero_circle_count', [
         'default' => 50,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_hero_circle_count', [
         'label' => __('Hero Circle Count', 'callamir'),
@@ -410,6 +442,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_hero_star_count', [
         'default' => 150,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_hero_star_count', [
         'label' => __('Hero Star Count', 'callamir'),
@@ -421,6 +454,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_enable_services_effect', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_enable_services_effect', [
         'label' => __('Enable Services Cosmic Effect', 'callamir'),
@@ -430,6 +464,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_services_pattern', [
         'default' => 'circular',
         'sanitize_callback' => 'callamir_sanitize_select',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_services_pattern', [
         'label' => __('Services Pattern', 'callamir'),
@@ -443,6 +478,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_services_circle_count', [
         'default' => 50,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_services_circle_count', [
         'label' => __('Services Circle Count', 'callamir'),
@@ -453,6 +489,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('callamir_services_star_count', [
         'default' => 150,
         'sanitize_callback' => 'absint',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('callamir_services_star_count', [
         'label' => __('Services Star Count', 'callamir'),
@@ -460,6 +497,8 @@ function callamir_customize_register($wp_customize) {
         'type' => 'number',
         'input_attrs' => ['min' => 10, 'max' => 500, 'step' => 10],
     ]);
+
+    $max_services = function_exists('callamir_max_services') ? callamir_max_services() : 6;
 
     // Modern Services Section
     $wp_customize->add_section('callamir_modern_services', [
@@ -478,7 +517,7 @@ function callamir_customize_register($wp_customize) {
         'label' => __('Number of Services', 'callamir'),
         'section' => 'callamir_modern_services',
         'type' => 'number',
-        'input_attrs' => ['min' => 0, 'max' => callamir_max_services(), 'step' => 1],
+        'input_attrs' => ['min' => 0, 'max' => $max_services, 'step' => 1],
         'description' => __('Set to 0 to hide all services.', 'callamir'),
     ]);
 
@@ -486,6 +525,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_title_en', [
         'default' => __('Our Services', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_title_en', [
         'label' => __('Services Section Title (EN)', 'callamir'),
@@ -496,6 +536,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_title_fa', [
         'default' => __('خدمات ما', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_title_fa', [
         'label' => __('Services Section Title (FA)', 'callamir'),
@@ -506,6 +547,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_subtitle_en', [
         'default' => __('Professional IT solutions tailored to your needs', 'callamir'),
         'sanitize_callback' => 'sanitize_textarea_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_subtitle_en', [
         'label' => __('Services Section Subtitle (EN)', 'callamir'),
@@ -516,6 +558,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_subtitle_fa', [
         'default' => __('راه‌حل‌های حرفه‌ای آی‌تی متناسب با نیازهای شما', 'callamir'),
         'sanitize_callback' => 'sanitize_textarea_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_subtitle_fa', [
         'label' => __('Services Section Subtitle (FA)', 'callamir'),
@@ -527,6 +570,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('read_more_text_en', [
         'default' => __('Read More', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('read_more_text_en', [
         'label' => __('Read More Button Text (EN)', 'callamir'),
@@ -537,6 +581,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('read_more_text_fa', [
         'default' => __('بیشتر بخوانید', 'callamir'),
         'sanitize_callback' => 'sanitize_text_field',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('read_more_text_fa', [
         'label' => __('Read More Button Text (FA)', 'callamir'),
@@ -545,11 +590,12 @@ function callamir_customize_register($wp_customize) {
     ]);
 
     // Individual Service Settings
-    for ($i = 1; $i <= callamir_max_services(); $i++) {
+    for ($i = 1; $i <= $max_services; $i++) {
         // Service Icon
         $wp_customize->add_setting("callamir_service_icon_{$i}", [
             'default' => 'fa-solid fa-computer',
             'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("callamir_service_icon_{$i}", [
             'label' => __("Service {$i} Icon (FontAwesome class)", 'callamir'),
@@ -563,6 +609,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("callamir_service_image_{$i}", [
             'default' => '',
             'sanitize_callback' => 'esc_url_raw',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "callamir_service_image_{$i}", [
             'label' => __("Service {$i} Image", 'callamir'),
@@ -575,6 +622,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_title_{$i}_en", [
             'default' => __("Service {$i}", 'callamir'),
             'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_title_{$i}_en", [
             'label' => __("Service {$i} Title (EN)", 'callamir'),
@@ -586,6 +634,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_title_{$i}_fa", [
             'default' => __("خدمت {$i}", 'callamir'),
             'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_title_{$i}_fa", [
             'label' => __("Service {$i} Title (FA)", 'callamir'),
@@ -598,6 +647,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_desc_{$i}_en", [
             'default' => __("Description for service {$i}", 'callamir'),
             'sanitize_callback' => 'sanitize_textarea_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_desc_{$i}_en", [
             'label' => __("Service {$i} Short Description (EN)", 'callamir'),
@@ -609,6 +659,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_desc_{$i}_fa", [
             'default' => __("توضیح خدمت {$i}", 'callamir'),
             'sanitize_callback' => 'sanitize_textarea_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_desc_{$i}_fa", [
             'label' => __("Service {$i} Short Description (FA)", 'callamir'),
@@ -621,6 +672,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_full_desc_{$i}_en", [
             'default' => __("Detailed description for service {$i}. This will be shown in the modal popup.", 'callamir'),
             'sanitize_callback' => 'sanitize_textarea_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_full_desc_{$i}_en", [
             'label' => __("Service {$i} Full Description (EN)", 'callamir'),
@@ -633,6 +685,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_full_desc_{$i}_fa", [
             'default' => __("توضیح کامل خدمت {$i}. این متن در پنجره بازشو نمایش داده می‌شود.", 'callamir'),
             'sanitize_callback' => 'sanitize_textarea_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_full_desc_{$i}_fa", [
             'label' => __("Service {$i} Full Description (FA)", 'callamir'),
@@ -646,6 +699,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_price_{$i}_en", [
             'default' => '',
             'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_price_{$i}_en", [
             'label' => __("Service {$i} Price (EN)", 'callamir'),
@@ -658,6 +712,7 @@ function callamir_customize_register($wp_customize) {
         $wp_customize->add_setting("service_price_{$i}_fa", [
             'default' => '',
             'sanitize_callback' => 'sanitize_text_field',
+            'transport' => 'postMessage',
         ]);
         $wp_customize->add_control("service_price_{$i}_fa", [
             'label' => __("Service {$i} Price (FA)", 'callamir'),
@@ -686,6 +741,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_card_background', [
         'default' => 'rgba(255, 255, 255, 0.05)',
         'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_card_background', [
         'label' => __('Service Card Background', 'callamir'),
@@ -697,6 +753,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_card_border_color', [
         'default' => 'rgba(255, 255, 255, 0.1)',
         'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_card_border_color', [
         'label' => __('Service Card Border Color', 'callamir'),
@@ -708,6 +765,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_icon_color', [
         'default' => '#FFD700',
         'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'services_icon_color', [
         'label' => __('Service Icon Color', 'callamir'),
@@ -717,6 +775,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_title_color', [
         'default' => '#ffffff',
         'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'services_title_color', [
         'label' => __('Service Title Color', 'callamir'),
@@ -726,6 +785,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_description_color', [
         'default' => 'rgba(255, 255, 255, 0.8)',
         'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_description_color', [
         'label' => __('Service Description Color', 'callamir'),
@@ -737,6 +797,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_button_background', [
         'default' => 'linear-gradient(135deg, #FFD700, #FFA500)',
         'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_button_background', [
         'label' => __('Read More Button Background', 'callamir'),
@@ -748,6 +809,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_button_text_color', [
         'default' => '#0A0A0A',
         'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'services_button_text_color', [
         'label' => __('Read More Button Text Color', 'callamir'),
@@ -758,6 +820,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_enable_cosmic_effect', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_enable_cosmic_effect', [
         'label' => __('Enable Cosmic Background Effect', 'callamir'),
@@ -769,6 +832,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_icon_size', [
         'default' => '32px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_icon_size', [
         'label' => __('Service Icon Size', 'callamir'),
@@ -780,6 +844,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_button_font_size', [
         'default' => '16px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_button_font_size', [
         'label' => __('Read More Button Font Size', 'callamir'),
@@ -791,6 +856,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_button_border_radius', [
         'default' => '8px',
         'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_button_border_radius', [
         'label' => __('Read More Button Border Radius', 'callamir'),
@@ -802,6 +868,7 @@ function callamir_customize_register($wp_customize) {
     $wp_customize->add_setting('services_enable_liquid_effect', [
         'default' => true,
         'sanitize_callback' => 'wp_validate_boolean',
+        'transport' => 'postMessage',
     ]);
     $wp_customize->add_control('services_enable_liquid_effect', [
         'label' => __('Enable Liquid Hover Effect', 'callamir'),
