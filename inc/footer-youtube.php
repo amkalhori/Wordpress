@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
 function callamir_get_footer_youtube_defaults() {
     return [
         'channel_url' => 'https://www.youtube.com/',
+        'subscribe_url' => 'https://www.youtube.com/?sub_confirmation=1',
         'cta_en' => __('Subscribe to our YouTube channel', 'callamir'),
         'cta_fa' => __('در کانال یوتیوب ما مشترک شوید', 'callamir'),
         'button_color' => '#ff0000',
@@ -48,6 +49,18 @@ function callamir_register_footer_youtube_controls($wp_customize) {
         'label' => __('YouTube Channel URL', 'callamir'),
         'section' => 'callamir_footer_youtube',
         'type' => 'url',
+    ]);
+
+    $wp_customize->add_setting('footer_youtube_subscribe_url', [
+        'default' => $defaults['subscribe_url'],
+        'sanitize_callback' => 'esc_url_raw',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('footer_youtube_subscribe_url', [
+        'label' => __('YouTube Subscribe URL', 'callamir'),
+        'section' => 'callamir_footer_youtube',
+        'type' => 'url',
+        'description' => __('Use a URL such as https://www.youtube.com/@channel?sub_confirmation=1', 'callamir'),
     ]);
 
     $wp_customize->add_setting('footer_youtube_cta_text_en', [
@@ -124,6 +137,7 @@ function callamir_register_footer_youtube_controls($wp_customize) {
             'selector' => '.footer-youtube-subscribe',
             'settings' => [
                 'footer_youtube_channel_url',
+                'footer_youtube_subscribe_url',
                 'footer_youtube_cta_text_en',
                 'footer_youtube_cta_text_fa',
                 'footer_youtube_button_color',
@@ -225,7 +239,7 @@ function callamir_get_footer_youtube_embed($channel_url) {
     }
 
     $embed_url = callamir_normalize_youtube_embed_url($channel_url);
-    if ($embed_url === '') {
+    if ($embed_url === '' || !wp_http_validate_url($embed_url)) {
         return '';
     }
 
@@ -248,6 +262,13 @@ function callamir_get_footer_youtube_data() {
     if ($channel_url === '') {
         $channel_url = $defaults['channel_url'];
     }
+    $subscribe_url = get_theme_mod('footer_youtube_subscribe_url', $defaults['subscribe_url']);
+    if ($subscribe_url === '' && $channel_url) {
+        $subscribe_url = trailingslashit($channel_url) . '?sub_confirmation=1';
+    }
+    if ($subscribe_url === '') {
+        $subscribe_url = $defaults['subscribe_url'];
+    }
     $button_color = get_theme_mod('footer_youtube_button_color', $defaults['button_color']);
     $button_hover_color = get_theme_mod('footer_youtube_button_hover_color', $defaults['button_hover_color']);
     $logo_theme = get_theme_mod('footer_youtube_logo_theme', $defaults['logo_theme']);
@@ -265,6 +286,7 @@ function callamir_get_footer_youtube_data() {
     return [
         'channel_url' => $channel_url,
         'cta_text' => callamir_get_text('footer_youtube_cta_text', $defaults['cta_en'], $defaults['cta_fa']),
+        'subscribe_url' => $subscribe_url,
         'button_color' => $button_color ?: $defaults['button_color'],
         'button_hover_color' => $button_hover_color ?: $defaults['button_hover_color'],
         'logo_color' => $logo_color,
@@ -285,19 +307,36 @@ function callamir_render_footer_youtube_section($echo = true) {
     if ($channel_url === '') {
         $channel_url = esc_url($defaults['channel_url']);
     }
-
-    $style_rules = sprintf(
-        '--footer-yt-button-bg:%1$s;--footer-yt-button-hover:%2$s;--footer-yt-logo-color:%3$s;',
-        esc_attr($data['button_color']),
-        esc_attr($data['button_hover_color']),
-        esc_attr($data['logo_color'])
-    );
+    $subscribe_url = esc_url($data['subscribe_url']);
+    if ($subscribe_url === '') {
+        $subscribe_url = esc_url($defaults['subscribe_url']);
+    }
 
     $button_label = callamir_t(__('Subscribe', 'callamir'), __('اشتراک', 'callamir'));
 
-    $markup = sprintf(
-        '<div class="footer-youtube-subscribe" style="%1$s" role="complementary" aria-label="%2$s">',
-        esc_attr($style_rules),
+    static $footer_youtube_inline_styles_printed = false;
+    $markup = '';
+
+    if (!$footer_youtube_inline_styles_printed) {
+        $markup .= '<style>';
+        $markup .= '.footer-youtube-subscribe{display:flex;flex-direction:column;align-items:stretch;gap:clamp(14px,2vw,18px);';
+        $markup .= '--footer-yt-button-bg:var(--footer-yt-btn-bg);--footer-yt-button-hover:var(--footer-yt-btn-hover);';
+        $markup .= '--footer-yt-logo-color:var(--footer-yt-logo,var(--color-light));--footer-yt-icon-color:var(--footer-yt-icon,var(--footer-yt-logo));}';
+        $markup .= '.footer-youtube-inner{display:flex;flex-direction:column;gap:inherit;width:100%;}';
+        $markup .= '.footer-youtube-details{text-align:center;}';
+        $markup .= '.footer-youtube-logo i,.footer-youtube-embed__icon i{font-size:clamp(36px,5vw,44px);color:var(--footer-yt-icon-color);}';
+        $markup .= '.footer-youtube-embed__message{margin-top:10px;font-size:0.95rem;color:rgba(var(--color-light-rgb),0.92);}';
+        $markup .= '@media(max-width:640px){.footer-youtube-logo i,.footer-youtube-embed__icon i{font-size:32px;}}';
+        $markup .= '@media(min-width:900px){.footer-youtube-subscribe{flex-direction:row;align-items:center;}';
+        $markup .= '.footer-youtube-inner{flex-direction:row;align-items:center;gap:clamp(16px,2vw,22px);}';
+        $markup .= '.footer-youtube-embed,.footer-youtube-details{flex:1;}';
+        $markup .= '.footer-youtube-details{align-items:flex-start;text-align:start;}}';
+        $markup .= '</style>';
+        $footer_youtube_inline_styles_printed = true;
+    }
+
+    $markup .= sprintf(
+        '<div class="footer-youtube-subscribe" role="complementary" aria-label="%s">',
         esc_attr__('YouTube subscribe prompt', 'callamir')
     );
     $markup .= '<div class="footer-youtube-inner">';
@@ -308,20 +347,18 @@ function callamir_render_footer_youtube_section($echo = true) {
         $markup .= '<div class="footer-youtube-embed__placeholder">';
         $markup .= '<span class="footer-youtube-embed__pulse"></span>';
         $markup .= '<span class="footer-youtube-embed__icon" aria-hidden="true">';
-        $markup .= '<svg viewBox="0 0 24 24" focusable="false">';
-        $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0 .5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';
-        $markup .= '<path d="m9.75 15.02 6.25-3.02-6.25-3.02Z" />';
-        $markup .= '</svg>';
+        $markup .= '<i class="fa-brands fa-youtube"></i>';
         $markup .= '</span>';
+        $markup .= sprintf(
+            '<p class="footer-youtube-embed__message">%s</p>',
+            esc_html__('Subscribe on YouTube to watch our latest videos.', 'callamir')
+        );
         $markup .= '</div>';
     }
     $markup .= '</div>';
     $markup .= '<div class="footer-youtube-details">';
     $markup .= '<div class="footer-youtube-logo" aria-hidden="true">';
-    $markup .= '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">';
-    $markup .= '<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.4.6 9.4.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1 31.6 31.6 0 0 0-.5-5.8 31.6 31.6 0 0 0-.5-5.8Z" />';
-    $markup .= '<path d="m9.75 15.02 6.25-3.02-6.25-3.02Z" />';
-    $markup .= '</svg>';
+    $markup .= '<i class="fa-brands fa-youtube"></i>';
     $markup .= '</div>';
     $markup .= sprintf(
         '<p class="footer-youtube-text">%s</p>',
@@ -329,7 +366,7 @@ function callamir_render_footer_youtube_section($echo = true) {
     );
     $markup .= sprintf(
         '<a class="footer-youtube-button" href="%1$s" target="_blank" rel="noopener noreferrer" aria-label="%3$s">%2$s</a>',
-        $channel_url,
+        $subscribe_url,
         esc_html($button_label),
         esc_attr(callamir_t(__('Subscribe to our YouTube channel (opens in a new tab)', 'callamir'), __('اشتراک در کانال یوتیوب ما (در زبانه جدید باز می‌شود)', 'callamir')))
     );
