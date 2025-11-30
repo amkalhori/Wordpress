@@ -64,6 +64,25 @@ function callamir_generate_dynamic_css() {
     $services_enable_cosmic_effect = get_theme_mod('callamir_enable_services_effect', true);
     $services_enable_liquid_effect = get_theme_mod('services_enable_liquid_effect', true);
 
+    $footer_yt_defaults = function_exists('callamir_get_footer_youtube_defaults') ? callamir_get_footer_youtube_defaults() : [
+        'button_color' => '#ff0000',
+        'button_hover_color' => '#cc0000',
+        'logo_theme' => 'light',
+        'logo_custom_color' => '#ff0000',
+    ];
+
+    $footer_yt_button_color = esc_attr(get_theme_mod('footer_youtube_button_color', $footer_yt_defaults['button_color']));
+    $footer_yt_button_hover_color = esc_attr(get_theme_mod('footer_youtube_button_hover_color', $footer_yt_defaults['button_hover_color']));
+    $footer_yt_logo_theme = get_theme_mod('footer_youtube_logo_theme', $footer_yt_defaults['logo_theme']);
+    $footer_yt_logo_custom = get_theme_mod('footer_youtube_logo_custom_color', $footer_yt_defaults['logo_custom_color']);
+
+    $footer_yt_logo_color = 'var(--color-light)';
+    if ($footer_yt_logo_theme === 'dark') {
+        $footer_yt_logo_color = 'var(--color-dark)';
+    } elseif ($footer_yt_logo_theme === 'custom' && $footer_yt_logo_custom) {
+        $footer_yt_logo_color = esc_attr($footer_yt_logo_custom);
+    }
+
     $css = "
     :root {
         --callamir-primary: {$primary};
@@ -108,6 +127,12 @@ function callamir_generate_dynamic_css() {
         --callamir-contact-form-field-color: {$contact_form_field_color};
         --callamir-contact-form-button-bg: {$contact_form_button_background};
         --callamir-contact-form-button-color: {$contact_form_button_color};
+        --footer-yt-btn-bg: {$footer_yt_button_color};
+        --footer-yt-btn-hover: {$footer_yt_button_hover_color};
+        --footer-yt-logo: {$footer_yt_logo_color};
+        --footer-yt-button-bg: {$footer_yt_button_color};
+        --footer-yt-button-hover: {$footer_yt_button_hover_color};
+        --footer-yt-logo-color: {$footer_yt_logo_color};
     }
     body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
     h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
@@ -121,6 +146,9 @@ function callamir_generate_dynamic_css() {
     }
     .stars-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
     .site-header .wrap { display: flex; justify-content: var(--header-justify); align-items: center; padding: 10px 20px; }
+    @media (max-width: 768px) {
+        .site-header .wrap { justify-content: var(--header-justify-mobile); }
+    }
     .site-header .logo { text-align: var(--logo-align); }
     .logo img { max-height: {$logo_max_height}; width: auto; }
     .nav-link:hover { color: var(--cosmic-accent); text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
