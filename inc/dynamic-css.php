@@ -133,6 +133,7 @@ function callamir_generate_dynamic_css() {
         --footer-yt-button-bg: {$footer_yt_button_color};
         --footer-yt-button-hover: {$footer_yt_button_hover_color};
         --footer-yt-logo-color: {$footer_yt_logo_color};
+        --footer-yt-icon: {$footer_yt_button_color};
     }
     body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
     h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
