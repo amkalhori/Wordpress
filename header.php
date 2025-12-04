@@ -98,13 +98,25 @@ $contact_email = sanitize_email(get_theme_mod('header_contact_email', 'hello@cal
                     <?php endif; ?>
                 </div>
 
+                <button
+                    class="menu-toggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="primary-menu"
+                    data-menu-toggle
+                >
+                    <span class="menu-toggle__bars" aria-hidden="true"><span></span></span>
+                    <span class="menu-toggle__label"><?php _e('Menu', 'callamir'); ?></span>
+                </button>
+
                 <?php
                 wp_nav_menu([
                     'theme_location'  => 'one_page_menu',
                     'container'       => 'nav',
                     'container_class' => 'main-menu-container',
-                    'menu_class'      => 'main-menu-list',
+                    'menu_class'      => 'main-menu-list main-menu-list--desktop',
                     'fallback_cb'     => 'callamir_fallback_menu',
+                    'aria_label'      => __('Primary navigation', 'callamir'),
                 ]);
                 ?>
 
@@ -115,6 +127,34 @@ $contact_email = sanitize_email(get_theme_mod('header_contact_email', 'hello@cal
                     </a>
                 </div>
             </div>
+
+            <nav
+                class="mobile-menu-panel"
+                id="primary-menu"
+                aria-label="<?php esc_attr_e('Primary navigation', 'callamir'); ?>"
+                data-mobile-menu
+                hidden
+            >
+                <?php
+                wp_nav_menu([
+                    'theme_location'  => 'one_page_menu',
+                    'container'       => false,
+                    'menu_class'      => 'main-menu-list main-menu-list--mobile',
+                    'fallback_cb'     => 'callamir_fallback_menu',
+                ]);
+                ?>
+
+                <div class="mobile-menu-actions">
+                    <a href="<?php echo esc_url($cta_url); ?>" class="header-button header-button--primary">
+                        <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
+                        <span><?php echo esc_html($leave_message_label); ?></span>
+                    </a>
+                    <a href="<?php echo esc_url($secondary_cta_url); ?>" class="header-button header-button--ghost">
+                        <span><?php echo esc_html($secondary_cta_label); ?></span>
+                    </a>
+                </div>
+            </nav>
+            <div class="menu-overlay" data-menu-overlay hidden></div>
         </div>
 
         <a href="#content" class="skip-link screen-reader-text"><?php _e('Skip to content', 'callamir'); ?></a>
