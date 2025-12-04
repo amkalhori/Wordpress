@@ -107,10 +107,21 @@ if (strpos($html_attributes, 'dir=') === false) {
                 </div>
 
                 <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" aria-label="<?php _e('Toggle mobile menu', 'callamir'); ?>" aria-controls="mobile-menu" aria-expanded="false">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
+                <button
+                    class="mobile-menu-toggle"
+                    type="button"
+                    aria-label="<?php _e('Open mobile menu', 'callamir'); ?>"
+                    aria-controls="mobile-menu"
+                    aria-expanded="false"
+                    data-open-label="<?php esc_attr_e('Menu', 'callamir'); ?>"
+                    data-close-label="<?php esc_attr_e('Close', 'callamir'); ?>"
+                >
+                    <span class="hamburger-icon" aria-hidden="true">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </span>
+                    <span class="hamburger-label"><?php _e('Menu', 'callamir'); ?></span>
                 </button>
             </div>
         </div>
