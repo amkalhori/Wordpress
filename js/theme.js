@@ -16,6 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     let mobileNavigatorController = null;
 
+    const syncToggleLabel = (isOpen) => {
+        if (!mobileMenuToggle) {
+            return;
+        }
+
+        const openLabel = mobileMenuToggle.dataset.openLabel || mobileMenuToggle.getAttribute('aria-label') || 'Menu';
+        const closeLabel = mobileMenuToggle.dataset.closeLabel || 'Close';
+        const labelEl = mobileMenuToggle.querySelector('.hamburger-label');
+        const labelText = isOpen ? closeLabel : openLabel;
+
+        mobileMenuToggle.setAttribute('aria-label', labelText);
+
+        if (labelEl) {
+            labelEl.textContent = labelText;
+        }
+    };
+
     const setMobileMenuState = (isOpen) => {
         if (!mobileMenu || !mobileMenuToggle) {
             return;
@@ -26,9 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenuToggle.setAttribute('aria-expanded', isOpen);
         body.classList.toggle('nav-mobile-open', isOpen);
         body.style.overflow = isOpen ? 'hidden' : '';
+        syncToggleLabel(isOpen);
     };
 
     if (mobileMenuToggle && mobileMenu) {
+        syncToggleLabel(false);
+
         mobileMenuToggle.addEventListener('click', (e) => {
             e.preventDefault();
             const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
