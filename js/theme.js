@@ -78,6 +78,55 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('scroll', requestTick, { passive: true });
     }
 
+    // --- Responsive Navigation ---
+    const navToggle = document.querySelector('[data-menu-toggle]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const menuOverlay = document.querySelector('[data-menu-overlay]');
+    const bodyElement = document.body;
+
+    if (navToggle && mobileMenu) {
+        const closeMenu = () => {
+            bodyElement.classList.remove('nav-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            mobileMenu.hidden = true;
+            if (menuOverlay) {
+                menuOverlay.setAttribute('hidden', 'hidden');
+            }
+        };
+
+        const openMenu = () => {
+            bodyElement.classList.add('nav-open');
+            navToggle.setAttribute('aria-expanded', 'true');
+            mobileMenu.hidden = false;
+            if (menuOverlay) {
+                menuOverlay.removeAttribute('hidden');
+            }
+        };
+
+        navToggle.addEventListener('click', () => {
+            const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+            if (expanded) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+
+        mobileMenu.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024 && navToggle.getAttribute('aria-expanded') === 'true') {
+                closeMenu();
+            }
+        });
+    }
+
     // --- FAQ Accordion ---
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(btn => {

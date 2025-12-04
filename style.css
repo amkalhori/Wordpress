@@ -454,6 +454,8 @@ main#site-main {
     text-align: center;
     color: var(--color-light);
     box-shadow: 0 18px 46px rgba(var(--color-dark-rgb), 0.55);
+    position: relative;
+    z-index: 1;
 }
 
 .footer-youtube-inner {
@@ -573,6 +575,9 @@ main#site-main {
     transition: all 0.3s ease;
     min-inline-size: min(360px, 100%);
     box-shadow: 0 12px 30px rgba(var(--color-accent-rgb), 0.35);
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .footer-youtube-button:hover,
@@ -1669,21 +1674,28 @@ body[dir="rtl"] .service-icon {
    SIMPLE NAV LAYOUT STYLES (Replacement for Header Grid)
    =========================================== */
 
+.header-shell {
+    position: relative;
+}
+
 .header-simple-nav {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 20px;
-    padding-inline: 0;
+    gap: clamp(14px, 3vw, 24px);
+    padding-inline: clamp(8px, 2vw, 12px);
 }
 
 .header-simple-nav .logo-link {
     font-size: 1.5rem;
+    font-weight: 700;
     flex-shrink: 0;
+    letter-spacing: 0.4px;
 }
 
 .main-menu-container {
-    flex-grow: 1;
+    display: flex;
+    justify-content: center;
     text-align: center;
 }
 
@@ -1692,8 +1704,8 @@ body[dir="rtl"] .service-icon {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    gap: 30px;
+    align-items: center;
+    gap: clamp(18px, 3vw, 34px);
     white-space: nowrap;
 }
 
@@ -1704,34 +1716,194 @@ body[dir="rtl"] .service-icon {
 
 .main-menu-list a {
     color: var(--color-light);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
-    transition: color 0.2s;
-    padding: 8px 0;
-    display: block;
+    letter-spacing: 0.2px;
+    padding: 12px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     position: relative;
+    transition: color 0.25s ease, transform 0.25s ease;
 }
 
-.main-menu-list a:hover {
+.main-menu-list a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 6px;
+    height: 2px;
+    background: linear-gradient(120deg, var(--color-accent), var(--nav-gold-hover));
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+    opacity: 0.85;
+}
+
+.main-menu-list a:hover,
+.main-menu-list a:focus-visible {
     color: var(--nav-gold-hover);
+    transform: translateY(-1px);
 }
 
-@media (max-width: 900px) {
+.main-menu-list a:hover::after,
+.main-menu-list a:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(var(--color-light-rgb), 0.08);
+    border: 1px solid rgba(var(--color-light-rgb), 0.14);
+    border-radius: 12px;
+    color: var(--color-light);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.menu-toggle__bars {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 14px;
+}
+
+.menu-toggle__bars::before,
+.menu-toggle__bars::after,
+.menu-toggle__bars span {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.menu-toggle__bars::before { top: 0; }
+.menu-toggle__bars::after { bottom: 0; }
+.menu-toggle__bars span { top: 6px; }
+
+.menu-toggle[aria-expanded="true"] .menu-toggle__bars::before {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.menu-toggle[aria-expanded="true"] .menu-toggle__bars::after {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+.menu-toggle[aria-expanded="true"] .menu-toggle__bars span {
+    opacity: 0;
+}
+
+.menu-toggle:hover,
+.menu-toggle:focus-visible {
+    border-color: rgba(var(--color-light-rgb), 0.25);
+    box-shadow: 0 10px 30px rgba(var(--color-dark-rgb), 0.35);
+}
+
+.mobile-menu-panel {
+    position: absolute;
+    inset-inline: clamp(12px, 3vw, 22px);
+    top: calc(100% + 14px);
+    background: rgba(var(--color-dark-rgb), 0.96);
+    border: 1px solid rgba(var(--color-light-rgb), 0.12);
+    border-radius: 18px;
+    box-shadow: 0 18px 44px rgba(var(--color-dark-rgb), 0.6);
+    padding: clamp(16px, 4vw, 22px);
+    display: grid;
+    gap: 12px;
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    z-index: 20;
+}
+
+.main-menu-list--mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.main-menu-list--mobile a {
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(var(--color-light-rgb), 0.04);
+}
+
+.main-menu-list--mobile a::after {
+    display: none;
+}
+
+.mobile-menu-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(var(--color-accent-rgb), 0.2), transparent 35%), rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+body.nav-open .menu-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.nav-open .mobile-menu-panel {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (max-width: 1024px) {
     .header-simple-nav {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: auto auto;
+        grid-template-areas:
+            'logo actions'
+            'menu menu';
+        row-gap: 10px;
     }
 
     .main-menu-container {
         display: none;
     }
 
+    .menu-toggle {
+        display: inline-flex;
+        grid-area: actions;
+        justify-self: end;
+    }
+
     .header-actions {
-        margin-top: 15px;
+        display: none;
+    }
+
+    .logo-wrap {
+        grid-area: logo;
     }
 }
 
-/* RTL Adjustments */
+@media (max-width: 640px) {
+    .mobile-menu-panel {
+        inset-inline: 12px;
+    }
+}
+
 body[dir="rtl"] .header-simple-nav {
     direction: rtl;
 }
@@ -1740,6 +1912,6 @@ body[dir="rtl"] .main-menu-list {
     direction: rtl;
 }
 
-body[dir="rtl"] .header-actions {
-    justify-content: flex-start;
+body[dir="rtl"] .mobile-menu-panel {
+    text-align: right;
 }

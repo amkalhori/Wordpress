@@ -312,6 +312,13 @@ function callamir_render_footer_youtube_section($echo = true) {
         $subscribe_url = esc_url($defaults['subscribe_url']);
     }
 
+    $style_variables = sprintf(
+        '--footer-yt-button-bg:%1$s;--footer-yt-button-hover:%2$s;--footer-yt-logo:%3$s;--footer-yt-logo-color:%3$s;--footer-yt-icon:%1$s;',
+        esc_attr($data['button_color'] ?: $defaults['button_color']),
+        esc_attr($data['button_hover_color'] ?: $defaults['button_hover_color']),
+        esc_attr($data['logo_color'] ?: $defaults['logo_custom_color'])
+    );
+
     $button_label = callamir_t(__('Subscribe', 'callamir'), __('اشتراک', 'callamir'));
 
     static $footer_youtube_inline_styles_printed = false;
@@ -336,8 +343,9 @@ function callamir_render_footer_youtube_section($echo = true) {
     }
 
     $markup .= sprintf(
-        '<div class="footer-youtube-subscribe" role="complementary" aria-label="%s">',
-        esc_attr__('YouTube subscribe prompt', 'callamir')
+        '<div class="footer-youtube-subscribe" role="complementary" aria-label="%1$s" style="%2$s">',
+        esc_attr__('YouTube subscribe prompt', 'callamir'),
+        esc_attr($style_variables)
     );
     $markup .= '<div class="footer-youtube-inner">';
     $markup .= '<div class="footer-youtube-embed" aria-hidden="true">';
