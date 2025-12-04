@@ -87,52 +87,32 @@ $contact_email = sanitize_email(get_theme_mod('header_contact_email', 'hello@cal
         <canvas id="stars" class="stars-header" aria-hidden="true"></canvas>
 
         <div class="header-shell">
-            <div class="header-grid">
-                <div class="brand-panel">
-                    <div class="logo-wrap">
-                        <?php if (has_custom_logo()) : ?>
-                            <?php the_custom_logo(); ?>
-                        <?php else : ?>
-                            <a href="<?php echo esc_url(home_url('/')); ?>" class="logo-link">
-                                <span class="logo-text"><?php echo esc_html($logo_text); ?></span>
-                            </a>
-                        <?php endif; ?>
-                    </div>
-
-                    <p class="brand-kicker"><?php echo esc_html($kicker_text); ?></p>
-                    <h1 class="brand-title"><?php echo esc_html($header_title); ?></h1>
-                    <p class="brand-subtitle"><?php echo esc_html($header_subtitle); ?></p>
-
-                    <div class="header-actions">
-                        <a href="<?php echo esc_url($cta_url); ?>" class="header-button header-button--primary">
-                            <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
-                            <span><?php echo esc_html($leave_message_label); ?></span>
+            <div class="header-simple-nav wrap">
+                <div class="logo-wrap">
+                    <?php if (has_custom_logo()) : ?>
+                        <?php the_custom_logo(); ?>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(home_url('/')); ?>" class="logo-link">
+                            <span class="logo-text"><?php echo esc_html($logo_text); ?></span>
                         </a>
-                        <a href="<?php echo esc_url($secondary_cta_url); ?>" class="header-button header-button--ghost">
-                            <span><?php echo esc_html($secondary_cta_label); ?></span>
-                        </a>
-                    </div>
+                    <?php endif; ?>
                 </div>
 
-                <div class="highlight-panel">
-                    <div class="highlight-card">
-                        <div class="highlight-icon" aria-hidden="true">★</div>
-                        <div class="highlight-copy">
-                            <p class="highlight-title"><?php echo esc_html($project_note); ?></p>
-                            <p class="highlight-text"><?php echo esc_html($support_text); ?></p>
-                        </div>
-                    </div>
+                <?php
+                wp_nav_menu([
+                    'theme_location'  => 'one_page_menu',
+                    'container'       => 'nav',
+                    'container_class' => 'main-menu-container',
+                    'menu_class'      => 'main-menu-list',
+                    'fallback_cb'     => 'callamir_fallback_menu',
+                ]);
+                ?>
 
-                    <div class="header-meta">
-                        <div class="meta-item">
-                            <span class="meta-label"><?php echo esc_html($contact_label); ?></span>
-                            <a class="meta-value" href="mailto:<?php echo esc_attr($contact_email); ?>"><?php echo esc_html($contact_email); ?></a>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label"><?php _e('Office hours', 'callamir'); ?></span>
-                            <span class="meta-value"><?php _e('Sat – Thu, 9:00 to 18:00', 'callamir'); ?></span>
-                        </div>
-                    </div>
+                <div class="header-actions">
+                    <a href="<?php echo esc_url($cta_url); ?>" class="header-button header-button--primary">
+                        <i class="<?php echo esc_attr(get_theme_mod('leave_message_icon', 'fa-solid fa-envelope')); ?>" aria-hidden="true"></i>
+                        <span><?php echo esc_html($leave_message_label); ?></span>
+                    </a>
                 </div>
             </div>
         </div>

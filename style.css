@@ -179,7 +179,7 @@ button:hover, .btn:hover, .cta-button:hover, .read-more-btn:hover, .hero-button:
     background: var(--nav-bg-gradient);
     box-shadow: var(--nav-shadow);
     border-bottom: var(--nav-border);
-    padding: clamp(32px, 5vw, 64px) 0;
+    padding: 15px 0;
     overflow: hidden;
 }
 
@@ -1665,7 +1665,78 @@ body[dir="rtl"] .service-icon {
 }
 
 /* RTL Adjustments */
-body[dir="rtl"] .header-grid {
+/* ===========================================
+   SIMPLE NAV LAYOUT STYLES (Replacement for Header Grid)
+   =========================================== */
+
+.header-simple-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding-inline: 0;
+}
+
+.header-simple-nav .logo-link {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.main-menu-container {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.main-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    white-space: nowrap;
+}
+
+.main-menu-list li {
+    margin: 0;
+    padding: 0;
+}
+
+.main-menu-list a {
+    color: var(--color-light);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 8px 0;
+    display: block;
+    position: relative;
+}
+
+.main-menu-list a:hover {
+    color: var(--nav-gold-hover);
+}
+
+@media (max-width: 900px) {
+    .header-simple-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .main-menu-container {
+        display: none;
+    }
+
+    .header-actions {
+        margin-top: 15px;
+    }
+}
+
+/* RTL Adjustments */
+body[dir="rtl"] .header-simple-nav {
+    direction: rtl;
+}
+
+body[dir="rtl"] .main-menu-list {
     direction: rtl;
 }
 
