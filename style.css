@@ -180,7 +180,7 @@ button:hover, .btn:hover, .cta-button:hover, .read-more-btn:hover, .hero-button:
     box-shadow: var(--nav-shadow);
     border-bottom: var(--nav-border);
     padding: 15px 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .site-header.scrolled {
