@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 
 function callamir_enqueue_scripts() {
     // Enqueue styles with performance optimizations
-    $theme_version = '1.0.56';
+    $theme_version = '1.0.57';
 
     wp_enqueue_style('callamir-style', get_stylesheet_uri(), [], $theme_version);
     wp_style_add_data('callamir-style', 'rtl', 'replace');
