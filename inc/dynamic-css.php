@@ -64,6 +64,23 @@ function callamir_generate_dynamic_css() {
     $services_enable_cosmic_effect = get_theme_mod('callamir_enable_services_effect', true);
     $services_enable_liquid_effect = get_theme_mod('services_enable_liquid_effect', true);
 
+    // Navigation styling
+    $nav_gap = callamir_sanitize_css_value(get_theme_mod('nav_menu_gap', 'clamp(18px, 3vw, 34px)'));
+    $nav_item_padding = callamir_sanitize_css_value(get_theme_mod('nav_menu_padding', '12px 0'));
+    $nav_item_radius = callamir_sanitize_dimension(get_theme_mod('nav_menu_border_radius', '0px'));
+    $nav_item_bg = callamir_sanitize_css_value(get_theme_mod('nav_menu_background', 'transparent'));
+    $nav_item_hover_bg = callamir_sanitize_css_value(get_theme_mod('nav_menu_hover_background', 'transparent'));
+    $nav_text_color = esc_attr(get_theme_mod('nav_menu_text_color', '#f9fafb'));
+    $nav_hover_color = esc_attr(get_theme_mod('nav_menu_hover_color', '#ffd700'));
+
+    $nav_mobile_panel_bg = callamir_sanitize_css_value(get_theme_mod('nav_mobile_panel_background', 'rgba(var(--color-dark-rgb), 0.96)'));
+    $nav_mobile_item_bg = callamir_sanitize_css_value(get_theme_mod('nav_mobile_item_background', 'rgba(var(--color-light-rgb), 0.04)'));
+    $nav_mobile_item_hover_bg = callamir_sanitize_css_value(get_theme_mod('nav_mobile_item_hover_background', 'rgba(var(--color-light-rgb), 0.08)'));
+    $nav_mobile_item_radius = callamir_sanitize_dimension(get_theme_mod('nav_mobile_item_radius', '12px'));
+    $nav_mobile_gap = callamir_sanitize_css_value(get_theme_mod('nav_mobile_gap', '6px'));
+    $nav_mobile_text_color = esc_attr(get_theme_mod('nav_mobile_text_color', '#f9fafb'));
+    $nav_mobile_hover_color = esc_attr(get_theme_mod('nav_mobile_hover_color', '#ffd700'));
+
     $footer_yt_defaults = function_exists('callamir_get_footer_youtube_defaults') ? callamir_get_footer_youtube_defaults() : [
         'button_color' => '#ff0000',
         'button_hover_color' => '#cc0000',
@@ -134,6 +151,20 @@ function callamir_generate_dynamic_css() {
         --footer-yt-button-hover: {$footer_yt_button_hover_color};
         --footer-yt-logo-color: {$footer_yt_logo_color};
         --footer-yt-icon: {$footer_yt_button_color};
+        --nav-gap: {$nav_gap};
+        --nav-desktop-item-padding: {$nav_item_padding};
+        --nav-desktop-item-radius: {$nav_item_radius};
+        --nav-desktop-bg: {$nav_item_bg};
+        --nav-desktop-hover-bg: {$nav_item_hover_bg};
+        --nav-desktop-text: {$nav_text_color};
+        --nav-desktop-hover: {$nav_hover_color};
+        --nav-mobile-panel-bg: {$nav_mobile_panel_bg};
+        --nav-mobile-item-bg: {$nav_mobile_item_bg};
+        --nav-mobile-item-hover-bg: {$nav_mobile_item_hover_bg};
+        --nav-mobile-text: {$nav_mobile_text_color};
+        --nav-mobile-hover: {$nav_mobile_hover_color};
+        --nav-mobile-radius: {$nav_mobile_item_radius};
+        --nav-mobile-gap: {$nav_mobile_gap};
     }
     body { color: var(--callamir-text); font-family: var(--callamir-body-font); font-size: var(--callamir-base-font-size); }
     h1, h2, h3, h4, h5, h6 { font-family: var(--callamir-heading-font); }
