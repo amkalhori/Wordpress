@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeMenu = () => {
             bodyElement.classList.remove('nav-open');
             navToggle.setAttribute('aria-expanded', 'false');
-            mobileMenu.hidden = true;
+            mobileMenu.setAttribute('hidden', 'hidden');
+            mobileMenu.classList.remove('is-open');
             if (menuOverlay) {
                 menuOverlay.setAttribute('hidden', 'hidden');
             }
@@ -97,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const openMenu = () => {
             bodyElement.classList.add('nav-open');
             navToggle.setAttribute('aria-expanded', 'true');
-            mobileMenu.hidden = false;
+            mobileMenu.classList.add('is-open');
+            mobileMenu.removeAttribute('hidden');
             if (menuOverlay) {
                 menuOverlay.removeAttribute('hidden');
             }

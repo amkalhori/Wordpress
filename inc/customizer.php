@@ -70,6 +70,171 @@ function callamir_customize_register($wp_customize) {
         'priority' => 28,
         'description' => __('Customize header and footer layout', 'callamir')
     ]);
+
+    // Navigation Styling Section
+    $wp_customize->add_section('callamir_navigation_style', [
+        'title' => __('Navigation Styling', 'callamir'),
+        'priority' => 27,
+        'description' => __('Control the shape, spacing, and colors of desktop and mobile menus.', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_gap', [
+        'default' => 'clamp(18px, 3vw, 34px)',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_menu_gap', [
+        'label' => __('Desktop Menu Item Gap', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Spacing between desktop navigation links (supports clamp(), rem, px, etc.)', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_padding', [
+        'default' => '12px 0',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_menu_padding', [
+        'label' => __('Desktop Menu Item Padding', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Control top/right/bottom/left padding for desktop links (e.g., 12px 16px).', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_border_radius', [
+        'default' => '0px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_menu_border_radius', [
+        'label' => __('Desktop Menu Item Radius', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Round the corners of desktop menu links (e.g., 8px).', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_background', [
+        'default' => 'transparent',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_menu_background', [
+        'label' => __('Desktop Menu Background', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Background for desktop links (supports gradients, rgba, etc.)', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_hover_background', [
+        'default' => 'transparent',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_menu_hover_background', [
+        'label' => __('Desktop Menu Hover Background', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Background when hovering/focusing desktop links.', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_menu_text_color', [
+        'default' => '#f9fafb',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'nav_menu_text_color', [
+        'label' => __('Desktop Menu Text Color', 'callamir'),
+        'section' => 'callamir_navigation_style',
+    ]));
+
+    $wp_customize->add_setting('nav_menu_hover_color', [
+        'default' => '#ffd700',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'nav_menu_hover_color', [
+        'label' => __('Desktop Menu Hover Color', 'callamir'),
+        'section' => 'callamir_navigation_style',
+    ]));
+
+    $wp_customize->add_setting('nav_mobile_panel_background', [
+        'default' => 'rgba(var(--color-dark-rgb), 0.96)',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_mobile_panel_background', [
+        'label' => __('Mobile Menu Panel Background', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Background for the slide-down mobile menu container.', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_mobile_item_background', [
+        'default' => 'rgba(var(--color-light-rgb), 0.04)',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_mobile_item_background', [
+        'label' => __('Mobile Menu Item Background', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+    ]);
+
+    $wp_customize->add_setting('nav_mobile_item_hover_background', [
+        'default' => 'rgba(var(--color-light-rgb), 0.08)',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_mobile_item_hover_background', [
+        'label' => __('Mobile Menu Item Hover Background', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+    ]);
+
+    $wp_customize->add_setting('nav_mobile_item_radius', [
+        'default' => '12px',
+        'sanitize_callback' => 'callamir_sanitize_dimension',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_mobile_item_radius', [
+        'label' => __('Mobile Menu Item Radius', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Rounded corners for mobile links.', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_mobile_gap', [
+        'default' => '6px',
+        'sanitize_callback' => 'callamir_sanitize_css_value',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control('nav_mobile_gap', [
+        'label' => __('Mobile Menu Item Gap', 'callamir'),
+        'section' => 'callamir_navigation_style',
+        'type' => 'text',
+        'description' => __('Spacing between mobile navigation links.', 'callamir'),
+    ]);
+
+    $wp_customize->add_setting('nav_mobile_text_color', [
+        'default' => '#f9fafb',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'nav_mobile_text_color', [
+        'label' => __('Mobile Menu Text Color', 'callamir'),
+        'section' => 'callamir_navigation_style',
+    ]));
+
+    $wp_customize->add_setting('nav_mobile_hover_color', [
+        'default' => '#ffd700',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport' => 'postMessage',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'nav_mobile_hover_color', [
+        'label' => __('Mobile Menu Hover Color', 'callamir'),
+        'section' => 'callamir_navigation_style',
+    ]));
     $wp_customize->add_setting('header_justify_content', [
         'default' => 'space-between',
         'sanitize_callback' => 'callamir_sanitize_select',
